@@ -1,0 +1,56 @@
+# macOS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.AppleDouble
+.LSStore
+.Trashes
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*~
+
+# PHP / Composer
+/vendor/
+composer.phar
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# Build artifacts
+apk/
+*.apk
+
+# CodeIgniter caches and logs
+/application/cache/
+/application/logs/
+cache/
+logs/
+
+# Sensitive files and environment
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.secret
+*.enc
+
+# Firebase service account keys
+*firebase-adminsdk*.json
+myvegiz-a3615-firebase-adminsdk*.json
+uploads/*firebase-adminsdk*.json
+
+# Misc
+coverage/
+phpunit.xml
+phpunit.xml.dist
+

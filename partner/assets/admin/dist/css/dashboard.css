@@ -1,0 +1,74 @@
+
+.grid 
+	{
+     display:flex;
+    margin: 0;
+    padding:10px;
+    list-style: none;
+    text-align: center;
+}
+
+.remove
+{
+	margin-left:-20px;
+}
+
+.grid-style
+{
+margin-left:20px;
+}
+
+.grid-item {
+
+  padding: 30px; 
+ text-align: center;
+}
+
+.uk-icon {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    font: inherit;
+    color: inherit;
+    text-transform: none;
+    padding: 0;
+    background-color: transparent;
+    display: inline-block;
+    fill: currentcolor;
+    line-height: 0;
+}
+
+	.uk-border-rounded {
+    border-radius: 5px;
+     }
+	 
+	 .uk-icon-forder {
+    box-sizing: border-box;
+    border: 1px solid #fff;
+    width: 60px;
+    height: 60px;
+    vertical-align: middle;
+    display: -ms-inline-flexbox;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+.uk-light a, .uk-section-primary:not(.uk-preserve-color) a, .uk-section-secondary:not(.uk-preserve-color) a, .uk-tile-primary:not(.uk-preserve-color) a, .uk-tile-secondary:not(.uk-preserve-color) a, .uk-card-primary.uk-card-body a, .uk-card-primary > :not([class*='uk-card-media']) a, .uk-card-secondary.uk-card-body a, .uk-card-secondary > :not([class*='uk-card-media']) a, .uk-overlay-primary a, .uk-offcanvas-bar a, .uk-light .uk-link, .uk-section-primary:not(.uk-preserve-color) .uk-link, .uk-section-secondary:not(.uk-preserve-color) .uk-link, .uk-tile-primary:not(.uk-preserve-color) .uk-link, .uk-tile-secondary:not(.uk-preserve-color) .uk-link, .uk-card-primary.uk-card-body .uk-link, .uk-card-primary > :not([class*='uk-card-media']) .uk-link, .uk-card-secondary.uk-card-body .uk-link, .uk-card-secondary > :not([class*='uk-card-media']) .uk-link, .uk-overlay-primary .uk-link, .uk-offcanvas-bar .uk-link {
+    color: #fff;
+}
+	.uk-icon [stroke*='#']:not(.uk-preserve), .uk-icon [STROKE*='#']:not(.uk-preserve) {
+    stroke: currentcolor;
+}
+
+.uk-card-box p {
+    font-size: 1.1rem;
+    font-weight: 300;
+	margin-top: 20px;
+}
+	

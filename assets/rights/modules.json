@@ -1,0 +1,186 @@
+{
+  "Dashboard": {
+    "type": 0,
+    "menus": {}
+  },
+  "Configuration": {
+    "type": 1,
+    "menus": {
+      "Unit List": {
+        "isActive": 1
+      },
+	  "Sub Unit List": {
+        "isActive": 1
+      },
+      "Currency List": {
+        "isActive": 1
+      },
+      "City List": {
+        "isActive": 1
+      },
+      "Address List": {
+        "isActive": 1
+      },
+      "Company Info": {
+        "isActive": 1
+      },
+      "Tag List": {
+        "isActive": 1
+      },
+      "Delivery Charges Slot List": {
+        "isActive": 1
+      },
+	  "Delivery Charges Slot List": {
+        "isActive": 1
+      },	  
+      "Settings": {
+        "isActive": 1
+      }
+    }
+  },
+  "Main Category": {
+    "type": 0,
+    "menus": {}
+  },
+  "Home Slider": {
+    "type": 0,
+    "menus": {}
+  },
+  "Android Users": {
+    "type": 0,
+    "menus": {}
+  },
+  "Reset Password": {
+    "type": 1,
+    "menus": {
+      "Delivery Boy": {
+        "isActive": 1
+      }
+    }
+  },
+  "Food/Restaurants": {
+    "type": 2,
+    "menus": {
+	  "Configuration":{
+		 "Entity Category": {
+			"isActive": 1
+		 },
+	     "Menu Category": {
+			"isActive": 1
+		 },
+		 "Menu Sub Category": {
+			"isActive": 1
+		 },
+		 "Food Slider": {
+			"isActive": 1
+		 },
+		 "Cuisine": {
+			"isActive": 1
+		 },
+		 "Vendor": {
+			"isActive": 1
+		 },
+		 "Vendor Items": {
+			"isActive": 1
+		 },
+		 "Vendor Coupons": {
+			"isActive": 1
+		 },
+		 "Vendor Configuration": {
+			"isActive": 1
+		 }
+	  },
+      "Food Order": {
+        "isActive": 1
+      },
+      "User Cancel / Reject Order": {
+        "isActive": 1
+      }
+    }
+  },
+  "Vegetable": {
+    "type": 1,
+    "menus": {
+      "Product Category List": {
+        "isActive": 1
+      },
+      "Product Subcategory List": {
+        "isActive": 1
+      },
+      "Product List": {
+        "isActive": 1
+      },
+      "Slider List": {
+        "isActive": 1
+      }
+    }
+  },
+  "Grocery": {
+    "type": 1,
+    "menus": {
+      "Grocery Category List": {
+        "isActive": 1
+      },
+      "Grocery Subcategory List": {
+        "isActive": 1
+      },
+      "Grocery Product List": {
+        "isActive": 1
+      },
+      "Grocery Slider List": {
+        "isActive": 1
+      }
+    }
+  },
+  "Vegetable/Grocery Orders": {
+    "type": 1,
+    "menus": {
+      "Pending List": {
+        "isActive": 1
+      },
+      "Placed List": {
+        "isActive": 1
+      },
+      "Service Unavailable List": {
+        "isActive": 1
+      }
+    }
+  },
+  "Push Notification": {
+    "type": 0,
+    "menus": {}
+  },
+  "Push Customer Notification": {
+    "type": 0,
+    "menus": {}
+  },
+  "Other": {
+    "type": 1,
+    "menus": {
+      "Vegetable Offers": {
+        "isActive": 1
+      },
+      "Order Reports": {
+        "isActive": 1
+      },
+      "Delivery Boy Penalty Report": {
+        "isActive": 1
+      },
+      "Vendor Penalty Report": {
+        "isActive": 1
+      },
+      "Delivery Boy Commission": {
+        "isActive": 1
+      },
+      "Vendor Order Commission": {
+        "isActive": 1
+      },
+      "Vendor Payment": {
+        "isActive": 1
+      },
+      "App Alert": {
+        "isActive": 1
+      }
+    }
+  }
+}

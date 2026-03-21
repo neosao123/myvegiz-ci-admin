@@ -1,0 +1,4 @@
+User-agent:*
+Disalow:/wp-admin/
+Sitemap:https://myvegiz.com/sitemap.xml
+Sitemap:https://myvegiz.com/?sitemap.xml

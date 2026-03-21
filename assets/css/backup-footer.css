@@ -1,0 +1,106 @@
+<div class="">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="">
+					
+				</div>
+			</div><!-- col-lg -->
+		</div><!-- row -->
+	</div><!-- container -->
+</div><!-- about-us -->
+
+
+<div class="main-footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+				<div class="ftr-1">					
+					<h4>About Dating</h4>
+					<p>Here you can put your customized short information, Great!</p>
+					<p><i class="fa fa-envelope"></i><a href="">yourname@youremail.com</a></p>
+					<p><i class="fa fa-phone"></i><a href="tel:0123568456">+91-0123568456</a></p>					
+					<div class="social">
+						<h4>Stay in touch</h4>
+						<ul>
+							<li><a href=""><i class="fa fa-facebook"></i>Face Book</a></li>
+							<li><a href=""><i class="fa fa-twitter"></i>Twitter</a></li>
+							<li><a href=""><i class="fa fa-instagram"></i>Instagram</a></li>
+							<li><a href=""><i class="fa fa-linkedin"></i>Linkedin</a></li>
+						</ul>
+					</div>
+				</div>
+			</div><!-- col-lg -->
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+				<div class="ftr-2">
+					<h4>Latest Tweets</h4>
+					<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard 	</p>
+					<a href="">https://t.co/cN19bMUQ5a</a><br>
+					<label>1 March</label>
+				</div>
+				<div class="ftr-2">					
+					<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard 	</p>
+					<a href="">https://t.co/cN19bMUQ5a</a><br>
+					<label>27 feb</label>
+				</div>
+				
+			</div><!-- col-lg -->
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+				<div class="ftr-3">
+					<h4> Latest from Blog </h4>
+					<div class="blog-1">
+					<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard 	<a href="">Read More</a></p>	
+					</div>
+					<div class="blog-1">
+					<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard 	<a href="">Read More</a></p>	
+					</div>
+					<div class="blog-1">
+					<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard 	<a href="">Read More</a></p>	
+					</div>
+				</div>
+			</div><!-- col-lg -->
+		</div><!-- row -->
+	</div><!-- container -->
+</div><!-- main-footer -->
+
+
+<!-- footer css -->
+/*main-footer*/
+.main-footer{padding: 100px 0; background: url(../images/footer-bg.jpg) center bottom 100% fixed; background-position-y:-100px; position: relative;}
+.main-footer:before{content: ''; background: rgb(0 0 0 / 75%); position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+.ftr-1 img{width: 100%; max-width: 120px;}
+.ftr-1 p{color: #969494;font-family: Muli,sans-serif; font-weight: 600;font-size: 12px; padding: 0 30px 0 0; margin: 30px auto 0px;}
+.main-footer h4{color: #cac2c2;font-family: "Cormorant Garamond"; font-weight: 600;font-size: 24px;
+    padding: 0 0 0 22px; margin: 0 auto 30px; position: relative;}
+.main-footer h4:before{position: absolute; content: '\f004'; left: 0; color: #f69850; top: 5px; font-family: fontAwesome; font-size: 15px;}
+.ftr-1 p .fa{font-size: 15px;  color: #f69850; margin: 0 10px 0 0 ;}
+.ftr-1 p a{color: #969494; transition: 0.5s; text-decoration: none;}
+.ftr-1 p a:hover{color: #f69850;}
+/*.social*/
+.social{margin: 20px auto 0; padding: 0; }
+.social h4{color: #cac2c2;font-family: "Cormorant Garamond"; font-weight: 600;font-size: 24px;
+    padding: 0 0 0 22px; margin: 0 auto 10px; position: relative;}
+.social h4:before{position: absolute; content: '\f0ac'; left: 0; color: #f69850; top: 5px; font-family: fontAwesome; font-size: 15px;}
+.social ul{padding: 0; margin: 0; }
+.social li{padding: 0; margin: 0; list-style-type: none; }
+.social li a .fa{margin: 0 10px 0 0; color:#f69850; }
+.social li a{color: #969494; transition: 0.5s; text-decoration: none;}
+.social li a:hover{color: #f69850;}
+/*ftr-2*/
+.ftr-2 ul{}
+.ftr-2 h4{color: #cac2c2;font-family: "Cormorant Garamond"; font-weight: 600;font-size: 24px;
+    padding: 0 0 0 22px; margin: 0 auto 30px; position: relative;}
+.ftr-2 h4:before{position: absolute; content: '\f099'; left: 0; color: #f69850; top: 5px; font-family: fontAwesome; font-size: 15px;}
+.ftr-2 p{color: #969494;font-family: Muli,sans-serif; font-weight: 600;font-size: 12px; padding: 0 30px 0 0; margin: 30px auto 0px;}
+.ftr-2 a{color: #f69850; transition: 0.5s; text-decoration: none;}
+.ftr-2 a:hover{color: #d29e76;}
+.ftr-2 label{color: #f69850;font-size: 12px; background: #464343; padding: 2px 5px; border-radius: 2px;}
+/*.ftr-3*/
+.ftr-3 h4{color: #cac2c2;font-family: "Cormorant Garamond"; font-weight: 600;font-size: 24px;
+    padding: 0 0 0 22px; margin: 0 auto 30px; position: relative;}
+.ftr-3 h4:before{position: absolute; content: '\f09e'; left: 0; color: #f69850; top: 5px; font-family: fontAwesome; font-size: 15px;}
+.ftr-3 p{position: relative; color: #969494; font-family: Muli,sans-serif; font-weight: 600;font-size: 12px; padding: 0 0px 0 68px; margin: 30px auto 0px;}
+.ftr-3 p:before{position: absolute; content: ''; left: 0; top: 0; background: url(../images/blog-1.jpg); width: 55px; height: 55px; border-radius: 50%;}
+.ftr-3 a{color: #f69850; transition: 0.5s; text-decoration: none;}
+.ftr-3 a:hover{color: #d29e76;}
+

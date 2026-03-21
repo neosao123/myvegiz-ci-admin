@@ -48,6 +48,8 @@ logs/
 *firebase-adminsdk*.json
 myvegiz-a3615-firebase-adminsdk*.json
 uploads/*firebase-adminsdk*.json
+uploads/*.*
+partner/uploads/*.*
 
 # Misc
 coverage/

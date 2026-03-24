@@ -301,7 +301,7 @@
 				"searching": false,
 				"ajax":{  
 					url: base_path+"Order/getPlacedOrders",  
-					type:"GET",
+					type:"POST",
 					data:{	
 						'placeList':'1',
 						'cityCode':cityCode,

@@ -41,11 +41,11 @@ class Groceryproduct extends CI_Controller
 
 	public function getGroceryProductList()
 	{
-		$productCode = $this->input->get('productCode');
-		$search = $this->input->GET("search")['value'];
-		$productCategory = $this->input->get('categoryCode');
-		$startDate = $this->input->get('startDate');
-		$endDate = $this->input->get('endDate');
+		$productCode = $this->input->post('productCode');
+		$search = $this->input->post("search")['value'];
+		$productCategory = $this->input->post('categoryCode');
+		$startDate = $this->input->post('startDate');
+		$endDate = $this->input->post('endDate');
 		if ($startDate != '') {
 			$startDate = date('Y-m-d', strtotime($startDate));
 			$endDate = date('Y-m-d', strtotime($endDate));
@@ -59,8 +59,8 @@ class Groceryproduct extends CI_Controller
 		$joinType = array('categorymaster' => 'inner', 'subcategorymaster' => 'left');
 		$join = array('categorymaster' => 'categorymaster.categorySName=productmaster.productCategory', 'subcategorymaster' => 'subcategorymaster.code=productmaster.subcategoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length");
+		$offset = $this->input->post("start");
 		$extraCondition = " productmaster.isDelete=0 OR productmaster.isDelete IS NULL";
 		if ($startDate != "") {
 			$extraCondition = "productmaster.addDate between '" . $startDate . "' AND '" . $endDate . "' and (productmaster.isDelete = 0 OR productmaster.isDelete IS NULL)";

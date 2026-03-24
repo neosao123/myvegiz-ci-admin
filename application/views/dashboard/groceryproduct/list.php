@@ -233,7 +233,8 @@
 							'storageCode':p_keyStorageCode,
 							'categoryCode':p_keyCategoryCode
 						},						
-						type:"GET" ,  
+						type:"POST"
+				   },  
 				   //model views
 				   "complete": function(json) { 
 					    //console.log(json);

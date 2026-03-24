@@ -295,12 +295,12 @@ class Order extends CI_Controller
 
 	public function getOrderList()
 	{
-		$orderCode = $this->input->get('orderCode');
-		$cityCode = $this->input->get('cityCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$areaCode = $this->input->get('areaCode');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
+		$orderCode = $this->input->post('orderCode');
+		$cityCode = $this->input->post('cityCode');
+		$orderStatus = $this->input->post('orderStatus');
+		$areaCode = $this->input->post('areaCode');
+		$fromDate = $this->input->post('fromDate');
+		$toDate = $this->input->post('toDate');
 
 		$tables = 'ordermaster';
 		$orderColumns = "ordermaster.*,ordermaster.code as orderCode,clientmaster.name,citymaster.cityName,clientprofile.pincode,customaddressmaster.place";
@@ -311,8 +311,8 @@ class Order extends CI_Controller
 		$joinType = array('citymaster' => 'left', 'clientmaster' => 'inner', 'clientprofile' => 'inner', 'customaddressmaster' => "left");
 		$join = array('citymaster' => 'ordermaster.cityCode=citymaster.code', 'customaddressmaster' => 'customaddressmaster.code = ordermaster.areaCode', 'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode', 'clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode'); //'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode','clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode','customaddressmaster'=>'customaddressmaster.code = ordermaster.areaCode'
 		$like = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length");
+		$offset = $this->input->post("start");
 		$groupByColumn = array("ordermaster.code");
 		$dateCondition = "";
 		if ($fromDate != "" && $toDate != "") {
@@ -473,7 +473,7 @@ class Order extends CI_Controller
 			$totalData = $this->GlobalModel->selectQuery("IFNULL(SUM(ordermaster.totalPrice),0)as total", $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result();
 			$total = $totalData[0]->total;
 		}
-		$output = array("qResult" => $qResult, "draw" => intval($this->input->GET("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
+		$output = array("qResult" => $qResult, "draw" => intval($this->input->post("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
 		echo json_encode($output);
 	}
 

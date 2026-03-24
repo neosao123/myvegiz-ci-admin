@@ -202,7 +202,7 @@
 				"paging": true,
 				"ajax": {
 					url: base_path + "Order/getOrderList",
-					type: "GET",
+					type: "POST",
 					data: {
 						'call': 'call from pending',
 						'cityCode': cityCode,

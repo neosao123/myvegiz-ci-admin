@@ -254,7 +254,7 @@
                         'toDate': p_kToDate,
                         'orderType': 'food'
                     },
-                    type: "GET",
+                    type: "POST",
                     complete: function(json) {
                         //console.log(json);
 					

@@ -37,19 +37,19 @@ class Offer extends CI_Controller {
 	
 	public function getOfferList() {	
 		$tableName="offers";
-		$cityCode = $this->input->get('cityCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$orderColumns = array("offers.*,citymaster.cityName");
 		$condition=array('offers.isDelete !='=>1,"offers.cityCode"=>$cityCode);
 		$orderBy = array('offers' . '.id' => 'desc');
 		$joinType=array('citymaster'=>'left');
 		$join = array('citymaster'=>'offers.cityCode=citymaster.code');
 		$groupByColumn=array();
-		$limit=$this->input->GET("length");
-		$offset=$this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition="";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns,$tableName,$condition,$orderBy,$join,$joinType,$like,$limit,$offset,$groupByColumn,$extraCondition);
-		$srno=$_GET['start']+1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		if($Records){
 			foreach($Records->result() as $row)
 			{
@@ -109,7 +109,7 @@ class Offer extends CI_Controller {
 			}
 			$dataCount=sizeof($this->GlobalModel->selectQuery($orderColumns,$tableName,$condition,$orderBy,$join,$joinType,array(),'','','',$extraCondition)->result());
 				$output = array(
-								"draw"			  =>     intval($_GET["draw"]),
+								"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 								"recordsTotal"    =>      $dataCount,
 								"recordsFiltered" =>     $dataCount,
 								"data"            =>     $data
@@ -119,7 +119,7 @@ class Offer extends CI_Controller {
 			$dataCount=0;
 			$data =array();
 			$output = array(
-							"draw"			  =>     intval($_GET["draw"]),
+							"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 							"recordsTotal"    =>     $dataCount,
 							"recordsFiltered" =>     $dataCount,
 							"data"            =>     $data
@@ -582,7 +582,7 @@ class Offer extends CI_Controller {
 	}
 	
 	public function view(){
-		$code = $this->input->GET	('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		$data['offerdata'] = $this->GlobalModel->selectDataById($code,'offers');
 		$cityCode = $data['offerdata']->result()[0]->cityCode;
 		$data['city'] = "";

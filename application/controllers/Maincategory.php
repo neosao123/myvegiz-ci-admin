@@ -40,7 +40,7 @@ class Maincategory extends CI_Controller {
 		
 		$Records = $this->GlobalModel1->make_datatables($tables,$requiredColumns,$conditions,$extraConditionColumnNames,$extraConditions);
 		// print_r($Records->result());
-		$srno=$_GET['start']+1;
+		$srno = ($this->input->post('start') ?? $this->input->get('start') ?? 0) + 1;
 		$data=array();
 		foreach($Records->result() as $row) 
 		{
@@ -95,7 +95,7 @@ class Maincategory extends CI_Controller {
 		}
 		$dataCount=$this->GlobalModel1->get_all_data($tables,$requiredColumns,$conditions,$extraConditionColumnNames,$extraConditions);
 		$output = array( 
-		"draw"                    =>     intval($_GET["draw"]),  
+		"draw"                    =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),  
 		"recordsTotal"          =>      $dataCount,  
 		"recordsFiltered"     =>     $dataCount,  
 		"data"                    =>     $data  

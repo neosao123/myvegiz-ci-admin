@@ -45,19 +45,19 @@ class Menucategory extends CI_Controller
 	public function getMenuCategoryList()
 	{
 		$tableName = "menucategory";
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$orderColumns = array("menucategory.*");
 		$condition = array();
 		$orderBy = array('menucategory' . '.id' => 'DESC');
 		$joinType = array();
 		$join = array();
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (menucategory.isDelete=0 OR menucategory.isDelete IS NULL)";
 		$like = array("menucategory.menuCategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$code = $row->code;
@@ -89,7 +89,7 @@ class Menucategory extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal"    =>      $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data
@@ -99,7 +99,7 @@ class Menucategory extends CI_Controller
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal"    =>     $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data

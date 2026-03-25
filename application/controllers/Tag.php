@@ -23,7 +23,7 @@ class Tag extends CI_Controller {
     
    
     public function getTagList() {
-		$search = strtolower($this->input->GET("search") ['value']);
+		$search = strtolower(($this->input->post("search") ?? $this->input->get("search")) ['value']);
 		$activeKey = "";
 		if ($search == "active"){
             $activeKey = "1";
@@ -39,8 +39,8 @@ class Tag extends CI_Controller {
         $join = array();
         $joinType = array();
         $groupBy = array();
-        $limit = $this->input->GET("length"); 
-        $offset = $this->input->GET("start");
+        $limit = $this->input->post("length") ?? $this->input->get("length"); 
+        $offset = $this->input->post("start") ?? $this->input->get("start");
         $like = array("tagmaster.code" => $search . "~both", "tagmaster.tagTitle" => $search . "~both", "tagmaster.tagColor" => $search . "~both");
         $extraCondition=" (tagmaster.isDelete=0 or tagmaster.isDelete is null)";
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy, $extraCondition);
@@ -72,7 +72,7 @@ class Tag extends CI_Controller {
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, "", "", $groupBy, $extraCondition)->result());
 		}
         $output = array(
-			"draw" => intval($_GET["draw"]), 
+			"draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), 
 			"recordsTotal" => $dataCount, 
 			"recordsFiltered" => $dataCount, 
 			"data" => $data,
@@ -165,7 +165,7 @@ class Tag extends CI_Controller {
         echo $this->GlobalModel->delete($code, 'tagmaster');
     }
     public function view() {
-        $code = $this->input->get('code');
+        $code = $this->input->post('code') ?? $this->input->get('code');
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
         $userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
         $userName = $this->session->userdata['logged_in' . $this->session_key]['username'];

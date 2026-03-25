@@ -78,7 +78,7 @@ $( document ).ready(function() {
 		$('#error_message').html('');
 		$.ajax({
 			url: base_path+"Food/MenuSubcategory/add",  
-			method:"GET",
+			method:"POST",
 			datatype:"text",
 			success: function(data)
 			{
@@ -161,7 +161,7 @@ $( document ).ready(function() {
 			"searching": true,
 			"ajax":{  
 				url: base_path+"Food/MenuSubcategory/getMenuSubCategoryList",  
-				type:"GET",  
+				type:"POST",  
 				"complete": function(response) {
 					
 					$(".edit").click(function(){

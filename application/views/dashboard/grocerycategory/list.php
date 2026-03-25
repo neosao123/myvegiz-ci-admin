@@ -87,13 +87,13 @@ $( document ).ready(function() {
 	   "searching": true,
 	   "ajax":{  
 			url: base_path+"Grocerycategory/getGrocerycategoryList",  
-			type:"GET",  
+			type:"POST",  
 	 "complete": function(response) {
 		$(".blue").click(function(){
 			 var code=$(this).data('seq');
 			 $.ajax({
 					url: base_path+"Grocerycategory/view",  
-					method:"GET",
+					method:"POST",
 					data:{code:code},
 					datatype:"text",
 					success: function(data)

@@ -164,7 +164,7 @@
 				"searching": false,
 				"ajax": {
 					url: base_path + "Couponoffer/getOfferList",
-					type: "GET",
+					type: "POST",
 					data: {
 						'call': 'call from pending',
 						'placeList': 0,

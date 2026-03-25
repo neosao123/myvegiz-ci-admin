@@ -37,12 +37,12 @@ class FoodOrderList extends CI_Controller
 
 	public function getOrderList()
 	{
-		$startDate = $this->input->get('startDate');
-		$endDate = $this->input->get('endDate');		
-		$vendorCode = $this->input->get('vendorCode');
-		$deliveryboyCode = $this->input->get('deliveryboyCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$orderCode = $this->input->get('orderCode');
+		$startDate = $this->input->post('startDate') ?? $this->input->get('startDate');
+		$endDate = $this->input->post('endDate') ?? $this->input->get('endDate');		
+		$vendorCode = $this->input->post('vendorCode') ?? $this->input->get('vendorCode');
+		$deliveryboyCode = $this->input->post('deliveryboyCode') ?? $this->input->get('deliveryboyCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
 		if ($orderStatus == "") {
 			//$orderStatus = "PND";
 		}
@@ -66,15 +66,15 @@ class FoodOrderList extends CI_Controller
 		}
 		$orderBy = array('vendorordermaster' . '.id' => 'DESC');
 		$groupByColumn = array("vendorordermaster.code");
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = "vendorordermaster.orderStatus NOT IN ('CAN','REL','RJT') AND (vendorordermaster.isDelete=0 OR vendorordermaster.isDelete IS NULL)" . $datw;
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		//echo $this->db->last_query();
 		// exit; 
 		$data = array();
-		$srno = $_GET['start'] + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$statusTime = $row->addDate;
@@ -175,7 +175,7 @@ class FoodOrderList extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal"    =>      $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data,
@@ -186,7 +186,7 @@ class FoodOrderList extends CI_Controller
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal"    =>     $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data,
@@ -199,8 +199,8 @@ class FoodOrderList extends CI_Controller
 	public function getOrderDetails()
 	{
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
-		$orderCode = $this->input->get('orderCode');
-		$noPic = $this->input->get('noPic');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+		$noPic = $this->input->post('noPic') ?? $this->input->get('noPic');
 		$tableName = 'vendororderlineentries';
 		$orderColumns = array("vendororderlineentries.*,vendoritemmaster.vendorCode,vendoritemmaster.itemName,vendoritemmaster.salePrice,vendoritemmaster.itemPhoto");
 		$condition = array('vendororderlineentries.orderCode' => $orderCode);
@@ -208,9 +208,9 @@ class FoodOrderList extends CI_Controller
 		$joinType = array('vendoritemmaster' => 'inner');
 		$join = array('vendoritemmaster' => 'vendoritemmaster.code=vendororderlineentries.vendorItemCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
-		$srno = $offset + 1;
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		$addonText = '';
 		$extraCondition = "vendororderlineentries.isActive=1";
 		$like = array();
@@ -263,7 +263,7 @@ class FoodOrderList extends CI_Controller
 		if ($dataCount1) {
 			$dataCount = sizeOf($dataCount1->result());
 		}
-		$output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+		$output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
 		echo json_encode($output);
 	}
 
@@ -280,8 +280,8 @@ class FoodOrderList extends CI_Controller
 		$joinType = array('clientmaster' => 'inner', 'usermaster' => 'left');
 		$join = array('clientmaster' => 'clientmaster.code=vendorordermaster.clientCode', 'usermaster' => 'usermaster.code=vendorordermaster.deliveryBoyCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (vendorordermaster.isDelete=0 OR vendorordermaster.isDelete IS NULL)";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -305,8 +305,8 @@ class FoodOrderList extends CI_Controller
 
 	public function getPendingDeliveryBoys()
 	{
-		$deliveryBoyCode = $this->input->get('deliveryBoyCode');
-		$cityCode = $this->input->get('cityCode');
+		$deliveryBoyCode = $this->input->post('deliveryBoyCode') ?? $this->input->get('deliveryBoyCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$statusType = 'PND';
 		$data = array();
 		$dataCount = 0;
@@ -455,7 +455,7 @@ class FoodOrderList extends CI_Controller
 		$dataCount = 0;
 		$data = array();
 		$cnt = 0;
-		$orderCode = $this->input->get('orderCode');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
 		$orderColumns = "vendororderstatusmaster.statusName,bookorderstatuslineentries.statusPutCode,bookorderstatuslineentries.reason,bookorderstatuslineentries.statusTime";
 		$table = "bookorderstatuslineentries";
 		$condition["bookorderstatuslineentries.orderCode"] = $orderCode;
@@ -497,12 +497,12 @@ class FoodOrderList extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType)->result_array());
 		}
-		$output = array("r" => $ra, "draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+		$output = array("r" => $ra, "draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
 		echo json_encode($output);
 	}
 	public function checkDeliveryBoyOrders()
 	{
-		$orderCode = $this->input->get('code');
+		$orderCode = $this->input->post('code') ?? $this->input->get('code');
 
 
 		$Result = $this->GlobalModel->selectDataByField('code', $orderCode, 'vendorordermaster');

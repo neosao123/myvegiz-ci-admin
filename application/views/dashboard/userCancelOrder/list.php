@@ -234,7 +234,7 @@
 				"searching": false,
 				"ajax":{  
 					url: base_path+"index.php/userCancelOrder/UserCancelOrder/getcancelorderlist",
-					type:"GET" , 
+					type:"POST" , 
 					data:{
 						'call':'call from pending',
 						'placeList':0,

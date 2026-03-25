@@ -24,28 +24,28 @@ class Homeslider extends CI_Controller {
         $this->load->view('dashboard/homeslider/list', $data);
         $this->load->view('dashboard/footer');
     }
-    public function getSliderList() 
+    	public function getSliderList() 
 	{
         $tables = array('homeslider');
         $tableName = 'homeslider';
 		$orderColumns = array("homeslider.*");
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$condition = array();
 		// $condition = array('homeslider.mainCategoryCode'=>'MCAT_1');
 		$orderBy = array('homeslider.id'=>'desc');
 		$joinType=array();
 		$join = array();
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
-		$srno = $offset + 1; 
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1; 
 		$like = array();
 		$extraCondition="(homeslider.isDelete=0 or homeslider.isDelete is null)";
 		$like = array();
 		$data=array();
 		$dataCount = 0;
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
         $data = array();
         $productPhoto = "";
 		if($Records){ 
@@ -74,7 +74,7 @@ class Homeslider extends CI_Controller {
 			 $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result_array());
 		}
        
-        $output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+        $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
         echo json_encode($output);
     }
     public function add() 
@@ -227,7 +227,7 @@ class Homeslider extends CI_Controller {
     }
     public function view() 
 	{
-        $code = $this->input->get('code');
+        $code = $this->input->post('code') ?? $this->input->get('code');
         //Activity Track Starts
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
         $userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];

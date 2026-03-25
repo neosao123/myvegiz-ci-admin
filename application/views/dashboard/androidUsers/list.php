@@ -223,7 +223,7 @@
 							'page':totalRecords,
 							draw:0
 						},
-						type:"GET", 
+						type:"POST", 
 						success: function (result) {
 						},
 						async: false
@@ -248,13 +248,13 @@
 						'emailId':p_keyemailId,	 
 						'isActive':p_keystatus
 						},	
-					type:"GET", 
+					type:"POST", 
 					"complete": function(response) {
 						$(".blue").click(function(){
 							var code=$(this).data('seq');
 							$.ajax({
 								url: base_path+"AndroidUsers/view",  
-								method:"GET",
+								method:"POST",
 								data:{code:code},
 								datatype:"text",
 								success: function(data)

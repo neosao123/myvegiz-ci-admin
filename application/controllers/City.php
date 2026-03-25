@@ -50,14 +50,14 @@ class City extends CI_Controller
     {
         $tableName = 'citymaster';
         $orderColumns = array("citymaster.*");
-        $search = $this->input->GET("search")['value'];
+        $search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
         $condition = array();
         $orderBy = array('citymaster.id' => 'desc');
         $joinType = array();
         $join = array();
         $groupByColumn = array();
-        $limit = $this->input->GET("length");
-        $offset = $this->input->GET("start");
+        $limit = $this->input->post("length") ?? $this->input->get("length");
+        $offset = $this->input->post("start") ?? $this->input->get("start");
         $srno = $offset + 1;
         $like = array();
         $extraCondition = " (citymaster.isDelete=0 or citymaster.isDelete is null)";
@@ -88,7 +88,7 @@ class City extends CI_Controller
             }
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
         }
-        $output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+        $output = array("draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
         echo json_encode($output);
     }
 
@@ -274,7 +274,7 @@ class City extends CI_Controller
     }
     public function view()
     {
-        $code = $this->input->get('code');
+        $code = $this->input->post('code') ?? $this->input->get('code');
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
         $userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
         $userName = $this->session->userdata['logged_in' . $this->session_key]['username'];

@@ -47,19 +47,19 @@ class Grocerycategory extends CI_Controller {
 	public function getGrocerycategoryList()
 	{		
 		$tableName="categorymaster";
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$orderColumns = array("categorymaster.*,maincategorymaster.mainCategoryName");
 		$condition=array('categorymaster.mainCategoryCode'=>'MCAT_2');
 		$orderBy = array('categorymaster' . '.id' => 'DESC');
 		$joinType=array('maincategorymaster'=>'inner');
 		$join = array('maincategorymaster'=>'maincategorymaster.code=categorymaster.mainCategoryCode');
 		$groupByColumn=array();
-		$limit=$this->input->GET("length");
-		$offset=$this->input->GET("start");
+		$limit=$this->input->post("length") ?? $this->input->get("length");
+		$offset=$this->input->post("start") ?? $this->input->get("start");
 		$extraCondition=" categorymaster.isDelete=0 OR categorymaster.isDelete IS NULL";
 		$like = array("categorymaster.categoryName" => $search . "~both","categorymaster.categorySName" => $search . "~both","maincategorymaster.mainCategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns,$tableName,$condition,$orderBy,$join,$joinType,$like,$limit,$offset,$groupByColumn,$extraCondition);
-		$srno=$_GET['start']+1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		if($Records){
 			foreach($Records->result() as $row) 
 			{ 	
@@ -96,7 +96,7 @@ class Grocerycategory extends CI_Controller {
 			} 
 			$dataCount=sizeof($this->GlobalModel->selectQuery($orderColumns,$tableName,$condition,$orderBy,$join,$joinType,array(),'','','',$extraCondition)->result());
 			$output = array( 
-				"draw"			  =>     intval($_GET["draw"]),  
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),  
 				"recordsTotal"    =>      $dataCount,  
 				"recordsFiltered" =>     $dataCount,  
 				"data"            =>     $data  
@@ -106,7 +106,7 @@ class Grocerycategory extends CI_Controller {
 			$dataCount=0;
 			$data =array();
 			$output = array( 
-				"draw"			  =>     intval($_GET["draw"]),  
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),  
 				"recordsTotal"    =>     $dataCount,  
 				"recordsFiltered" =>     $dataCount,  
 				"data"            =>     $data  
@@ -430,7 +430,7 @@ class Grocerycategory extends CI_Controller {
 	
 	public function view()
 	{
-		$code = $this->input->get('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		
 		//Activity Track Starts
 		

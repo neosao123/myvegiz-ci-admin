@@ -106,14 +106,14 @@
 				   "searching": true,
 				   "ajax":{  
 						url: base_path+"Subunit/getSubunitList",  
-						type:"GET" , 
+						type:"POST" , 
 				   
 				    "complete": function(response) {
 					 $(".blue").click(function(){
 									 var code=$(this).data('seq');
 									 $.ajax({
 											url: base_path+"Subunit/view",  
-											method:"GET",
+											method:"POST",
 											data:{code:code},
 											datatype:"text",
 											success: function(data)

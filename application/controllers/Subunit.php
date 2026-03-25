@@ -66,18 +66,18 @@ public function listRecords()
     	// $this->load->view('dashboard/footer');
     	
     // }
-   public function getSubunitList()
+	public function getSubunitList()
 	{
 		$tableName = 'subunit';
 		$orderColumns = array("subunit.*,uommaster.uomName");
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$condition = array();
 		$orderBy = array('subunit.id'=>'desc');
 		$joinType = array('uommaster' => 'inner');
 		$join = array('uommaster' => 'uommaster.code=subunit.uomCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$srno = $offset + 1;
 		$like = array();
 		$extraCondition=" (subunit.isDelete=0 or subunit.isDelete is null)";
@@ -118,7 +118,7 @@ public function listRecords()
             }
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
 		}
-        $output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+        $output = array("draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
         echo json_encode($output);
 	}
      public function save()
@@ -332,7 +332,7 @@ public function listRecords()
          } 
 	public function view()
 	{
-		 $code = $this->input->get('code');
+		 $code = $this->input->post('code') ?? $this->input->get('code');
 		
 			$addID = $this->session->userdata['logged_in'.$this->session_key]['code'];
 			$userRole = $this->session->userdata['logged_in'.$this->session_key]['role'];

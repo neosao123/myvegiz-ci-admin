@@ -154,7 +154,7 @@ input[type=color] {
                 paging: true,
 				"ajax":{  
 					url: base_path+"Tag/getTagList",  
-					type:"GET" , 
+					type:"POST" , 
 				   "complete": function(response) {
 					    $(".edit").click(function(){
 						 var code=$(this).data('seq');
@@ -175,7 +175,7 @@ input[type=color] {
 						 var code=$(this).data('seq');
 						 $.ajax({
 								url: base_path+"Tag/view",  
-								method:"GET",
+								method:"POST",
 								data:{code:code},
 								datatype:"text",
 								success: function(data)

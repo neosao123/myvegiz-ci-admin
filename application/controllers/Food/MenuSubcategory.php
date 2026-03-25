@@ -43,19 +43,19 @@ class MenuSubcategory extends CI_Controller
 	public function getMenuSubCategoryList()
 	{
 		$tableName = "menusubcategory";
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$orderColumns = array("menusubcategory.*,menucategory.menuCategoryName");
 		$condition = array('menucategory.isActive' => 1);
 		$orderBy = array('menusubcategory' . '.id' => 'ASC');
 		$joinType = array('menucategory' => 'inner');
 		$join = array('menucategory' => 'menucategory.code=menusubcategory.menuCategoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (menusubcategory.isDelete=0 OR menusubcategory.isDelete IS NULL)";
 		$like = array("menusubcategory.code" => $search . "~both","menusubcategory.menuSubCategoryName" => $search . "~both","menucategory.menuCategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		$dataCount = 0;
 		$data = array();
 		$query = $this->db->last_query();
@@ -90,7 +90,7 @@ class MenuSubcategory extends CI_Controller
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, '', '', $groupByColumn, $extraCondition)->result());
 		}
 		$output = array(
-			"draw"			  =>     intval($_GET["draw"]),
+			"draw"			  =>     intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
 			"recordsTotal"    =>     $dataCount,
 			"recordsFiltered" =>     $dataCount,
 			"data"            =>     $data,

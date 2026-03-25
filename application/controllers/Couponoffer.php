@@ -47,21 +47,21 @@ class Couponoffer extends CI_Controller
 	public function getOfferList()
 	{
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
-		$coupanCode = $this->input->get('coupanCode');
-		$offerType = $this->input->get('offerType');
-		$discountCode = $this->input->get('discountCode');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
+		$coupanCode = $this->input->post('coupanCode');
+		$offerType = $this->input->post('offerType');
+		$discountCode = $this->input->post('discountCode');
+		$fromDate = $this->input->post('fromDate');
+		$toDate = $this->input->post('toDate');
 
 		$tableName = "vegitableoroffer";
 		$orderColumns = array("vegitableoroffer.*"); 
-		$condition = array('vegitableoroffer.code' => $coupanCode, 'vegitableoroffer.offerType' => $offerType, 'vegitableoroffer.discount' => $discountCode, 'vegitableoroffer.addDate' => $fromDate, 'vegitableoroffer.addDate' => $toDate);
+		$condition = array('vegitableoroffer.code' => $coupanCode, 'vegitableoroffer.offerType' => $offerType, 'vegitableoroffer.discount' => $discountCode);
 		$orderBy = array('vegitableoroffer' . '.id' => 'DESC');
 		$joinType = array();
 		$join = array();
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length");
+		$offset = $this->input->post("start");
 		$dateCondition = "";
 		if ($fromDate != "") {
 			$fromDate = DateTime::createFromFormat('d/m/Y', $fromDate)->format('Y-m-d');
@@ -72,7 +72,7 @@ class Couponoffer extends CI_Controller
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		$r = $this->db->last_query();
-		$srno = $_GET['start'] + 1;
+		$srno = intval($offset) + 1;
 		$dataCount = 0;
 		$data = array();
 		if ($Records) {
@@ -118,7 +118,7 @@ class Couponoffer extends CI_Controller
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, '', '', $groupByColumn, $extraCondition)->result());
 		}
 		$output = array(
-			"draw"			  =>     intval($_GET["draw"]),
+			"draw"			  =>     intval($this->input->post("draw")),
 			"recordsTotal"    =>     $dataCount,
 			"recordsFiltered" =>     $dataCount,
 			"data"            =>     $data,

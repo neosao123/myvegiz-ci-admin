@@ -226,7 +226,7 @@
 						'storageCode': p_keyStorageCode,
 						'categoryCode': p_keyCategoryCode
 					},
-					type: "GET",
+					type: "POST",
 					//model views
 					"complete": function(json) {
 						//console.log(json);
@@ -234,7 +234,7 @@
 							var code = $(this).data('seq');
 							$.ajax({
 								url: base_path + "Product/view",
-								method: "GET",
+								method: "POST",
 								data: {
 									'code': code
 								},

@@ -191,13 +191,13 @@
         						'userName': p_userName,
         						'userRole': p_userRole
         					},
-        					type: "GET",
+        					type: "POST",
         					complete: function(json) {
         						$(".blue").click(function() {
         							var code = $(this).data('seq');
         							$.ajax({
         								url: base_path + "Usermaster/view",
-        								method: "GET",
+        								method: "POST",
         								data: {
         									code: code
         								},

@@ -243,7 +243,7 @@
 									 var code=$(this).data('seq');
 									 $.ajax({
 											url: base_path+"Groceryproduct/view",  
-											method:"GET",
+											method:"POST",
 											data:{'code':code},
 											datatype:"text",
 											success: function(data)

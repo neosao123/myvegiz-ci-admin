@@ -46,11 +46,11 @@ class Product extends CI_Controller
 
 	public function getProductList()
 	{
-		$search = $this->input->GET("search")['value'];
-		$productCode = $this->input->get('productCode');
-		$productCategory = $this->input->get('categoryCode');
-		$startDate = $this->input->get('startDate');
-		$endDate = $this->input->get('endDate');
+		$search = $this->input->post("search")['value'] ?? $this->input->get("search")['value'];
+		$productCode = $this->input->post('productCode') ?? $this->input->get('productCode');
+		$productCategory = $this->input->post('categoryCode') ?? $this->input->get('categoryCode');
+		$startDate = $this->input->post('startDate') ?? $this->input->get('startDate');
+		$endDate = $this->input->post('endDate') ?? $this->input->get('endDate');
 		if ($startDate != '') {
 			$startDate = date('Y-m-d', strtotime($startDate));
 			$endDate = date('Y-m-d', strtotime($endDate));
@@ -64,15 +64,15 @@ class Product extends CI_Controller
 		$joinType = array('categorymaster' => 'inner', 'subcategorymaster' => 'left');
 		$join = array('categorymaster' => 'categorymaster.categorySName=productmaster.productCategory', 'subcategorymaster' => 'subcategorymaster.code=productmaster.subcategoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (productmaster.isDelete=0 OR productmaster.isDelete IS NULL)";
 		if ($startDate != "") {
 			$extraCondition = "productmaster.addDate between '" . $startDate . "' AND '" . $endDate . "' and (productmaster.isDelete = 0 OR productmaster.isDelete IS NULL)";
 		}
 		$like = array("productmaster.productName" => $search . "~both", "categorymaster.categoryName" => $search . "~both", "subcategorymaster.subcategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = intval($offset) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$code = $row->code;
@@ -81,8 +81,8 @@ class Product extends CI_Controller
 				$tblname = 'productphotos';
 				$limit = 1;
 				$condData = array('isDelete' => 0, 'productCode' => $code);
-				$offset = array();
-				$photosData = $this->ApiModel->selectData($tblname, $limit, $offset, $condData);
+				$offsetArr = array();
+				$photosData = $this->ApiModel->selectData($tblname, $limit, $offsetArr, $condData);
 				$start = '<div class="d-flex align-items-center">';
 				$end = ' <h5 class="m-b-0 font-16 font-medium">' . $row->productName . '</h5></div></div>';
 				foreach ($photosData->result() as $ph) {
@@ -133,7 +133,7 @@ class Product extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw")),
 				"recordsTotal"    =>      $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data
@@ -143,7 +143,7 @@ class Product extends CI_Controller
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw")),
 				"recordsTotal"    =>     $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data
@@ -771,7 +771,7 @@ class Product extends CI_Controller
 
 	public function view()
 	{
-		$code = $this->input->get('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		//Activity Track Starts		
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
 		$userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
@@ -798,8 +798,8 @@ class Product extends CI_Controller
 		$joinType = array('categorymaster' => "inner", "subcategorymaster" => "left");
 		$join = array("categorymaster" => "categorymaster.categorySName = productmaster.productCategory", "subcategorymaster" => "subcategorymaster.code=productmaster.subCategoryCode");
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = "";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);

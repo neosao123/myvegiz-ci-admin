@@ -43,12 +43,12 @@ class UserCancelOrder extends CI_Controller
 	
 	public function getcancelorderlist()
 	{ 
-	   $startDate = $this->input->get('fromDate');
-		$endDate = $this->input->get('toDate');
-		$vendorCode = $this->input->get('vendorCode');
-		$deliveryboyCode = $this->input->get('deliveryboyCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$orderCode = $this->input->get('orderCode');
+	   $startDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$endDate = $this->input->post('toDate') ?? $this->input->get('toDate');
+		$vendorCode = $this->input->post('vendorCode') ?? $this->input->get('vendorCode');
+		$deliveryboyCode = $this->input->post('deliveryboyCode') ?? $this->input->get('deliveryboyCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
 		if ($orderStatus == "") {
 			//$orderStatus = "PND";
 		}
@@ -72,8 +72,8 @@ class UserCancelOrder extends CI_Controller
 		}
 		$orderBy = array('vendorordermaster' . '.id' => 'DESC');
 		$groupByColumn = array("vendorordermaster.code");
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = "`vendorordermaster`.`orderStatus` = 'CAN' OR `vendorordermaster`.`orderStatus` = 'RJT' AND (vendorordermaster.isDelete=0 OR vendorordermaster.isDelete IS NULL)".$datw;	 
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -82,7 +82,7 @@ class UserCancelOrder extends CI_Controller
 		//exit; 
 		
 		$data = array();
-		$srno = $_GET['start'] + 1;
+		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) { 
 				$statusTime = $row->addDate;
@@ -174,7 +174,7 @@ class UserCancelOrder extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal"    =>      $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data,
@@ -185,7 +185,7 @@ class UserCancelOrder extends CI_Controller
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
 				"recordsTotal"    =>     $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data,
@@ -203,16 +203,16 @@ class UserCancelOrder extends CI_Controller
         $tables = array('ordermaster', 'clientmaster');
         $requiredColumns = array(array('code', 'clientCode', 'paymentref', 'paymentmode', 'paymentStatus', 'orderStatus', 'areaCode', 'address', 'phone', 'totalPrice', 'isActive', 'addDate', 'placedTime', 'shippedTime', 'deliveredTime', 'shippingCharges'), array('name'));
         $conditions = array(array('clientCode', 'code'));
-        $placeList = $this->input->get('placeList');
-        $call = $this->input->get('call');
-        $pincode = $this->input->get('pincode');
-        $orderCode = $this->input->get('orderCode');
-        $orderStatus = $this->input->get('orderStatus');
-        $fromDate = $this->input->get('fromDate');
-        $toDate = $this->input->get('toDate');
-        $areaCode = $this->input->get('areaCode');
-        $deliveryCode = $this->input->get('deliveryCode');
-		$cityCode = $this->input->get('cityCode');
+        $placeList = $this->input->post('placeList') ?? $this->input->get('placeList');
+        $call = $this->input->post('call') ?? $this->input->get('call');
+        $pincode = $this->input->post('pincode') ?? $this->input->get('pincode');
+        $orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+        $orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+        $fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+        $toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
+        $areaCode = $this->input->post('areaCode') ?? $this->input->get('areaCode');
+        $deliveryCode = $this->input->post('deliveryCode') ?? $this->input->get('deliveryCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
         $extraCondition = "";
         $whereConditionArray = array();
         $extraConditionColumnNames = array();
@@ -430,8 +430,8 @@ class UserCancelOrder extends CI_Controller
         $join = array('citymaster' => 'citymaster.code=ordermaster.cityCode','customaddressmaster' => 'customaddressmaster.code = ordermaster.areaCode', 'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode', 'clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode'); 
 		//'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode','clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode','customaddressmaster'=>'customaddressmaster.code = ordermaster.areaCode'
         $like = array();
-        $limit = $this->input->GET("length");
-        $offset = $this->input->GET("start");
+        $limit = $this->input->post("length") ?? $this->input->get("length");
+        $offset = $this->input->post("start") ?? $this->input->get("start");
         $groupByColumn = array();
         $Records = $this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
         if ($Records)
@@ -561,13 +561,13 @@ class UserCancelOrder extends CI_Controller
             }
             $dSize = sizeOf($data);
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result_array());
-            $output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dSize, "data" => $data);
+            $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dSize, "data" => $data);
             echo json_encode($output);
         }
         else
         {
             $dataCount = 0;
-            $output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => "");
+            $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => "");
             echo json_encode($output);
         }
     }

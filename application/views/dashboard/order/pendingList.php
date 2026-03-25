@@ -218,7 +218,7 @@
 							var code = $(this).data('seq');
 							$.ajax({
 								url: '<?php echo site_url('Blog/view'); ?>',
-								method: "GET",
+								method: "POST",
 								data: {
 									code: code
 								},
@@ -232,7 +232,7 @@
 							var code = $(this).data('seq');
 							$.ajax({
 								url: base_path+'Order/transfer',
-								method: "GET",
+								method: "POST",
 								data: {
 									code: code
 								},

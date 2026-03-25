@@ -48,22 +48,22 @@ class Subcategory extends CI_Controller
 		$this->load->view('dashboard/subcategory/edit', $data);
 		$this->load->view('dashboard/footer');
 	}
-		public function getsubcategoryList()
+	public function getsubcategoryList()
 	{
 		$tableName = "subcategorymaster";
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$orderColumns = array("subcategorymaster.*,categorymaster.categoryName");
 		$condition = array('categorymaster.mainCategoryCode' => 'MCAT_1');
 		$orderBy = array('subcategorymaster' . '.id' => 'DESC');
 		$joinType = array('categorymaster' => 'inner');
 		$join = array('categorymaster' => 'categorymaster.code=subcategorymaster.categoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " subcategorymaster.isDelete=0 OR subcategorymaster.isDelete IS NULL";
 		$like = array("subcategorymaster.subcategoryName" => $search . "~both","categorymaster.categoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$code = $row->code;
@@ -97,7 +97,7 @@ class Subcategory extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
 				"recordsTotal"    =>      $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data
@@ -107,7 +107,7 @@ class Subcategory extends CI_Controller
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
+				"draw"			  =>     intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
 				"recordsTotal"    =>     $dataCount,
 				"recordsFiltered" =>     $dataCount,
 				"data"            =>     $data
@@ -306,7 +306,7 @@ class Subcategory extends CI_Controller
 	}
 	public function view()
 	{
-		$code = $this->input->get('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		//Activity Track Starts
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
 		$userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
@@ -329,8 +329,8 @@ class Subcategory extends CI_Controller
 		$joinType = array('categorymaster' => 'inner');
 		$join = array('categorymaster' => 'categorymaster.code=subcategorymaster.categoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " subcategorymaster.isDelete=0 OR subcategorymaster.isDelete IS NULL";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);

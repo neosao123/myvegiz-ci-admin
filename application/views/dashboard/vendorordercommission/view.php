@@ -96,7 +96,7 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('#datatableCommission_food').DataTable();
+        // $('#datatableCommission_food').DataTable(); // Removed redundant initialization
         var vendorCode = "",addDate = "";
         $('#fromDate ').datepicker({
             dateFormat: "mm/dd/yy",
@@ -168,7 +168,7 @@
                         'toDate': p_kToDate,
                         'orderType': 'food'
                     },
-                    type: "GET",
+                    type: "POST",
                     complete: function(json) {
                         //console.log(json);
                         $('#total').text(json.responseJSON['vendorAmount1']);
@@ -181,7 +181,7 @@
                             //$("#modal-title").html('View Vendor Orders Commission :<br>' + kfromDate + ' To ' + kToDate);
                             $.ajax({
                                 url: base_path + "Vendorordercommission/viewCurrentHistory",
-                                type: "GET",
+                                type: "POST",
                                 data: {
                                     'vendorCode': code,
                                     'fromDate': p_kfromDate,

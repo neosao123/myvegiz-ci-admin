@@ -105,13 +105,13 @@
 				"ajax":{  
 					url: base_path+"index.php/Homeslider/getSliderList",  
 					data:{},
-					type:"GET",  
+					type:"POST",  
 					"complete": function(response) {
 						$(".blue").click(function(){
 							var code=$(this).data('seq');
 							$.ajax({
 								url: base_path+"index.php/Homeslider/view",  
-								method:"GET",
+								method:"POST",
 								data:{code:code},
 								datatype:"text",
 								success: function(data)

@@ -160,7 +160,7 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('#datatableCommission_food').DataTable();
+        // $('#datatableCommission_food').DataTable(); // Removed redundant initialization
         var vendorCode = "",
             addDate = "";
         $('#fromDate ').datepicker({
@@ -264,7 +264,7 @@
 							$("#vendor").val(vendorCode);
                              $.ajax({
                                     url: base_path + "Vendorordercommission/viewUnpaid",
-                                    type: "GET",
+                                    type: "POST",
                                     data: {
                                         vendorCode: vendorCode,
                                         fromDate: p_kfromDate,
@@ -300,7 +300,7 @@
 								}
 								 $.ajax({
 									url: base_path + "Vendorordercommission/viewUnpaid",
-									type: "GET",
+									type: "POST",
 									data: {
 										vendorCode: code,
 										fromDate: fromDate,
@@ -323,9 +323,9 @@
 								$('#responsive-modal').modal('hide');
 								$.ajax({
                                     url: base_path + "Vendorordercommission/paidStatus",
-                                    type: "GET",
+                                    type: "POST",
                                     data: {
-                                        code: code,
+                                        vendorCode: code,
                                         fromDate: fromDate,
                                         toDate: toDate,
                                     },

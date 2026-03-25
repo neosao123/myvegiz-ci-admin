@@ -144,7 +144,7 @@ $( document ).ready(function() {
 			"searching": true,
 			"ajax":{  
 				url: base_path+"Food/Menucategory/getMenuCategoryList",  
-				type:"GET",  
+				type:"POST",  
 				"complete": function(response) {
 					
 					$(".edit").click(function(){

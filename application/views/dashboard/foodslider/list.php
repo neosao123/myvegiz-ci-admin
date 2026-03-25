@@ -60,7 +60,7 @@
 			
 			$.ajax({
 				url: base_path+"Food/Foodslider/add",  
-				method:"GET",
+				method:"POST",
 				datatype:"text",
 				success: function(data)
 				{
@@ -143,7 +143,7 @@
 				"searching": false,
 				"ajax":{  
 					url: base_path+"Food/Foodslider/getSliderList",  
-					type:"GET",  
+					type:"POST",  
 					"complete": function(response) {
 						//edit click
 						$(".edit").click(function(){

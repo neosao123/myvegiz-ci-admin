@@ -222,7 +222,7 @@
 				"searching": false,
 				"ajax":{  
 					url: base_path+"index.php/foodOrderList/FoodOrderList/getOrderList",
-					type:"GET" , 
+					type:"POST" , 
 					data:{
 						'call':'call from pending',						 
 						'placeList':0,
@@ -240,7 +240,7 @@
 							$.ajax({
 								//url:'<?php echo site_url('foodOrderList/FoodOrderList/view'); ?>',
 								url: base_path+"index.php/foodOrderList/FoodOrderList/view",
-								method:"GET",
+								method:"POST",
 								data:{code:code},
 								datatype:"text",
 								success: function(data)

@@ -12,7 +12,7 @@
                         <div class="d-flex align-items-center">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="<?php echo base_url().'index.php/admin/index';?>">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="<?php echo base_url() . 'index.php/admin/index'; ?>">Home</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Grocery Product List</li>
                                 </ol>
                             </nav>
@@ -21,7 +21,7 @@
                     <div class="col-7 align-self-center">
                         <div class="d-flex no-block justify-content-end align-items-center">
                             
-                            <div class=""><a class="btn btn-myve" href="<?php echo base_url().'index.php/Groceryproduct/add';?>">Add Grocery Product</a></div>
+                            <div class=""><a class="btn btn-myve" href="<?php echo base_url() . 'index.php/Groceryproduct/add'; ?>">Add Grocery Product</a></div>
                         </div>
                     </div>
                 </div>
@@ -50,9 +50,11 @@
 				   <span> <label>Product Name :</label> </span>
                     <input type="text"  class="form-control" list="productCodeList" id="productCode" name="productCode" placeholder="Enter Product Name Here ">
 					 <datalist id="productCodeList">
-					  <?php if($productmaster){ foreach($productmaster->result() as $product){
-						echo'<option value="'.$product->code.'">'.$product->productName.'</option>';
-					  } } ?>
+					  <?php if ($productmaster) {
+	foreach ($productmaster->result() as $product) {
+		echo '<option value="' . $product->code . '">' . $product->productName . '</option>';
+	}
+}?>
                     </div>
                </div>
 			   
@@ -61,9 +63,9 @@
 				   <span> <label>Category Name :</label> </span>
                     <select type="text"  class="form-control" id="categoryCode" name="categoryCode" >
 					<option value="">Select Option</option>
-					  <?php foreach($categorymaster->result() as $cat){
-						echo'<option value="'.$cat->categorySName.'">'.$cat->categoryName.'</option>';
-					}?>
+					  <?php foreach ($categorymaster->result() as $cat) {
+	echo '<option value="' . $cat->categorySName . '">' . $cat->categoryName . '</option>';
+}?>
 					</select>
                     </div>
                </div>
@@ -233,9 +235,9 @@
 							'storageCode':p_keyStorageCode,
 							'categoryCode':p_keyCategoryCode
 						},						
-						type:"GET" ,  
-				   //model views
-				   "complete": function(json) { 
+						type:"POST"
+				   },  
+				   "drawCallback": function(settings) { 
 					    //console.log(json);
 									$(".blue").click(function(){
 									 var code=$(this).data('seq');
@@ -311,7 +313,6 @@
 					});
 				});	
               }				
-			 }
 			  });
 		}   
 		   });

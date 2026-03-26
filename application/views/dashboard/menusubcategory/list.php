@@ -6,7 +6,7 @@
 				<div class="d-flex align-items-center">
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="<?php echo base_url().'index.php/admin/index';?>">Home</a></li>
+							<li class="breadcrumb-item"><a href="<?php echo base_url() . 'index.php/admin/index'; ?>">Home</a></li>
 							<li class="breadcrumb-item active" aria-current="page">Menu Sub Category List</li>
 						</ol>
 					</nav>
@@ -78,7 +78,7 @@ $( document ).ready(function() {
 		$('#error_message').html('');
 		$.ajax({
 			url: base_path+"Food/MenuSubcategory/add",  
-			method:"GET",
+			method:"POST",
 			datatype:"text",
 			success: function(data)
 			{
@@ -161,7 +161,7 @@ $( document ).ready(function() {
 			"searching": true,
 			"ajax":{  
 				url: base_path+"Food/MenuSubcategory/getMenuSubCategoryList",  
-				type:"GET",  
+				type:"POST",  
 				"complete": function(response) {
 					
 					$(".edit").click(function(){

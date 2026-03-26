@@ -228,7 +228,7 @@
     		    "searching": false,
                 "ajax":{  
                     url: base_path+"foodOrderList/FoodOrderList/getOrderDetails",  
-                    type:"GET" , 
+                    type:"POST" , 
     				data:{'orderCode':orderCode},
                     "complete": function(response) {
 						
@@ -247,7 +247,7 @@
     		    "searching": false,
                 "ajax":{  
                     url: base_path+"foodOrderList/FoodOrderList/getOrderStatusList",  
-                    type:"GET" , 
+                    type:"POST" , 
     				data:{'orderCode':orderCode},
                     "complete": function(response) {              
     		        }
@@ -261,7 +261,7 @@
 		   var cityCode = $('#cityCode').val();
 			 $.ajax({
 				url:base_path+"foodOrderList/FoodOrderList/getPendingDeliveryBoys",
-				method:"GET",
+				method:"POST",
 				data:{
 					'deliveryBoyCode':deliveryBoyCode,
 					'cityCode':cityCode,
@@ -341,7 +341,7 @@
 		var cityCode = $('#cityCode').val();
 			$.ajax({
 				url:base_path+"foodOrderList/FoodOrderList/getPendingDeliveryBoys",
-				method:"GET",
+				method:"POST",
 				data:{
 					'deliveryBoyCode':deliveryBoyCode,
 					'cityCode':cityCode,
@@ -371,7 +371,7 @@
          
 			$.ajax({
 				url: "<?php echo site_url('foodOrderList/FoodOrderList/checkDeliveryBoyOrders'); ?>",
-				method: "GET",
+				method: "POST",
 				data: {
 					"code": orderCode
 				},

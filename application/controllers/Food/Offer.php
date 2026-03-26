@@ -21,7 +21,7 @@ class Offer extends CI_Controller
 	public function listRecords()
 	{
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
-		$data['vendors'] = $this->GlobalModel->selectQuery('vendor.code,vendor.entityName', 'vendor',array(),array('vendor' . '.entityName' => 'ASC'),array(),array(),array(),'','',array(),'');
+		$data['vendors'] = $this->GlobalModel->selectQuery('vendor.code,vendor.entityName', 'vendor', array(), array('vendor' . '.entityName' => 'ASC'), array(), array(), array(), '', '', array(), '');
 		$data['coupan'] = $this->GlobalModel->selectQuery('vendoroffer.*', 'vendoroffer');
 		$data['offertype'] = $this->GlobalModel->selectQuery('vendoroffer.*', 'vendoroffer');
 		$data['discount'] = $this->GlobalModel->selectQuery('vendoroffer.*', 'vendoroffer');
@@ -31,15 +31,15 @@ class Offer extends CI_Controller
 		$this->load->view('dashboard/footer');
 	}
 
- 
+
 
 	public function edit()
 	{
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
 		$code = $this->uri->segment('4');
-		$join = array("vendor"=>"vendoroffer.vendorCode=vendor.code");
-		$joinType = array("vendor"=>"inner");
-		$data['query'] = $this->GlobalModel->selectQuery('vendoroffer.*,vendor.entityName', 'vendoroffer', array("vendoroffer.code" => $code),array(),$join,$joinType); 
+		$join = array("vendor" => "vendoroffer.vendorCode=vendor.code");
+		$joinType = array("vendor" => "inner");
+		$data['query'] = $this->GlobalModel->selectQuery('vendoroffer.*,vendor.entityName', 'vendoroffer', array("vendoroffer.code" => $code), array(), $join, $joinType);
 		$this->load->view('dashboard/header');
 		$this->load->view('dashboard/vendoroffer/edit', $data);
 		$this->load->view('dashboard/footer');
@@ -48,26 +48,26 @@ class Offer extends CI_Controller
 	public function getOfferList()
 	{
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
-		$coupanCode = $this->input->get('coupanCode');
-		$offerType = $this->input->get('offerType');
-		$discountCode = $this->input->get('discountCode');
-		$vendorCode = $this->input->get('vendorCode'); 
+		$coupanCode = $this->input->post('coupanCode');
+		$offerType = $this->input->post('offerType');
+		$discountCode = $this->input->post('discountCode');
+		$vendorCode = $this->input->post('vendorCode');
 		$tableName = "vendoroffer";
 		$orderColumns = array("vendoroffer.*,vendor.entityName");
-		$condition = array("vendoroffer.vendorCode" => $vendorCode,"vendoroffer.code" => $coupanCode, "vendoroffer.offerType" => $offerType, 'vendoroffer.discount' => $discountCode);
+		$condition = array("vendoroffer.vendorCode" => $vendorCode, "vendoroffer.code" => $coupanCode, "vendoroffer.offerType" => $offerType, 'vendoroffer.discount' => $discountCode);
 		$orderBy = array('vendoroffer' . '.id' => 'DESC');
-		$join = array("vendor"=>"vendoroffer.vendorCode=vendor.code");
-		$joinType = array("vendor"=>"inner");
+		$join = array("vendor" => "vendoroffer.vendorCode=vendor.code");
+		$joinType = array("vendor" => "inner");
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");  
+		$limit = $this->input->post("length");
+		$offset = $this->input->post("start");
 		$extraCondition = " (vendoroffer.isDelete=0 OR vendoroffer.isDelete IS NULL)";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		$r = $this->db->last_query();
 		//echo $r;
 		//exit();
-		$srno = $_GET['start'] + 1;
+		$srno = intval($offset) + 1;
 		$dataCount = 0;
 		$data = array();
 		if ($Records) {
@@ -75,15 +75,17 @@ class Offer extends CI_Controller
 				$code = $row->code;
 				if ($row->isActive == 1) {
 					$status = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$status = "<span class='label label-sm label-warning'>Inactive</span>";
 				}
-                
+
 				if ($row->offerType == 'cap') {
-                    $offerType = 'Per';
-                } else {
-                    $offerType = $row->offerType;
-                }
+					$offerType = 'Per';
+				}
+				else {
+					$offerType = $row->offerType;
+				}
 				$actionHtml = '<div class="btn-group">
 					<button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i class="ti-settings"></i>
@@ -93,19 +95,21 @@ class Offer extends CI_Controller
 						<a class="dropdown-item" href="' . base_url('Food/Offer/edit/' . $row->code) . '"><i class="ti-pencil-alt"></i> Edit</a> 
 					</div>
 				</div>';
-				 
-				if($row->isAdminApproved==1){
+
+				if ($row->isAdminApproved == 1) {
 					$approved = "<span class='label label-sm label-success'>Yes</span>";
-				} else{
+				}
+				else {
 					$approved = "<span class='label label-sm label-danger'>No</span>";
 				}
-				
+
 				if ($row->offerType == 'flat') {
-                    $discount = $row->flatAmount . ' ₹';
-                } else {
-                    $discount = $row->discount . ' %';
-                }
- 
+					$discount = $row->flatAmount . ' ₹';
+				}
+				else {
+					$discount = $row->discount . ' %';
+				}
+
 				$data[] = array(
 					$srno,
 					$row->code,
@@ -123,15 +127,15 @@ class Offer extends CI_Controller
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, '', '', $groupByColumn, $extraCondition)->result());
 		}
 		$output = array(
-			"draw"			  =>     intval($_GET["draw"]),
-			"recordsTotal"    =>     $dataCount,
-			"recordsFiltered" =>     $dataCount,
-			"data"            =>     $data,
-			'r'				  => 	 $r
+			"draw" => intval($this->input->post("draw")),
+			"recordsTotal" => $dataCount,
+			"recordsFiltered" => $dataCount,
+			"data" => $data,
+			'r' => $r
 		);
 		echo json_encode($output);
 	}
- 
+
 
 	public function update()
 	{
@@ -178,29 +182,31 @@ class Offer extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/vendoroffer/edit', $data);
 			$this->load->view('dashboard/footer');
-		} else {
-		     
+		}
+		else {
+
 			$this->form_validation->set_rules('coupanCode', 'coupanCode', 'trim|required');
 			$this->form_validation->set_rules('offerType', 'offerType', 'trim|required');
 			//$this->form_validation->set_rules('discount', 'discount', 'trim|required');
 			$this->form_validation->set_rules('minimumAmount', 'minimumAmount', 'trim|required');
 			$this->form_validation->set_rules('perUserLimit', 'perUserLimit', 'trim|required');
 			$this->form_validation->set_rules('startDate', 'startDate', 'trim|required');
-			$this->form_validation->set_rules('endDate', 'endDate', 'trim|required'); 
+			$this->form_validation->set_rules('endDate', 'endDate', 'trim|required');
 			if ($offerType == "cap") {
-                $this->form_validation->set_rules('discount', 'discount', 'trim|required');
-                $this->form_validation->set_rules('capLimit', 'capLimit', 'trim|required');
-            }
-            if ($offerType == "flat") {
-                $this->form_validation->set_rules('flatAmount', 'flatAmount', 'trim|required');
-            }
+				$this->form_validation->set_rules('discount', 'discount', 'trim|required');
+				$this->form_validation->set_rules('capLimit', 'capLimit', 'trim|required');
+			}
+			if ($offerType == "flat") {
+				$this->form_validation->set_rules('flatAmount', 'flatAmount', 'trim|required');
+			}
 			if ($this->form_validation->run() == FALSE) {
 				$data['error_message'] = '* Fields are Required!';
 				$data['query'] = $this->GlobalModel->selectQuery('vendoroffer.*', 'vendoroffer', array("vendoroffer.code" => $code, "vendoroffer.vendorCode" => $addID));
 				$this->load->view('dashboard/header');
 				$this->load->view('dashboard/vendoroffer/edit', $data);
 				$this->load->view('dashboard/footer');
-			} else { 
+			}
+			else {
 				$data = array(
 					'coupanCode' => $coupanCode,
 					'offerType' => $offerType,
@@ -212,25 +218,26 @@ class Offer extends CI_Controller
 					'editID' => $addID,
 					'editIP' => $ip,
 					'isActive' => trim($this->input->post("isActive")),
-					'isAdminApproved' =>trim($this->input->post("isAdminApproved"))
+					'isAdminApproved' => trim($this->input->post("isAdminApproved"))
 				);
 				if ($offerType == 'cap') {
-                    $data['capLimit'] = trim($this->input->post("capLimit"));
-                    $data['discount'] = trim($this->input->post("discount"));
-                    $data['flatAmount'] = 0;
-                }
-                if ($offerType == 'flat') {
-                    $data['capLimit'] = 0;
-                    $data['discount'] = trim($this->input->post("flatAmount"));
-                    $data['flatAmount'] = trim($this->input->post("flatAmount"));
-                }
+					$data['capLimit'] = trim($this->input->post("capLimit"));
+					$data['discount'] = trim($this->input->post("discount"));
+					$data['flatAmount'] = 0;
+				}
+				if ($offerType == 'flat') {
+					$data['capLimit'] = 0;
+					$data['discount'] = trim($this->input->post("flatAmount"));
+					$data['flatAmount'] = trim($this->input->post("flatAmount"));
+				}
 				$result = $this->GlobalModel->doEdit($data, 'vendoroffer', $code);
 
 				if ($result != 'false') {
 					$response['status'] = true;
 					$response['message'] = "Offer Successfully Updated.";
 					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "Failed To Update Offer";
 				}
@@ -271,7 +278,8 @@ class Offer extends CI_Controller
 		foreach ($Records->result() as $row) {
 			if ($row->isActive == "1") {
 				$activeStatus = '<span class="label label-sm label-success">Active</span>';
-			} else {
+			}
+			else {
 				$activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
 			}
 
@@ -290,18 +298,18 @@ class Offer extends CI_Controller
 								<input type="text" value="' . $row->minimumAmount . '" class="form-control-line"  readonly>
 							</div>';
 			if ($row->offerType == "cap") {
-							$modelHtml .= '<div class="col-md-4 mb-3"><label> <b>Discount (%):</b> </label>
+				$modelHtml .= '<div class="col-md-4 mb-3"><label> <b>Discount (%):</b> </label>
 												<input type="text" class="form-control-line" value="' . $row->discount . '"  readonly>
 											</div> 
 											<div class="col-md-4 mb-3"><label> <b>Cap Limit :</b> </label>
 												<input type="text" class="form-control-line" value="' . $row->capLimit . '"  readonly>
 											</div>';
-						}
-							if ($row->offerType == "flat") {
-							$modelHtml .= '<div class="col-md-4 mb-3"><label> <b>Flat Amount:</b> </label>
+			}
+			if ($row->offerType == "flat") {
+				$modelHtml .= '<div class="col-md-4 mb-3"><label> <b>Flat Amount:</b> </label>
 												<input type="text" class="form-control-line" value="' . $row->flatAmount . '"  readonly>
 											</div>';
-						}
+			}
 			$modelHtml .= '</div>
 						
 						<div class="form-row">
@@ -331,11 +339,12 @@ class Offer extends CI_Controller
 
 			$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 
-			//Activity Track Ends
+		//Activity Track Ends
 		}
 
 		$modelHtml .= '</form>';
 		echo $modelHtml;
 	}
- 
+
+
 }

@@ -6,7 +6,7 @@
 				<div class="d-flex align-items-center">
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="<?php echo base_url().'index.php/admin/index';?>">Home</a></li>
+							<li class="breadcrumb-item"><a href="<?php echo base_url() . 'index.php/admin/index'; ?>">Home</a></li>
 							<li class="breadcrumb-item active" aria-current="page">Main Category List</li>
 						</ol>
 					</nav>
@@ -64,7 +64,7 @@
 				"searching": false,
 				"ajax":{  
 					url: base_path+"Maincategory/getMainCategoryList",  
-					type:"GET",  
+					type:"POST",  
 					"complete": function(response) {
 						//edit click
 						$(".edit").click(function(){

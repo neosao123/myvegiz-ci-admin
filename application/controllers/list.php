@@ -107,7 +107,7 @@
 				   "searching": false,
 				   "ajax":{  
 						url: base_path+"Usermaster/getUserMasterList",  
-						type:"GET",  
+						type:"POST",  
 				   
 				     "complete": function(settings, json) {
 									$(".blue").click(function(){
@@ -115,7 +115,7 @@
 									
 									 $.ajax({
 											url: base_path+"Usermaster/view",  
-											method:"GET",
+											method:"POST",
 											data:{code:code},
 											datatype:"text",
 											success: function(data)

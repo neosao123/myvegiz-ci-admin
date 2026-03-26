@@ -75,14 +75,14 @@ class Order extends CI_Controller
 	public function placedTotal()
 	{
 		$total = 0;
-		$pincode = $this->input->get('pincode');
-		$orderCode = $this->input->get('orderCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
-		$areaCode = $this->input->get('areaCode');
-		$cityCode = $this->input->get('cityCode');
-		$deliveryCode = $this->input->get('deliveryCode');
+		$pincode = $this->input->post('pincode') ?? $this->input->get('pincode');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
+		$areaCode = $this->input->post('areaCode') ?? $this->input->get('areaCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
+		$deliveryCode = $this->input->post('deliveryCode') ?? $this->input->get('deliveryCode');
 		$tableName = 'ordermaster';
 		//$whereConditionArray = array('ordermaster.paymentStatus'=>"PID",'customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode);
 		$whereConditionArray = array('customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode);
@@ -113,14 +113,14 @@ class Order extends CI_Controller
 	public function getPlacedOrders()
 	{
 		$total = 0;
-		$pincode = $this->input->get('pincode');
-		$orderCode = $this->input->get('orderCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
-		$areaCode = $this->input->get('areaCode');
-		$deliveryCode = $this->input->get('deliveryCode');
-		$cityCode = $this->input->get('cityCode');
+		$pincode = $this->input->post('pincode') ?? $this->input->get('pincode');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
+		$areaCode = $this->input->post('areaCode') ?? $this->input->get('areaCode');
+		$deliveryCode = $this->input->post('deliveryCode') ?? $this->input->get('deliveryCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$tableName = 'ordermaster';
 		//$whereConditionArray = array('ordermaster.paymentStatus'=>"PID",'customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode,"ordermaster.isActive"=>1);
 		$whereCondition = array('customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode, "ordermaster.isActive" => 1);
@@ -129,8 +129,8 @@ class Order extends CI_Controller
 		$joinType = array('citymaster' => 'left', 'clientmaster' => 'inner', 'clientprofile' => 'inner', 'customaddressmaster' => "left");
 		$join = array('citymaster' => 'ordermaster.cityCode=citymaster.code', 'customaddressmaster' => 'customaddressmaster.code = ordermaster.areaCode', 'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode', 'clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode'); //'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode','clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode','customaddressmaster'=>'customaddressmaster.code = ordermaster.areaCode'
 		$like = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$groupByColumn = array("ordermaster.code");
 		$dateCondition = "";
 		if ($fromDate != "") {
@@ -289,18 +289,18 @@ class Order extends CI_Controller
 				$dataCount = 0;
 			}
 		}
-		$output = array("draw" => intval($this->input->GET("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
+		$output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
 		echo json_encode($output);
 	}
 
 	public function getOrderList()
 	{
-		$orderCode = $this->input->get('orderCode');
-		$cityCode = $this->input->get('cityCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$areaCode = $this->input->get('areaCode');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
+		$orderCode = $this->input->post('orderCode');
+		$cityCode = $this->input->post('cityCode');
+		$orderStatus = $this->input->post('orderStatus');
+		$areaCode = $this->input->post('areaCode');
+		$fromDate = $this->input->post('fromDate');
+		$toDate = $this->input->post('toDate');
 
 		$tables = 'ordermaster';
 		$orderColumns = "ordermaster.*,ordermaster.code as orderCode,clientmaster.name,citymaster.cityName,clientprofile.pincode,customaddressmaster.place";
@@ -311,8 +311,8 @@ class Order extends CI_Controller
 		$joinType = array('citymaster' => 'left', 'clientmaster' => 'inner', 'clientprofile' => 'inner', 'customaddressmaster' => "left");
 		$join = array('citymaster' => 'ordermaster.cityCode=citymaster.code', 'customaddressmaster' => 'customaddressmaster.code = ordermaster.areaCode', 'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode', 'clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode'); //'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode','clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode','customaddressmaster'=>'customaddressmaster.code = ordermaster.areaCode'
 		$like = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length");
+		$offset = $this->input->post("start");
 		$groupByColumn = array("ordermaster.code");
 		$dateCondition = "";
 		if ($fromDate != "" && $toDate != "") {
@@ -473,23 +473,23 @@ class Order extends CI_Controller
 			$totalData = $this->GlobalModel->selectQuery("IFNULL(SUM(ordermaster.totalPrice),0)as total", $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result();
 			$total = $totalData[0]->total;
 		}
-		$output = array("qResult" => $qResult, "draw" => intval($this->input->GET("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
+		$output = array("qResult" => $qResult, "draw" => intval($this->input->post("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
 		echo json_encode($output);
 	}
 
 	public function getOrderListByOnlyDates()
 	{
 		// ,'inwardlineentries'
-		$offset = $_GET['start'];
-		$limit = $_GET['length'];
+		$offset = $this->input->post('start') ?? $_GET['start'] ?? 0;
+		$limit = $this->input->post('length') ?? $_GET['length'] ?? 10;
 		$value = array("length" => $limit, "start" => $offset);
-		$placeList = $this->input->get('placeList');
-		$clientCode = $this->input->get('clientCode');
-		$orderCode = $this->input->get('orderCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$orderState = $this->input->get('orderState');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
+		$placeList = $this->input->post('placeList') ?? $this->input->get('placeList');
+		$clientCode = $this->input->post('clientCode') ?? $this->input->get('clientCode');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$orderState = $this->input->post('orderState') ?? $this->input->get('orderState');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
 		$fromDate = DateTime::createFromFormat('d/m/Y', $fromDate)->format('Y-m-d');
 		$toDate = DateTime::createFromFormat('d/m/Y', $toDate)->format('Y-m-d');
 		$tableName = 'SELECT ordermaster.*,clientmaster.name,clientmaster.code as clientCodeOf FROM ordermaster  INNER JOIN clientmaster ON ordermaster.clientCode=clientmaster.code';
@@ -532,7 +532,7 @@ class Order extends CI_Controller
 		$select = 1;
 		$Records = $this->GlobalModel->selectActiveDataByMultipleFields($conditionColumns, $conditionValues, $tableName, $extraCondition, $select); // Query # Get Data From Inward By Above Condition
 		//print_r($Records->result());
-		$srno = $_GET['start'] + 1;
+		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		$data = array();
 		$radio = '';
 		foreach ($Records->result() as $row) {
@@ -594,7 +594,7 @@ class Order extends CI_Controller
 		}
 		$forCount = $this->GlobalModel->selectActiveDataByMultipleFields($conditionColumns, $conditionValues, $tableName, $extraCondition, $select); // Query # Get Data From Inward By Above Condition
 		$dataCount = sizeOf($forCount->result());
-		$output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+		$output = array("draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
 		echo json_encode($output);
 	}
 

@@ -383,7 +383,7 @@
 
 	function getOrderCounts() {
 		$.ajax({
-			type: "get",
+			type: "POST",
 			url: base_path + "Admin/getOrderCounts",
 			data: {},
 			success: function(response) {
@@ -425,7 +425,7 @@
 			"searching": false,
 			"ajax": {
 				url: base_path + "Admin/getDeliveryBoys",
-				type: "GET",
+				type: "POST",
 				data: {
 					"statusType": k_statusType
 				},
@@ -452,7 +452,7 @@
 			"searching": false,
 			"ajax": {
 				url: base_path + "Admin/getVegeGroceryOrders",
-				type: "GET",
+				type: "POST",
 				data: {
 					"orderStatus": k_orderStatus
 				},
@@ -472,7 +472,7 @@
 			"searching": false,
 			"ajax": {
 				url: base_path + "Admin/getFoodOrders",
-				type: "GET",
+				type: "POST",
 				data: {
 					"orderStatus": k_orderStatus
 				},
@@ -499,7 +499,7 @@
 			"searching": false,
 			"ajax": {
 				url: base_path + "Admin/getVegeGroceryReleasedOrders",
-				type: "GET",
+				type: "POST",
 				data: {},
 				"complete": function(response) { 
 				}
@@ -517,7 +517,7 @@
 			"searching": false,
 			"ajax": {
 				url: base_path + "Admin/getFoodReleasedOrders",
-				type: "GET",
+				type: "POST",
 				data: {},
 				"complete": function(response) { 
 				}

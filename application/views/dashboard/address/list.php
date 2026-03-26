@@ -14,7 +14,7 @@
                         <div class="d-flex align-items-center">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="<?php echo base_url().'admin/index';?>">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="<?php echo base_url() . 'admin/index'; ?>">Home</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Address List</li>
                                 </ol>
 
@@ -24,7 +24,7 @@
                     <div class="col-7 align-self-center">
                         <div class="d-flex no-block justify-content-end align-items-center">
                             
-                            <div class=""><a class="btn btn-myve" href="<?php echo base_url().'address/add';?>">Add New Address</a></div>
+                            <div class=""><a class="btn btn-myve" href="<?php echo base_url() . 'address/add'; ?>">Add New Address</a></div>
                         </div>
                     </div>
                 </div>
@@ -49,9 +49,9 @@
                      <span> <label>City</label> </span>
                      <select class="form-control cityCode"  id="cityCode" name="cityCode">
 						 <option value="">Select City</option>
-						 <?php foreach($city->result() as $c){
-							echo'<option value="'.$c->cityName.'">'.$c->cityName.'</option>';
-						}?>
+						 <?php foreach ($city->result() as $c) {
+	echo '<option value="' . $c->cityName . '">' . $c->cityName . '</option>';
+}?>
                      </select>
                   </div>
                </div>
@@ -62,9 +62,9 @@
 				   <span> <label>Place :</label> </span>
                     <input type="text" class="form-control" list="placelist" id="place" name="place" placeholder="Select Place ">
 					 <datalist id="placelist">
-						<?php foreach($place->result() as $pl){
-						echo'<option value="'.$pl->place.'">'.$pl->place.'</option>';
-						}?>
+						<?php foreach ($place->result() as $pl) {
+	echo '<option value="' . $pl->place . '">' . $pl->place . '</option>';
+}?>
 					  </datalist>
                     </div>
 				</div> 
@@ -75,9 +75,9 @@
 				   <span> <label>State :</label> </span>
                     <input type="text"  class="form-control" list="stateList" id="stateCode" name="stateCode" placeholder="Select State Name Here ">
 					 <datalist id="stateList">
-						<?php foreach($state->result() as $state){
-						echo'<option value="'.$state->state.'">'.$state->state.'</option>';
-						}?>
+						<?php foreach ($state->result() as $state) {
+	echo '<option value="' . $state->state . '">' . $state->state . '</option>';
+}?>
 					  </datalist>
                     </div>
 				</div>
@@ -87,9 +87,9 @@
 				   <span> <label>District :</label> </span>
                     <input type="text"  class="form-control" id="district" name="district" list="distList" placeholder="Select Your District">
 						<datalist id="distList">
-							<?php foreach($district->result() as $dist){
-							echo'<option value="'.$dist->district.'">'.$dist->district.'</option>';
-							}?>
+							<?php foreach ($district->result() as $dist) {
+	echo '<option value="' . $dist->district . '">' . $dist->district . '</option>';
+}?>
 						</datalist>
                     </div>
                </div>
@@ -224,14 +224,14 @@
 							'service':p_service,
 							'place':p_place
 						},
-						type:"GET" , 
+						type:"POST" , 
 				   
 				    "complete": function(response) {
 					 $(".blue").click(function(){
 									 var code=$(this).data('seq');
 									 $.ajax({
 											url: base_path+"Address/view",  
-											method:"GET",
+											method:"POST",
 											data:{code:code},
 											datatype:"text",
 											success: function(data)

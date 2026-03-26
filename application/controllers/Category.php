@@ -13,8 +13,8 @@ class Category extends CI_Controller
 		$this->load->model('GlobalModel');
 		$this->load->model('GlobalModel1');
 		$this->session_key = $this->session->userdata('key' . SESS_KEY);
-		if(!isset($this->session->userdata['logged_in' . $this->session_key]['code'])){
-			redirect('Admin/login','refresh');
+		if (!isset($this->session->userdata['logged_in' . $this->session_key]['code'])) {
+			redirect('Admin/login', 'refresh');
 		}
 	}
 
@@ -41,31 +41,33 @@ class Category extends CI_Controller
 		$this->load->view('dashboard/category/edit', $data);
 		$this->load->view('dashboard/footer');
 	}
-	
+
 
 	public function getCategoryList()
 	{
 		$tableName = "categorymaster";
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$orderColumns = array("categorymaster.*,maincategorymaster.mainCategoryName");
 		$condition = array('categorymaster.mainCategoryCode' => 'MCAT_1');
 		$orderBy = array('categorymaster' . '.id' => 'DESC');
 		$joinType = array('maincategorymaster' => 'inner');
 		$join = array('maincategorymaster' => 'maincategorymaster.code=categorymaster.mainCategoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " categorymaster.isDelete=0 OR categorymaster.isDelete IS NULL";
-		$like = array("categorymaster.categoryName" => $search . "~both","categorymaster.categorySName" => $search . "~both","maincategorymaster.mainCategoryName" => $search . "~both");
+		$like = array("categorymaster.categoryName" => $search . "~both", "categorymaster.categorySName" => $search . "~both", "maincategorymaster.mainCategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
+		$data = array();
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$code = $row->code;
 
 				if ($row->isActive == 1) {
 					$status = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$status = "<span class='label label-sm label-warning'>Inactive</span>";
 				}
 
@@ -93,20 +95,21 @@ class Category extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
-				"recordsTotal"    =>      $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
-		} else {
+		}
+		else {
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
-				"recordsTotal"    =>     $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
 		}
@@ -158,7 +161,8 @@ class Category extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/category/add', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 
 			$this->form_validation->set_rules('categoryName', 'Category Name', 'required');
 			$this->form_validation->set_rules('categorySName', 'Category Short Name', 'required');
@@ -169,7 +173,8 @@ class Category extends CI_Controller
 				$this->load->view('dashboard/header');
 				$this->load->view('dashboard/c/adategoryd', $data);
 				$this->load->view('dashboard/footer');
-			} else {
+			}
+			else {
 				$data = array(
 					'mainCategoryCode' => 'MCAT_1',
 					'categoryName' => $categoryName,
@@ -200,7 +205,8 @@ class Category extends CI_Controller
 						if (file_exists($filename)) {
 							$categoryImage = $code . '-CAT.jpg';
 						}
-					} else {
+					}
+					else {
 						$dummyFile = 'file_not_found.png';
 						$tmpFile = $uploadRootDir . $dummyFile;
 						$filename = $uploadDir . '/' . $code . '-CAT.jpg';
@@ -221,7 +227,8 @@ class Category extends CI_Controller
 					$response['status'] = true;
 					$response['message'] = "Category Successfully Added.";
 					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "Failed To Add Category";
 				}
@@ -236,7 +243,7 @@ class Category extends CI_Controller
 
 		$categoryName = trim($this->input->post("categoryName"));
 		$categorySName = trim($this->input->post("categorySName"));
-		$code =  $this->input->post('code');
+		$code = $this->input->post('code');
 
 		//Activity Track Starts
 
@@ -270,14 +277,15 @@ class Category extends CI_Controller
 		if ($result == true) {
 			$data = array('error_message' => 'Duplicate Category short name');
 			/* $this->load->view('dashboard/header');
-				$this->load->view('dashboard/category/add', $data);
-				$this->load->view('dashboard/footer'); */
+			 $this->load->view('dashboard/category/add', $data);
+			 $this->load->view('dashboard/footer'); */
 
 			$data['query'] = $this->GlobalModel->selectDataById($code, 'categorymaster');
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/category/edit', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 
 
 			$this->form_validation->set_rules('categoryName', 'Category Name', 'required');
@@ -289,7 +297,8 @@ class Category extends CI_Controller
 				$this->load->view('dashboard/header');
 				$this->load->view('dashboard/category/add', $data);
 				$this->load->view('dashboard/footer');
-			} else {
+			}
+			else {
 
 				$data = array(
 					'mainCategoryCode' => 'MCAT_1',
@@ -306,7 +315,8 @@ class Category extends CI_Controller
 				$shortcode = strtoupper(trim(str_replace(' ', '', $this->input->post("categorySName"))));
 				if (trim($this->input->post("isActive")) != 1) {
 					$update = array('isActive' => 0, 'editID' => $addID, 'editIP' => $ip);
-				} else {
+				}
+				else {
 					$update = array('isActive' => 1, 'editID' => $addID, 'editIP' => $ip);
 				}
 				$sa = $this->GlobalModel->doEditWithField($update, 'productmaster', 'productCategory', $shortcode);
@@ -343,7 +353,8 @@ class Category extends CI_Controller
 					$response['status'] = true;
 					$response['message'] = "Category Successfully Updated.";
 					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "No change In Category";
 				}
@@ -390,8 +401,8 @@ class Category extends CI_Controller
 
 			foreach ($dataStock->result() as $row) {
 				$stockId = $row->id;
-				$dataDeleteStock  = array(
-					'isDelete'	=>	'1'
+				$dataDeleteStock = array(
+					'isDelete' => '1'
 				);
 				$this->GlobalModel->doEditWithField($dataDeleteStock, 'stockinfo', 'id', $stockId);
 			}
@@ -418,11 +429,11 @@ class Category extends CI_Controller
 
 		echo $this->GlobalModel->delete($code, 'categorymaster');
 
-		//redirect(base_url() . 'index.php/currency/listrecords', 'refresh');
+	//redirect(base_url() . 'index.php/currency/listrecords', 'refresh');
 	}
 	public function view()
 	{
-		$code = $this->input->get('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 
 		//Activity Track Starts
 
@@ -447,16 +458,16 @@ class Category extends CI_Controller
 		$tables = array('categorymaster');
 
 		$requiredColumns = array(
-			array('code', 'categoryName', 'categorySName', 'categoryImage', 'isActive')
+				array('code', 'categoryName', 'categorySName', 'categoryImage', 'isActive')
 
 		);
 		$conditions = array();
 		$extraConditionColumnNames = array(
-			array("code")
+				array("code")
 		);
 
 		$extraConditions = array(
-			array($code)
+				array($code)
 		);
 
 		$Records = $this->GlobalModel1->make_datatables($tables, $requiredColumns, $conditions, $extraConditionColumnNames, $extraConditions);
@@ -471,7 +482,8 @@ class Category extends CI_Controller
 
 			if ($row->isActive_04 == "1") {
 				$activeStatus = '<span class="label label-sm label-success">Active</span>';
-			} else {
+			}
+			else {
 				$activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
 			}
 
@@ -496,7 +508,7 @@ class Category extends CI_Controller
 
 			$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 
-			//Activity Track Ends
+		//Activity Track Ends
 		}
 		$modelHtml .= '</form>';
 		echo $modelHtml;

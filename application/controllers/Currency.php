@@ -56,7 +56,7 @@ class Currency extends CI_Controller
 		$tables = array('currencymaster');
 
 		$requiredColumns = array(
-			array('code', 'currencyName', 'currencySName', 'currencyDescription', 'isActive')
+				array('code', 'currencyName', 'currencySName', 'currencyDescription', 'isActive')
 
 		);
 		$conditions = array();
@@ -66,13 +66,15 @@ class Currency extends CI_Controller
 
 		$Records = $this->GlobalModel1->make_datatables($tables, $requiredColumns, $conditions, $extraConditionColumnNames, $extraConditions);
 		//print_r($Records->result());
-		$srno = $_GET['start'] + 1;
+		$offset = $this->input->post("start") ?? $this->input->get("start");
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		$data = array();
 		foreach ($Records->result() as $row) {
 
 			if ($row->isActive_04 == "1") {
 				$status = " <span class='label label-sm label-success'>Active</span>";
-			} else {
+			}
+			else {
 				$status = " <span class='label label-sm label-warning'>Inactive</span>";
 			}
 
@@ -104,10 +106,10 @@ class Currency extends CI_Controller
 		}
 		$dataCount = $this->GlobalModel1->get_all_data($tables, $requiredColumns, $conditions, $extraConditionColumnNames, $extraConditions);
 		$output = array(
-			"draw"                    =>     intval($_GET["draw"]),
-			"recordsTotal"          =>      $dataCount,
-			"recordsFiltered"     =>     $dataCount,
-			"data"                    =>     $data
+			"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+			"recordsTotal" => $dataCount,
+			"recordsFiltered" => $dataCount,
+			"data" => $data
 		);
 		echo json_encode($output);
 	}
@@ -151,7 +153,8 @@ class Currency extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/currency/add', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 
 			$this->form_validation->set_rules('currencyName', 'Currency Name', 'required');
 			$this->form_validation->set_rules('currencySName', 'Currency Short Name', 'required');
@@ -162,7 +165,8 @@ class Currency extends CI_Controller
 				$this->load->view('dashboard/header');
 				$this->load->view('dashboard/currency/add', $data);
 				$this->load->view('dashboard/footer');
-			} else {
+			}
+			else {
 				$data = array(
 					'currencyName' => trim($this->input->post("currencyName")),
 					'currencySName' => strtoupper(trim($this->input->post("currencySName"))),
@@ -177,7 +181,8 @@ class Currency extends CI_Controller
 					$response['status'] = true;
 					$response['message'] = "Currency Successfully Added.";
 					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "Failed To Add Currency";
 				}
@@ -190,7 +195,7 @@ class Currency extends CI_Controller
 	{
 
 		$currencyName = trim($this->input->post("currencyName"));
-		$code =  $this->input->post('code');
+		$code = $this->input->post('code');
 
 		//Activity Track Starts
 
@@ -228,7 +233,8 @@ class Currency extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/currency/add', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 
 			$data = array(
 				'currencyName' => $currencyName,
@@ -244,7 +250,8 @@ class Currency extends CI_Controller
 				$response['status'] = true;
 				$response['message'] = "Currency Successfully Updated.";
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-			} else {
+			}
+			else {
 				$response['status'] = false;
 				$response['message'] = "No change In Currency";
 			}
@@ -300,7 +307,7 @@ class Currency extends CI_Controller
 
 		echo $this->GlobalModel->delete($code, 'currencymaster');
 
-		//redirect(base_url() . 'index.php/currency/listrecords', 'refresh');
+	//redirect(base_url() . 'index.php/currency/listrecords', 'refresh');
 	}
 	public function view()
 	{
@@ -329,16 +336,16 @@ class Currency extends CI_Controller
 		$tables = array('currencymaster');
 
 		$requiredColumns = array(
-			array('code', 'currencyName', 'currencySName', 'currencyDescription', 'isActive')
+				array('code', 'currencyName', 'currencySName', 'currencyDescription', 'isActive')
 
 		);
 		$conditions = array();
 		$extraConditionColumnNames = array(
-			array("code")
+				array("code")
 		);
 
 		$extraConditions = array(
-			array($code)
+				array($code)
 		);
 
 		$Records = $this->GlobalModel1->make_datatables($tables, $requiredColumns, $conditions, $extraConditionColumnNames, $extraConditions);
@@ -353,7 +360,8 @@ class Currency extends CI_Controller
 
 			if ($row->isActive_04 == "1") {
 				$activeStatus = '<span class="label label-sm label-success">Active</span>';
-			} else {
+			}
+			else {
 				$activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
 			}
 
@@ -379,7 +387,7 @@ class Currency extends CI_Controller
 
 			$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 
-			//Activity Track Ends
+		//Activity Track Ends
 		}
 
 		$modelHtml .= '</form>';

@@ -154,7 +154,7 @@
                             'vendorCode':kvendorCode,
                             'date': kaddDate 
                         },
-                        type: "GET", 
+                        type: "POST", 
                         complete: function(json) { 
                             $(".paybtn").click(function() {
                                 var code = $(this).data('id');

@@ -55,39 +55,39 @@ class Vendoritem extends CI_Controller
 
 	public function getVendorItemList()
 	{
-		$menucategoryCode = $this->input->get('menucategoryCode');
-		$itemCode = $this->input->get('itemCode');
-		$startDate = $this->input->get('startDate');
-		$endDate = $this->input->get('endDate');
-		$vendorCode = $this->input->get('vendorCode');
-		$itemtype = $this->input->get('itemtype');
-		$itemstatus = $this->input->get('itemstatus');
-		//$itemactivestatus=$this->input->get('itemactivestatus');
-		// $fromDate=$this->input->get('fromDate');
-		// $toDate=$this->input->get('toDate');
+		$menucategoryCode = $this->input->post('menucategoryCode');
+		$itemCode = $this->input->post('itemCode');
+		$startDate = $this->input->post('startDate');
+		$endDate = $this->input->post('endDate');
+		$vendorCode = $this->input->post('vendorCode');
+		$itemtype = $this->input->post('itemtype');
+		$itemstatus = $this->input->post('itemstatus');
+		//$itemactivestatus=$this->input->post('itemactivestatus');
+		// $fromDate=$this->input->post('fromDate');
+		// $toDate=$this->input->post('toDate');
 
 		$tableName = "vendoritemmaster";
 		$orderColumns = array("vendoritemmaster.*,vendor.entityName,menucategory.menuCategoryName");
 		$condition = array(
-			'menucategory.isActive' => 1, 
+			'menucategory.isActive' => 1,
 			'vendoritemmaster.isActive' => 1,
-			"vendoritemmaster.menuCategoryCode" => $menucategoryCode, 
-			"vendoritemmaster.isActive" => $itemstatus, 
-			"vendoritemmaster.vendorCode" => $vendorCode, 
-			"vendoritemmaster.code" => $itemCode, 
+			"vendoritemmaster.menuCategoryCode" => $menucategoryCode,
+			"vendoritemmaster.isActive" => $itemstatus,
+			"vendoritemmaster.vendorCode" => $vendorCode,
+			"vendoritemmaster.code" => $itemCode,
 			"vendoritemmaster.cuisineType" => $itemtype
 		);
 		$orderBy = array('vendoritemmaster' . '.id' => 'DESC');
 		$joinType = array("vendor" => 'inner', "menucategory" => 'inner', "vendoritemmaster" => 'inner');
 		$join = array("vendor" => "vendoritemmaster.vendorCode=vendor.code", "menucategory" => "vendoritemmaster.menuCategoryCode=menucategory.code");
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length");
+		$offset = $this->input->post("start");
 		$extraCondition = " (vendoritemmaster.isDelete=0 OR vendoritemmaster.isDelete IS NULL)";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		$r = $this->db->last_query();
-		$srno = $_GET['start'] + 1;
+		$srno = intval($offset) + 1;
 		$dataCount = 0;
 		$data = array();
 		if ($Records) {
@@ -95,17 +95,20 @@ class Vendoritem extends CI_Controller
 				$code = $row->code;
 				if ($row->isActive == 1) {
 					$status = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$status = "<span class='label label-sm label-warning'>Inactive</span>";
 				}
 				if ($row->itemActiveStatus == 1) {
 					$itemActiveStatus = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$itemActiveStatus = "<span class='label label-sm label-danger'>Inactive</span>";
 				}
 				if ($row->isAdminApproved == 1) {
 					$isAdminApproved = "<span class='label label-sm label-success'>Yes</span>";
-				} else {
+				}
+				else {
 					$isAdminApproved = "<span class='label label-sm label-danger'>No</span>";
 				}
 
@@ -114,20 +117,14 @@ class Vendoritem extends CI_Controller
 						<i class="ti-settings"></i>
 					</button>
 					<div class="dropdown-menu animated slideInUp" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 35px, 0px);">
-						<a class="dropdown-item" href="' . base_url() . 'Food/Vendoritem/view/' . $row->code . '"><i class="ti-eye"></i> Open</a>
+						<a class="dropdown-item blue" data-toggle="modal" data-target="#responsive-modal" data-seq="' . $row->code . '" href="javascript:void(0)"><i class="ti-eye"></i> Open</a>
+						<span class="dropdown-divider"></span>
 						<a class="dropdown-item" href="' . base_url() . 'Food/Vendoritem/edit/' . $row->code . '"><i class="ti-pencil-alt"></i> Edit</a>
 						<a class="dropdown-item" href="' . base_url() . 'Food/Vendoritem/customizeaddon/' . $row->code . '"><i class="ti-eye"></i> Add Ons</a>
 						<a class="dropdown-item  mywarning" data-seq="' . $row->code . '" id="' . $row->code . '"><i class="ti-trash" href></i> Delete</a>
 					</div>
 				</div>';
-				/*  $dateCondition = "";
-        if ($fromDate != "")
-        {
-            $fromDate = DateTime::createFromFormat('d/m/Y', $fromDate)->format('Y-m-d');
-            $toDate = DateTime::createFromFormat('d/m/Y', $toDate)->format('Y-m-d');
-            $dateCondition = "'" . $fromDate . " 01:00:01' AND '" . $toDate . " 12:59:59'";
-        }
-			$dateCondition;	*/
+
 				$data[] = array(
 					$srno,
 					$row->code,
@@ -145,11 +142,11 @@ class Vendoritem extends CI_Controller
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, '', '', $groupByColumn, $extraCondition)->result());
 		}
 		$output = array(
-			"draw"			  =>     intval($_GET["draw"]),
-			"recordsTotal"    =>     $dataCount,
-			"recordsFiltered" =>     $dataCount,
-			"data"            =>     $data,
-			'r'				  => 	 $r
+			"draw" => intval($this->input->post("draw")),
+			"recordsTotal" => $dataCount,
+			"recordsFiltered" => $dataCount,
+			"data" => $data,
+			'r' => $r
 		);
 		echo json_encode($output);
 	}
@@ -183,7 +180,7 @@ class Vendoritem extends CI_Controller
 		);
 		//Activity Track Ends
 
-	
+
 		$this->form_validation->set_rules('itemName', 'Item Name', 'trim|required');
 		//$this->form_validation->set_rules('itemDescription', 'Item Description', 'trim|required');
 		$this->form_validation->set_rules('cuisineType', 'Cuisine Type', 'trim|required');
@@ -197,93 +194,96 @@ class Vendoritem extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/vendoritem/add', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$vendorCode = trim($this->input->post("vendorCode"));
 			$maxOrderQty = trim($this->input->post("maxOrderQty"));
-			if ($maxOrderQty == 0 || $maxOrderQty == "") $maxOrderQty = 1;
+			if ($maxOrderQty == 0 || $maxOrderQty == "")
+				$maxOrderQty = 1;
 			//check same item exists with   
 			/*
-			$conditionArray["vendoritemmaster.vendorCode"]=$vendorCode;
-			$conditionArray["vendoritemmaster.itemName"]=$itemName;
-			$result = $this->GlobalModel->checkDuplicateRecordNew($conditionArray,'vendoritemmaster');
-			if($result==true) 
-			{
-				$data['vendormaster']=$this->GlobalModel->selectActiveData('vendor');    
-				$data['menucategory']=$this->GlobalModel->selectActiveData('menucategory');
-				$data = array('error_message' => 'Duplicate Item Name');
-				$this->load->view('dashboard/header');
-				$this->load->view('dashboard/vendoritem/add', $data);
-				$this->load->view('dashboard/footer');
-			}
-			else
-			{
-			*/				
-				$data = array(
-					'itemName' => $itemName,
-					'itemDescription' => trim($this->input->post("itemDescription")),
-					'vendorCode' => trim($this->input->post("vendorCode")),
-					'menuCategoryCode' => trim($this->input->post("menuCategoryCode")),
-					'menuSubCategoryCode' => trim($this->input->post("menuSubCategoryCode")),
-					'salePrice' => trim($this->input->post("salePrice")),
-					'cuisineType' => trim($this->input->post("cuisineType")),
-					'itemActiveStatus' => trim($this->input->post("itemActiveStatus")),
-					'isAdminApproved' => trim($this->input->post("isAdminApproved")),
-					'itemPackagingPrice' => trim($this->input->post("itemPackagingPrice")),
-					'maxOrderQty' => $maxOrderQty,
-					'addID' => $addID,
-					'addIP' => $ip,
-					'isActive' => trim($this->input->post("isActive")),
+			 $conditionArray["vendoritemmaster.vendorCode"]=$vendorCode;
+			 $conditionArray["vendoritemmaster.itemName"]=$itemName;
+			 $result = $this->GlobalModel->checkDuplicateRecordNew($conditionArray,'vendoritemmaster');
+			 if($result==true) 
+			 {
+			 $data['vendormaster']=$this->GlobalModel->selectActiveData('vendor');    
+			 $data['menucategory']=$this->GlobalModel->selectActiveData('menucategory');
+			 $data = array('error_message' => 'Duplicate Item Name');
+			 $this->load->view('dashboard/header');
+			 $this->load->view('dashboard/vendoritem/add', $data);
+			 $this->load->view('dashboard/footer');
+			 }
+			 else
+			 {
+			 */
+			$data = array(
+				'itemName' => $itemName,
+				'itemDescription' => trim($this->input->post("itemDescription")),
+				'vendorCode' => trim($this->input->post("vendorCode")),
+				'menuCategoryCode' => trim($this->input->post("menuCategoryCode")),
+				'menuSubCategoryCode' => trim($this->input->post("menuSubCategoryCode")),
+				'salePrice' => trim($this->input->post("salePrice")),
+				'cuisineType' => trim($this->input->post("cuisineType")),
+				'itemActiveStatus' => trim($this->input->post("itemActiveStatus")),
+				'isAdminApproved' => trim($this->input->post("isAdminApproved")),
+				'itemPackagingPrice' => trim($this->input->post("itemPackagingPrice")),
+				'maxOrderQty' => $maxOrderQty,
+				'addID' => $addID,
+				'addIP' => $ip,
+				'isActive' => trim($this->input->post("isActive")),
+			);
+			$code = $this->GlobalModel->addWithoutYear($data, 'vendoritemmaster', 'VITM');
+			// For Vendor Item Image file upload 
+			if ($code != 'false') {
+				if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode)) {
+					mkdir(FCPATH . 'partner/uploads/' . $vendorCode);
+				}
+				if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem')) {
+					mkdir(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem');
+				}
+				$uploadRootDir = 'uploads/';
+				$uploadDir = 'partner/uploads/' . $vendorCode . '/vendoritem';
+				$entityImage = "";
+				if (!empty($_FILES['itemImage']['name'])) {
+					$tmpFile = $_FILES['itemImage']['tmp_name'];
+					$ext = pathinfo($_FILES['itemImage']['name'], PATHINFO_EXTENSION);
+					$filename = $uploadDir . '/' . $code . '-VITMPhoto.jpg';
+					move_uploaded_file($tmpFile, $filename);
+					if (file_exists($filename)) {
+						$entityImage = $code . '-VITMPhoto.jpg';
+					}
+				}
+				// else
+				// {                    
+				// $dummyFile='file_not_found.png';
+				// $tmpFile = $uploadRootDir.$dummyFile;
+				// $filename = $uploadDir.'/'.$code.'-VITMPhoto.jpg';
+				// copy($tmpFile, $filename);
+				// if(file_exists($filename))
+				// {
+				// $entityImage=$code.'-VITMPhoto.jpg';
+				// }
+				// }  
+				$subData = array(
+					'itemPhoto' => $entityImage,
 				);
-				$code = $this->GlobalModel->addWithoutYear($data, 'vendoritemmaster', 'VITM');
-				// For Vendor Item Image file upload 
-				if ($code != 'false') {
-					if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode)) {
-						mkdir(FCPATH . 'partner/uploads/' . $vendorCode);
-					}
-					if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem')) {
-						mkdir(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem');
-					}
-					$uploadRootDir = 'uploads/';
-					$uploadDir = 'partner/uploads/' . $vendorCode . '/vendoritem';
-					$entityImage = "";
-					if (!empty($_FILES['itemImage']['name'])) {
-						$tmpFile = $_FILES['itemImage']['tmp_name'];
-						$ext = pathinfo($_FILES['itemImage']['name'], PATHINFO_EXTENSION);
-						$filename = $uploadDir . '/' . $code . '-VITMPhoto.jpg';
-						move_uploaded_file($tmpFile, $filename);
-						if (file_exists($filename)) {
-							$entityImage = $code . '-VITMPhoto.jpg';
-						}
-					}
-					// else
-					// {                    
-					// $dummyFile='file_not_found.png';
-					// $tmpFile = $uploadRootDir.$dummyFile;
-					// $filename = $uploadDir.'/'.$code.'-VITMPhoto.jpg';
-					// copy($tmpFile, $filename);
-					// if(file_exists($filename))
-					// {
-					// $entityImage=$code.'-VITMPhoto.jpg';
-					// }
-					// }  
-					$subData = array(
-						'itemPhoto' => $entityImage,
-					);
-					$this->GlobalModel->doEdit($subData, 'vendoritemmaster', $code);
-				}
-				if ($code != 'false') {
-					$response['status'] = true;
-					$response['message'] = "Vendor Item Successfully Added.";
-					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
-					$response['status'] = false;
-					$response['message'] = "Failed To Add Vendor Item";
-				}
-				$this->session->set_flashdata('response', json_encode($response));
-				redirect(base_url() . 'Food/Vendoritem/listRecords', 'refresh');
-			/*
+				$this->GlobalModel->doEdit($subData, 'vendoritemmaster', $code);
 			}
-			*/
+			if ($code != 'false') {
+				$response['status'] = true;
+				$response['message'] = "Vendor Item Successfully Added.";
+				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
+			}
+			else {
+				$response['status'] = false;
+				$response['message'] = "Failed To Add Vendor Item";
+			}
+			$this->session->set_flashdata('response', json_encode($response));
+			redirect(base_url() . 'Food/Vendoritem/listRecords', 'refresh');
+		/*
+		 }
+		 */
 		}
 	}
 
@@ -333,99 +333,104 @@ class Vendoritem extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/vendoritem/edit', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$vendorCode = trim($this->input->post("vendorCode"));
 			$maxOrderQty = trim($this->input->post("maxOrderQty"));
-			if ($maxOrderQty == 0 || $maxOrderQty == "") $maxOrderQty = 1;
+			if ($maxOrderQty == 0 || $maxOrderQty == "")
+				$maxOrderQty = 1;
 			//check same item name exists for selected vendor
-			
+
 			/*
-			$conditionArray["vendoritemmaster.vendorCode"]=$vendorCode;
-			$conditionArray["vendoritemmaster.itemName"]=$itemName;
-			$result = $this->GlobalModel->checkDuplicateRecordNew($conditionArray,'vendoritemmaster');
-			if ($result==true) 
-			{
-				$data = array('error_message' => 'Duplicate Item Name');
-				$data['query'] = $this->GlobalModel->selectDataById($code,'vendoritemmaster');
-				$menuCode = $data['query']->result_array()[0]['menuCategoryCode'];
-				$data['vendormaster']=$this->GlobalModel->selectActiveData('vendor');    
-				$data['menucategory']=$this->GlobalModel->selectActiveData('menucategory');
-				$data['menusubcategory']= $this->GlobalModel->selectQuery('menusubcategory.code,menusubcategory.menuSubCategoryName','menusubcategory',array("menusubcategory.menuCategoryCode"=>$menuCode,"menusubcategory.isActive"=>1));
-				$this->load->view('dashboard/header');
-				$this->load->view('dashboard/vendoritem/edit',$data);
-				$this->load->view('dashboard/footer'); 
+			 $conditionArray["vendoritemmaster.vendorCode"]=$vendorCode;
+			 $conditionArray["vendoritemmaster.itemName"]=$itemName;
+			 $result = $this->GlobalModel->checkDuplicateRecordNew($conditionArray,'vendoritemmaster');
+			 if ($result==true) 
+			 {
+			 $data = array('error_message' => 'Duplicate Item Name');
+			 $data['query'] = $this->GlobalModel->selectDataById($code,'vendoritemmaster');
+			 $menuCode = $data['query']->result_array()[0]['menuCategoryCode'];
+			 $data['vendormaster']=$this->GlobalModel->selectActiveData('vendor');    
+			 $data['menucategory']=$this->GlobalModel->selectActiveData('menucategory');
+			 $data['menusubcategory']= $this->GlobalModel->selectQuery('menusubcategory.code,menusubcategory.menuSubCategoryName','menusubcategory',array("menusubcategory.menuCategoryCode"=>$menuCode,"menusubcategory.isActive"=>1));
+			 $this->load->view('dashboard/header');
+			 $this->load->view('dashboard/vendoritem/edit',$data);
+			 $this->load->view('dashboard/footer'); 
+			 }
+			 else
+			 { 
+			 */
+			$data = array(
+				'itemName' => $itemName,
+				'itemDescription' => trim($this->input->post("itemDescription")),
+				'vendorCode' => trim($this->input->post("vendorCode")),
+				'menuCategoryCode' => trim($this->input->post("menuCategoryCode")),
+				'menuSubCategoryCode' => trim($this->input->post("menuSubCategoryCode")),
+				'salePrice' => trim($this->input->post("salePrice")),
+				'cuisineType' => trim($this->input->post("cuisineType")),
+				'itemActiveStatus' => trim($this->input->post("itemActiveStatus")),
+				'isAdminApproved' => trim($this->input->post("isAdminApproved")),
+				'itemPackagingPrice' => trim($this->input->post("itemPackagingPrice")),
+				'maxOrderQty' => $maxOrderQty,
+				'editID' => $addID,
+				'editIP' => $ip,
+				'isActive' => trim($this->input->post("isActive")),
+			);
+			$result = $this->GlobalModel->doEdit($data, 'vendoritemmaster', $code);
+			// For Vendor Item Image file upload 
+			$oldPhoto = "";
+			$RecordPhoto = $this->GlobalModel->selectQuery("vendoritemmaster.itemPhoto", "vendoritemmaster", array("vendoritemmaster.code" => $code));
+			if ($RecordPhoto) {
+				$photoData = $RecordPhoto->result_array()[0];
+				if ($photoData['itemPhoto'] != "")
+					$oldPhoto = 'partner/uploads/' . $vendorCode . '/vendoritem/' . $photoData['itemPhoto'];
 			}
-			else
-			{ 
-			*/
-				$data = array(
-					'itemName' => $itemName,
-					'itemDescription' => trim($this->input->post("itemDescription")),
-					'vendorCode' => trim($this->input->post("vendorCode")),
-					'menuCategoryCode' => trim($this->input->post("menuCategoryCode")),
-					'menuSubCategoryCode' => trim($this->input->post("menuSubCategoryCode")),
-					'salePrice' => trim($this->input->post("salePrice")),
-					'cuisineType' => trim($this->input->post("cuisineType")),
-					'itemActiveStatus' => trim($this->input->post("itemActiveStatus")),
-					'isAdminApproved' => trim($this->input->post("isAdminApproved")),
-					'itemPackagingPrice' => trim($this->input->post("itemPackagingPrice")),
-					'maxOrderQty' => $maxOrderQty,
-					'editID' => $addID,
-					'editIP' => $ip,
-					'isActive' => trim($this->input->post("isActive")),
-				);
-				$result = $this->GlobalModel->doEdit($data, 'vendoritemmaster', $code);
-				// For Vendor Item Image file upload 
-				$oldPhoto = "";
-				$RecordPhoto  = $this->GlobalModel->selectQuery("vendoritemmaster.itemPhoto", "vendoritemmaster", array("vendoritemmaster.code" => $code));
-				if ($RecordPhoto) {
-					$photoData = $RecordPhoto->result_array()[0];
-					if ($photoData['itemPhoto'] != "")	$oldPhoto = 'partner/uploads/' . $vendorCode . '/vendoritem/' . $photoData['itemPhoto'];
-				}
-				$photoResult = "false";
-				$entityImage = "";
-				if (!empty($_FILES['itemImage']['name'])) {
-					if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode)) {
-						mkdir(FCPATH . 'partner/uploads/' . $vendorCode);
-					}
-
-					if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem')) {
-						mkdir(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem');
-					}
-
-					$uploadRootDir = 'uploads/';
-					$uploadDir = 'partner/uploads/' . $vendorCode . '/vendoritem';
-
-					if ($oldPhoto != "") {
-						if (file_exists($oldPhoto)) unlink($oldPhoto);
-					}
-					sleep(2);
-					$tmpFile = $_FILES['itemImage']['tmp_name'];
-					$ext = pathinfo($_FILES['itemImage']['name'], PATHINFO_EXTENSION);
-					$filename = $uploadDir . '/' . $code . '-VITMPhoto.jpg';
-					move_uploaded_file($tmpFile, $filename);
-					if (file_exists($filename)) {
-						$entityImage = $code . '-VITMPhoto.jpg';
-						$subData = array(
-							'itemPhoto' => $entityImage,
-						);
-						$photoResult = $this->GlobalModel->doEdit($subData, 'vendoritemmaster', $code);
-					}
+			$photoResult = "false";
+			$entityImage = "";
+			if (!empty($_FILES['itemImage']['name'])) {
+				if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode)) {
+					mkdir(FCPATH . 'partner/uploads/' . $vendorCode);
 				}
 
-				if ($code != 'false' || $photoResult != "false") {
-					$response['status'] = true;
-					$response['message'] = "Vendor Item Successfully Updated.";
-					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
-					$response['status'] = false;
-					$response['message'] = "Failed To Update Vendor Item";
+				if (!file_exists(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem')) {
+					mkdir(FCPATH . 'partner/uploads/' . $vendorCode . '/vendoritem');
 				}
-				$this->session->set_flashdata('response', json_encode($response));
-				redirect(base_url() . 'Food/Vendoritem/listRecords', 'refresh');
-			/*
+
+				$uploadRootDir = 'uploads/';
+				$uploadDir = 'partner/uploads/' . $vendorCode . '/vendoritem';
+
+				if ($oldPhoto != "") {
+					if (file_exists($oldPhoto))
+						unlink($oldPhoto);
+				}
+				sleep(2);
+				$tmpFile = $_FILES['itemImage']['tmp_name'];
+				$ext = pathinfo($_FILES['itemImage']['name'], PATHINFO_EXTENSION);
+				$filename = $uploadDir . '/' . $code . '-VITMPhoto.jpg';
+				move_uploaded_file($tmpFile, $filename);
+				if (file_exists($filename)) {
+					$entityImage = $code . '-VITMPhoto.jpg';
+					$subData = array(
+						'itemPhoto' => $entityImage,
+					);
+					$photoResult = $this->GlobalModel->doEdit($subData, 'vendoritemmaster', $code);
+				}
 			}
-			*/
+
+			if ($code != 'false' || $photoResult != "false") {
+				$response['status'] = true;
+				$response['message'] = "Vendor Item Successfully Updated.";
+				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
+			}
+			else {
+				$response['status'] = false;
+				$response['message'] = "Failed To Update Vendor Item";
+			}
+			$this->session->set_flashdata('response', json_encode($response));
+			redirect(base_url() . 'Food/Vendoritem/listRecords', 'refresh');
+		/*
+		 }
+		 */
 		}
 	}
 
@@ -447,6 +452,8 @@ class Vendoritem extends CI_Controller
 	public function view()
 	{
 		$code = $this->uri->segment('4');
+		if (!$code)
+			$code = $this->input->post('code');
 		$tableName = "vendoritemmaster";
 		$orderColumns = array("vendoritemmaster.*,vendor.entityName,menucategory.menuCategoryName,menusubcategory.menuSubCategoryName");
 		$condition = array('vendoritemmaster.code' => $code);
@@ -454,9 +461,15 @@ class Vendoritem extends CI_Controller
 		$joinType = array("vendor" => "inner", "menucategory" => "inner", "menusubcategory" => "left");
 		$join = array("vendor" => "vendoritemmaster.vendorCode=vendor.code", "menucategory" => "vendoritemmaster.menuCategoryCode=menucategory.code", "menusubcategory" => "vendoritemmaster.menuSubCategoryCode=menusubcategory.code");
 		$data['query'] = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType);
-		$this->load->view('dashboard/header');
-		$this->load->view('dashboard/vendoritem/view', $data);
-		$this->load->view('dashboard/footer');
+
+		if ($this->input->is_ajax_request()) {
+			$this->load->view('dashboard/vendoritem/view_modal', $data);
+		}
+		else {
+			$this->load->view('dashboard/header');
+			$this->load->view('dashboard/vendoritem/view', $data);
+			$this->load->view('dashboard/footer');
+		}
 	}
 
 	public function delete()
@@ -566,12 +579,13 @@ class Vendoritem extends CI_Controller
 			'logText' => $text
 		);
 		//Activity Track Ends
-		$where = array("vendorItemCode"=>$vendorItemCode,"categoryTitle"=>$categoryTitle);
+		$where = array("vendorItemCode" => $vendorItemCode, "categoryTitle" => $categoryTitle);
 		$result = $this->GlobalModel->checkDuplicateRecordNew($where, 'customizedcategory');
 		if ($result == true) {
-			$response['status']  = 'exists';
+			$response['status'] = 'exists';
 			$response['message'] = 'Duplicate Category Exists';
-		} else {
+		}
+		else {
 			$data = array(
 				'vendorItemCode' => $vendorItemCode,
 				'categoryTitle' => $categoryTitle,
@@ -584,11 +598,12 @@ class Vendoritem extends CI_Controller
 			$code = $this->GlobalModel->addWithoutYear($data, 'customizedcategory', 'ITCC');
 			if ($code != 'false') {
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				$response['status']  = 'true';
-				$response['code']  = $code;
+				$response['status'] = 'true';
+				$response['code'] = $code;
 				$response['message'] = 'Category Added Successfully';
-			} else {
-				$response['status']  = 'failed';
+			}
+			else {
+				$response['status'] = 'failed';
 				$response['message'] = 'Failed to add category';
 			}
 		}
@@ -626,12 +641,13 @@ class Vendoritem extends CI_Controller
 			'logText' => $text
 		);
 		//Activity Track Ends
-		$where = array("vendorItemCode"=>$vendorItemCode,"categoryTitle"=>$categoryTitle,'code!='=>$customizedCategoryCode);
-		$result = $this->GlobalModel->checkDuplicateRecordNew($where, 'customizedcategory'); 
+		$where = array("vendorItemCode" => $vendorItemCode, "categoryTitle" => $categoryTitle, 'code!=' => $customizedCategoryCode);
+		$result = $this->GlobalModel->checkDuplicateRecordNew($where, 'customizedcategory');
 		if ($result == true) {
-			$response['status']  = 'exists';
+			$response['status'] = 'exists';
 			$response['message'] = 'Duplicate Category Exists';
-		} else {
+		}
+		else {
 			$data = array(
 				'vendorItemCode' => $vendorItemCode,
 				'categoryTitle' => $categoryTitle,
@@ -644,13 +660,14 @@ class Vendoritem extends CI_Controller
 			$resultUpdate = $this->GlobalModel->doEdit($data, 'customizedcategory', $customizedCategoryCode);
 			if ($resultUpdate != 'false') {
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				$response['status']  = 'true';
-				$response['code']  = $customizedCategoryCode;
-				$response['updatedtitle']  = $categoryTitle;
+				$response['status'] = 'true';
+				$response['code'] = $customizedCategoryCode;
+				$response['updatedtitle'] = $categoryTitle;
 				$response['message'] = 'Category updated successfully';
-			} else {
-				$response['status']  = 'failed';
-				$response['code']  = $customizedCategoryCode;
+			}
+			else {
+				$response['status'] = 'failed';
+				$response['code'] = $customizedCategoryCode;
 				$response['message'] = 'Failed to update category';
 			}
 		}
@@ -677,7 +694,7 @@ class Vendoritem extends CI_Controller
 		$cateCode = trim($this->input->post("cateCode"));
 		$subTitle = trim($this->input->post("subTitle"));
 		$price = trim($this->input->post("price"));
-		$price = $price!="" ? $price : 0;
+		$price = $price != "" ? $price : 0;
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$text = $role . " " . $userName . ' added new customized catefory  "' . $subTitle . '" from ' . $ip;
 
@@ -687,12 +704,13 @@ class Vendoritem extends CI_Controller
 			'logText' => $text
 		);
 		//Activity Track Ends
-		$where = array("customizedCategoryCode"=>$cateCode,"subCategoryTitle"=>$subTitle);
-		$result = $this->GlobalModel->checkDuplicateRecordNew($where, 'customizedcategorylineentries'); 
+		$where = array("customizedCategoryCode" => $cateCode, "subCategoryTitle" => $subTitle);
+		$result = $this->GlobalModel->checkDuplicateRecordNew($where, 'customizedcategorylineentries');
 		if ($result == true) {
-			$response['status']  = 'exists';
+			$response['status'] = 'exists';
 			$response['message'] = 'Duplicate Sub Category Exists';
-		} else {
+		}
+		else {
 			$data = array(
 				'customizedCategoryCode' => $cateCode,
 				'subCategoryTitle' => $subTitle,
@@ -700,16 +718,17 @@ class Vendoritem extends CI_Controller
 				'isEnabled' => trim($this->input->post("isCateEnabled")),
 				'addID' => $addID,
 				'addIP' => $ip,
-				'isActive' =>$this->input->post("isActive"),
+				'isActive' => $this->input->post("isActive"),
 			);
 			$code = $this->GlobalModel->addWithoutYear($data, 'customizedcategorylineentries', 'CCLN');
 			if ($code != 'false') {
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				$response['status']  = 'true';
-				$response['code']  = $code;
+				$response['status'] = 'true';
+				$response['code'] = $code;
 				$response['message'] = 'Sub Category Added Successfully';
-			} else {
-				$response['status']  = 'failed';
+			}
+			else {
+				$response['status'] = 'failed';
 				$response['message'] = 'Failed to add Sub Category';
 			}
 		}
@@ -762,8 +781,10 @@ class Vendoritem extends CI_Controller
 		$resultDataLine = $this->GlobalModel->deleteForeverFromField('customizedCategoryCode', $code, 'customizedcategorylineentries');
 
 		$resultData = $this->GlobalModel->deleteForever($code, 'customizedcategory');
-		if ($resultData == 'true') echo true;
-		else echo false;
+		if ($resultData == 'true')
+			echo true;
+		else
+			echo false;
 	}
 
 
@@ -811,8 +832,10 @@ class Vendoritem extends CI_Controller
 		);
 
 		$resultData = $this->GlobalModel->deleteForever($code, 'customizedcategorylineentries');
-		if ($resultData == 'true') echo true;
-		else echo false;
+		if ($resultData == 'true')
+			echo true;
+		else
+			echo false;
 	}
 
 	public function getAddonCategoryData()
@@ -823,7 +846,8 @@ class Vendoritem extends CI_Controller
 			// $r['status'] = true;
 			// $r['data'] = json_encode($data->result_array()[0]);
 			$dataRes = json_encode($data->result_array()[0]);
-		} else {
+		}
+		else {
 			// $r['status'] = false;
 			$dataRes = "";
 		}

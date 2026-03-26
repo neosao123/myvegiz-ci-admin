@@ -32,9 +32,9 @@ class Commission extends CI_Controller
 	
 	public function getDeliveryBoyCommissionsList(){
 		
-		$userCode = $this->input->GET('deliveryboyCode');
-        $fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');		
+		$userCode = $this->input->post('deliveryboyCode') ?? $this->input->get('deliveryboyCode');
+        $fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');		
 		$tableName = array('deliveryboyearncommission'); 
 		$orderColumns = array("ifNull(sum(deliveryboyearncommission.commissionAmount),0) as commission,deliveryboyearncommission.orderCode, usermaster.name,deliveryboyearncommission.deliveryBoyCode");		
 		$condition = array('usermaster.code' => $userCode,'deliveryboyearncommission.commissionType!='=>'penalty');
@@ -43,8 +43,8 @@ class Commission extends CI_Controller
 		$join = array('usermaster' => 'deliveryboyearncommission.deliveryBoyCode=usermaster.code');
 		//$groupByColumn = array();                     
 		$groupByColumn = array("deliveryboyearncommission.deliveryBoyCode");
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");             
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");               
 		
 		$dateCondition = "";
 		if ($fromDate != "") {
@@ -56,7 +56,7 @@ class Commission extends CI_Controller
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
         //echo $this->db->last_query();  
-		$srno = $_GET['start'] + 1;
+		$srno = ($this->input->post('start') ?? $this->input->get('start')) + 1;
 		$data = array();
 		if ($Records) {
 			foreach ($Records->result() as $row) { 
@@ -90,7 +90,7 @@ class Commission extends CI_Controller
 			$dataCount = 0;
 		}		
 		$output = array(
-			"draw" => intval($_GET["draw"]),
+			"draw" => intval($this->input->post("draw") ?? $this->input->get("draw")),
 			"recordsTotal" => $dataCount,
 			"recordsFiltered" => $dataCount,
 			"data" => $data
@@ -108,11 +108,11 @@ class Commission extends CI_Controller
 
 	public function getDeliveryBoyCommissionList()
 	{   
-		$userCode = $this->input->GET('deliveryboyCode'); 
-		$dateSearch = $this->input->GET('date'); 
-		$orderType = $this->input->GET('orderType'); 
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
+		$userCode = $this->input->post('deliveryboyCode') ?? $this->input->get('deliveryboyCode'); 
+		$dateSearch = $this->input->post('date') ?? $this->input->get('date'); 
+		$orderType = $this->input->post('orderType') ?? $this->input->get('orderType'); 
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
 		$tableName = array('deliveryboyearncommission');
 		$orderColumns = array("ifNull(deliveryboyearncommission.commissionAmount,0) as commission,deliveryboyearncommission.orderType,ifNull(deliveryboyearncommission.orderAmount,0) as totalorderAmount,deliveryboyearncommission.orderCode, usermaster.name,deliveryboyearncommission.deliveryBoyCode,deliveryboyearncommission.isPaid");		
 		$condition = array('usermaster.code' => $userCode,"deliveryboyearncommission.orderType"=>$orderType,'deliveryboyearncommission.commissionType!='=>'penalty');
@@ -121,8 +121,8 @@ class Commission extends CI_Controller
 		$join = array('usermaster' => 'deliveryboyearncommission.deliveryBoyCode=usermaster.code');
 		$groupByColumn = array();                     
 		//$groupByColumn = array("deliveryboyearncommission.deliveryBoyCode");
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");             
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");               
 		
 		$dateCondition = "";
 		if ($fromDate != "") {
@@ -134,7 +134,7 @@ class Commission extends CI_Controller
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
        // echo $this->db->last_query();  
-		$srno = $_GET['start'] + 1;
+		$srno = ($this->input->post('start') ?? $this->input->get('start')) + 1;
 		$data = array();
 		if ($Records) {
 			foreach ($Records->result() as $row) { 
@@ -155,7 +155,7 @@ class Commission extends CI_Controller
 			$dataCount = 0;
 		}		
 		$output = array(
-			"draw" => intval($_GET["draw"]),
+			"draw" => intval($this->input->post("draw") ?? $this->input->get("draw")),
 			"recordsTotal" => $dataCount,
 			"recordsFiltered" => $dataCount,
 			"data" => $data
@@ -167,11 +167,11 @@ class Commission extends CI_Controller
 
 	public function viewCurrentHistory()
 	{
-		$dbcode = $this->input->GET('code');
-		$fromDate = $this->input->GET('fromDate');
-		$toDate = $this->input->GET('toDate');
-		$order = $this->input->GET('order');
-		$orderType = $this->input->GET('orderType');
+		$dbcode = $this->input->post('code') ?? $this->input->get('code');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
+		$order = $this->input->post('order') ?? $this->input->get('order');
+		$orderType = $this->input->post('orderType') ?? $this->input->get('orderType');
 	
 		//$date = date('Y-m-d',strtotime(str_replace('/','-',$dateSearch)));
 		if ($fromDate != "") {
@@ -241,7 +241,7 @@ class Commission extends CI_Controller
 
 	public function showhistory()
 	{
-		$code = $this->input->GET('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		$tableName = array('usermaster');
 		$orderColumns = array("employeemaster.firstName,employeemaster.lastName,usermaster.code as userCode");
 		$condition = array('usermaster.code' => $code);
@@ -249,8 +249,8 @@ class Commission extends CI_Controller
 		$joinType = array('employeemaster' => 'inner');
 		$join = array('employeemaster' => 'employeemaster.code=usermaster.empCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (usermaster.isDelete is NUll or usermaster.isDelete = 0)";
 		$like = array();
 		$resultar = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -264,9 +264,9 @@ class Commission extends CI_Controller
 	}
 	
 	public function viewUnpaid(){
-		$dbcode = $this->input->GET('code');
-		$fromDate = $this->input->GET('fromDate');
-		$toDate = $this->input->GET('toDate');
+		$dbcode = $this->input->post('code') ?? $this->input->get('code');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
 		$tableName = array('deliveryboyearncommission'); 
 		$orderColumns = array("ifNull(sum(deliveryboyearncommission.commissionAmount),0) as commission,deliveryboyearncommission.orderCode, usermaster.name,deliveryboyearncommission.deliveryBoyCode");		
 		$condition = array('usermaster.code' => $dbcode,'deliveryboyearncommission.commissionType!='=>'penalty','deliveryboyearncommission.isPaid'=>'0');
@@ -295,9 +295,9 @@ class Commission extends CI_Controller
 	}
 	
 	public function paidStatus(){
-		$dbcode = $this->input->GET('code');
-		$fromDate = $this->input->GET('fromDate');
-		$toDate = $this->input->GET('toDate');
+		$dbcode = $this->input->post('code') ?? $this->input->get('code');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
 		$tableName = array('deliveryboyearncommission'); 
 		$orderColumns = array("deliveryboyearncommission.code");		
 		$condition = array('usermaster.code' => $dbcode,'deliveryboyearncommission.commissionType!='=>'penalty','deliveryboyearncommission.isPaid'=>'0');

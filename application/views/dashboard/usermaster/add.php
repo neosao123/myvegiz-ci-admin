@@ -295,7 +295,7 @@
 				let mobile  = $(this).val();
 				if (mobile != "") {
 					$.ajax({
-						type: 'get',
+						type: 'POST',
 						url: '<?php echo base_url() . 'Usermaster/duplicateMobileNumber' ?>',
 						data: {
 							'mobile': mobile,
@@ -323,7 +323,7 @@
 				let email  = $(this).val();
 				if (email != "") {
 					$.ajax({
-						type: 'get',
+						type: 'POST',
 						url: '<?php echo base_url() . 'Usermaster/duplicateEmail' ?>',
 						data: {
 							'email': email,

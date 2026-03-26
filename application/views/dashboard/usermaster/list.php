@@ -53,8 +53,8 @@
         								<select class="form-control cityCode" id="cityCode" name="cityCode">
         									<option value="">Select City</option>
         									<?php foreach ($city->result() as $c) {
-														echo '<option value="' . $c->code . '">' . $c->cityName . '</option>';
-													} ?>
+	echo '<option value="' . $c->code . '">' . $c->cityName . '</option>';
+}?>
         								</select>
         							</div>
         						</div>
@@ -63,9 +63,11 @@
         								<span> <label>User Name :</label> </span>
         								<input type="text"  class="form-control" list="userList" id="userName" name="userName" placeholder="Enter Name Of User ">
 											<datalist id="userList">
-											<?php  if($query){ foreach($query->result() as $d){
-											echo'<option value="'.$d->code.'">'.$d->name.'</option>';
-											} } ?>
+											<?php if ($query) {
+	foreach ($query->result() as $d) {
+		echo '<option value="' . $d->code . '">' . $d->name . '</option>';
+	}
+}?>
 											</datalist>
 
         							</div>
@@ -191,13 +193,13 @@
         						'userName': p_userName,
         						'userRole': p_userRole
         					},
-        					type: "GET",
+        					type: "POST",
         					complete: function(json) {
         						$(".blue").click(function() {
         							var code = $(this).data('seq');
         							$.ajax({
         								url: base_path + "Usermaster/view",
-        								method: "GET",
+        								method: "POST",
         								data: {
         									code: code
         								},

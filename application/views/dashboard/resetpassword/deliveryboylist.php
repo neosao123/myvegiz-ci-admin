@@ -118,7 +118,7 @@
   "ajax":{
   url: base_path+"index.php/resetpassword/getDeliveryBoyPasswordList",
   data:{'cityCode':cityCode},
-  type:"GET", 
+  type:"POST", 
   "complete": function(response) {
   operations();
   }

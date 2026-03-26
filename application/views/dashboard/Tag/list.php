@@ -11,7 +11,7 @@ input[type=color] {
                 <div class="d-flex align-items-center">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="<?php echo base_url().'admin/index';?>">Home</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url() . 'admin/index'; ?>">Home</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Tag List</li>
                         </ol>
                     </nav>
@@ -154,7 +154,7 @@ input[type=color] {
                 paging: true,
 				"ajax":{  
 					url: base_path+"Tag/getTagList",  
-					type:"GET" , 
+					type:"POST" , 
 				   "complete": function(response) {
 					    $(".edit").click(function(){
 						 var code=$(this).data('seq');
@@ -175,7 +175,7 @@ input[type=color] {
 						 var code=$(this).data('seq');
 						 $.ajax({
 								url: base_path+"Tag/view",  
-								method:"GET",
+								method:"POST",
 								data:{code:code},
 								datatype:"text",
 								success: function(data)

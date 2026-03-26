@@ -256,7 +256,7 @@
 		function getTotalAmount(cityCode,orderCode,orderStatus,pincode,fromDate,toDate,areaCode,deliveryCode){       
 		   $.ajax({
 				url:'<?php echo site_url('Order/placedTotal'); ?>',
-				method:"get",
+				method:"POST",
 				data:{
 					'placeList':'1',
 					'cityCode':cityCode,
@@ -301,7 +301,7 @@
 				"searching": false,
 				"ajax":{  
 					url: base_path+"Order/getPlacedOrders",  
-					type:"GET",
+					type:"POST",
 					data:{	
 						'placeList':'1',
 						'cityCode':cityCode,
@@ -324,7 +324,7 @@
 							//alert(code);
 							$.ajax({
 								url: base_path+"Order/transfer",  
-								method:"GET",
+								method:"POST",
 								data:{code:code},
 								datatype:"text",
 								success: function(data)

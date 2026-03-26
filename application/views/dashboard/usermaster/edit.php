@@ -340,7 +340,7 @@
 		debugger;
 		$.ajax({
 			url: "<?php echo site_url('Usermaster/checkPassword'); ?>",
-			method: "GET",
+			method: "POST",
 			data: {
 				'password': password,
 				"code": code
@@ -380,7 +380,7 @@
 				var code = $("#code").val();
 				if (mobile != "") {
 					$.ajax({
-						type: 'get',
+						type: 'POST',
 						url: '<?php echo base_url() . 'Usermaster/duplicateMobileForEdit' ?>',
 						data: {
 							'mobile': mobile,'code':code
@@ -410,7 +410,7 @@
 				var code = $("#code").val();
 				if (email != "") {
 					$.ajax({
-						type: 'get',
+						type: 'POST',
 						url: '<?php echo base_url() . 'Usermaster/duplicateEmailForEdit' ?>',
 						data: {
 							'email': email,'code':code
@@ -444,7 +444,7 @@
 
 		$.ajax({
 			url: "<?php echo site_url('Usermaster/checkUserName'); ?>",
-			method: "GET",
+			method: "POST",
 			data: {
 				'userName': userName
 			},
@@ -496,7 +496,7 @@
 		{
 			$.ajax({
 				url: "<?php echo site_url('Usermaster/checkDeliveryBoyOrders'); ?>",
-				method: "GET",
+				method: "POST",
 				data: {
 					"code": code,
 					"userRole":userRole
@@ -562,7 +562,7 @@
 		{
 			$.ajax({
 				url: "<?php echo site_url('Usermaster/checkDeliveryBoyOrders'); ?>",
-				method: "GET",
+				method: "POST",
 				data: {
 					"code": code,
 					"userRole":userRole

@@ -22,7 +22,7 @@ class Admin extends CI_Controller
 
 			//pending and cancelled order count
 			$data['pendingRes'] = $this->GlobalModel->getCountOfValueWithDate('ordermaster', 'orderStatus', 'PND');
-			$data['qry'] =$this->db->last_query(); 
+			$data['qry'] = $this->db->last_query();
 			$data['cancelledRes'] = $this->GlobalModel->getCountOfValueWithDate('ordermaster', 'orderStatus', 'CAN');
 
 			//placed and delivered and rejected order count
@@ -42,8 +42,7 @@ class Admin extends CI_Controller
 
 			//valueable coustmer count
 			$data['customer'] = $this->GlobalModel->getCountOfPerticularValue('clientmaster', 'isDelete', 0);
-			$data['oreder'] = $this->GlobalModel->selectData('ordermaster');
-// 			print_r($data);
+			$data['oreder'] = $this->GlobalModel->selectData('ordermaster'); // 			print_r($data);
 // 			exit();
 
 			$orderColumns = array("count(resetpassword.id) pCount,usermaster.code,usermaster.role");
@@ -60,7 +59,8 @@ class Admin extends CI_Controller
 			$p_result = $this->GlobalModel->selectQuery($orderColumns, 'resetpassword', $cond, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 			if ($p_result) {
 				$data["dlbReset"] = $p_result->result_array()[0]["pCount"];
-			} else {
+			}
+			else {
 				$data["dlbReset"] = 0;
 			}
 
@@ -79,7 +79,8 @@ class Admin extends CI_Controller
 			$c_result = $this->GlobalModel->selectQuery($orderColumns1, 'resetpassword', $cond1, $orderBy1, $join1, $joinType1, $like1, $limit1, $offset1, $groupByColumn1, $extraCondition1);
 			if ($c_result) {
 				$data["usrReset"] = $c_result->result_array()[0]["puCount"];
-			} else {
+			}
+			else {
 				$data["usrReset"] = 0;
 			}
 
@@ -88,14 +89,16 @@ class Admin extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/dashboard', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$data['error_message'] = $this->session->flashdata('error_message');
 			$data['logout_message'] = $this->session->flashdata('logout_message');
 			$this->load->view('dashboard/login', $data);
 		}
 	}
-	
-	public function testRealtime(){
+
+	public function testRealtime()
+	{
 		$this->session_key = $this->session->userdata('key' . SESS_KEY);
 		if (isset($this->session->userdata['logged_in' . $this->session_key]['code'])) {
 			$data['username'] = ($this->session->userdata['logged_in' . $this->session_key]['username']);
@@ -103,7 +106,8 @@ class Admin extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/realtime', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$data['error_message'] = $this->session->flashdata('error_message');
 			$data['logout_message'] = $this->session->flashdata('logout_message');
 			$this->load->view('dashboard/login', $data);
@@ -140,7 +144,7 @@ class Admin extends CI_Controller
 		$this->load->library('zip');
 		$this->load->dbutil();
 		$db_format = array('format' => 'zip', 'filename' => 'wf_eveggies.sql');
-		$backup = &$this->dbutil->backup($db_format);
+		$backup = & $this->dbutil->backup($db_format);
 		$dbname = 'backup-on-' . date('Y-m-d') . '.zip';
 		$save = 'assets/db_backup/' . $dbname;
 		write_file($save, $backup);
@@ -150,7 +154,7 @@ class Admin extends CI_Controller
 	//dashboard inward list
 	public function getInwardList()
 	{
-		$offset = $_GET['start'];
+		$offset = $this->input->post('start') ?? $this->input->get('start');
 		$limit = 5;
 		$tableName = 'inwardentries';
 		$orderColumns = array("inwardentries.*");
@@ -172,7 +176,7 @@ class Admin extends CI_Controller
 			for ($i = 0; $i < $totalRecords; $i++) {
 
 				$inwardCode = $Records->result()[$i]->code;
-				$offset1 = $_GET['start'];
+				$offset1 = $this->input->post('start') ?? $this->input->get('start');
 				$limit1 = 1;
 				$tableName1 = 'inwardlineentries';
 				$orderColumns1 = array("inwardlineentries.*,storagemaster.storageName,storagemaster.storageSName");
@@ -183,7 +187,7 @@ class Admin extends CI_Controller
 				$groupByColumn1 = array();
 				$extraCondition1 = array();
 				$lineRecords = $this->GlobalModel->selectQuery($orderColumns1, $tableName1, $cond1, $orderBy1, $join1, $joinType1, array(), $limit1, $offset1, $groupByColumn1, $extraCondition1);
-				$srno = $_GET['start'] + 1;
+				$srno = (intval($offset1) > 0 ? intval($offset1) : 0) + 1;
 				$data = array();
 				$dataCount = sizeof($lineRecords->result());
 				array_push($dataCountArray, $dataCount);
@@ -204,13 +208,14 @@ class Admin extends CI_Controller
 			$totalCount = array_sum($dataCountArray);
 			// $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns1,$tableName1,$cond1,$orderBy1,$join1,$joinType1,array(),$limit1,$offset1,$groupByColumn1, $extraCondition1)->result_array());
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal" => $totalCount,
 				"recordsFiltered" => $totalCount,
 				"data" => $dataArray
 			);
 			echo json_encode($output);
-		} else {
+		}
+		else {
 
 			$output = array(
 				"draw" => intval($_GET["draw"]),
@@ -240,10 +245,10 @@ class Admin extends CI_Controller
 
 	public function getProductList()
 	{
-		$productCode = $this->input->GET('productCode');
+		$productCode = $this->input->post('productCode') ?? $this->input->get('productCode');
 		$currentDate = date("Y-m-d");
 
-		$offset = $_GET['start'];
+		$offset = $this->input->post('start') ?? $this->input->get('start');
 		$limit = 1;
 		$tableName = 'productmaster';
 		$orderColumns = array("productmaster.code,productmaster.productName,productmaster.productCategory,inwardlineentries.inwardCode,inwardlineentries.productCode,inwardlineentries.storageCode,inwardlineentries.addDate,storagemaster.storageName,storagemaster.storageSName,inwardentries.code,inwardentries.inwardDate");
@@ -257,7 +262,7 @@ class Admin extends CI_Controller
 
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $cond, $orderBy, $join, $joinType, array(), $limit, $offset, $groupByColumn, $extraCondition);
 		if ($Records) {
-			$srno = $_GET['start'] + 1;
+			$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 			$data = array();
 
 			foreach ($Records->result() as $row) {
@@ -285,7 +290,8 @@ class Admin extends CI_Controller
 					foreach ($totalAmount->result() as $amt) {
 						$amount = $amt->total;
 					}
-				} else {
+				}
+				else {
 					$amount = 0;
 				}
 				$data[] = array(
@@ -300,15 +306,16 @@ class Admin extends CI_Controller
 
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $cond, $orderBy, $join, $joinType, array(), $limit, $offset, $groupByColumn, $extraCondition)->result_array());
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal" => $dataCount,
 				"recordsFiltered" => $dataCount,
 				"data" => $data
 			);
 			echo json_encode($output);
-		} else {
+		}
+		else {
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal" => 0,
 				"recordsFiltered" => 0,
 				"data" => '',
@@ -321,11 +328,11 @@ class Admin extends CI_Controller
 	public function getOrderCounts()
 	{
 		$today = date('Y-m-d');
-		$orderAssignedDelvBoyVege = $orderAssignedDelvBoyFood = $absentDelvBoysVege = $absentDelvBoysFood = $totalDelvBoysFood = $totalDelvBoysVege = $presentDelBoysFood = $presentDelBoysVege = $totalDelvBoys = $rejectedOrders = $deliveredOrders = $releasedOrders = $cancelledOrders = $pickedOrders = $placedOrders = $pendingOrders = $totalOrders  = 0;
+		$orderAssignedDelvBoyVege = $orderAssignedDelvBoyFood = $absentDelvBoysVege = $absentDelvBoysFood = $totalDelvBoysFood = $totalDelvBoysVege = $presentDelBoysFood = $presentDelBoysVege = $totalDelvBoys = $rejectedOrders = $deliveredOrders = $releasedOrders = $cancelledOrders = $pickedOrders = $placedOrders = $pendingOrders = $totalOrders = 0;
 		$joinType = $join = $like = $orderBy = array();
 		$limit = $offset = $extraCondition = "";
 		//$condition = array("ordermaster.isActive" => 1,"ordermaster.paymentStatus"=>"PID");
-        $condition = array("ordermaster.isActive" => 1);
+		$condition = array("ordermaster.isActive" => 1);
 		$groupBy = array();
 		$extraCondition = "(`ordermaster`.`orderStatus` NOT IN ('RJT', 'CAN')) AND (`ordermaster`.`addDate` BETWEEN '" . $today . " 00:00:00' AND '" . $today . " 23:59:59')";
 		$allOrders = $this->GlobalModel->selectQuery("COUNT(DISTINCT `ordermaster`.`code`) as cnt", "ordermaster", $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy, $extraCondition);
@@ -352,21 +359,21 @@ class Admin extends CI_Controller
 // 			$pendingOrders = $allPendingOrders->result()[0]->cnt;
 // 		}
 
-        $condition['vendorordermaster.orderStatus'] = 'PND';
-        //$condition['vendorordermaster.paymentStatus'] = 'PID';
+		$condition['vendorordermaster.orderStatus'] = 'PND';
+		//$condition['vendorordermaster.paymentStatus'] = 'PID';
 		$groupBy1 = array();
-		$extraCondition1 ="";
+		$extraCondition1 = "";
 		//$extraCondition1 = " (vendorordermaster.addDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
 		$allPendingOrders = $this->GlobalModel->selectQuery("count(distinct vendorordermaster.code) as cnt", "vendorordermaster", $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy1, $extraCondition1);
 		if ($allPendingOrders) {
 			$pendingOrders = $allPendingOrders->result()[0]->cnt;
 		}
-		
+
 		$condition1['ordermaster.orderStatus'] = 'PND';
-	    //$condition1['ordermaster.paymentStatus'] = 'PID';
+		//$condition1['ordermaster.paymentStatus'] = 'PID';
 		$condition1['ordermaster.isActive'] = 1;
 		$groupBy1 = array();
-		$extraCondition1="";
+		$extraCondition1 = "";
 		//$extraCondition1 = "(ordermaster.addDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
 		$allPendingOrders = $this->GlobalModel->selectQuery("count(distinct ordermaster.code) as cnt", "ordermaster", $condition1, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy1, $extraCondition1);
 		//echo $this->db->last_query();
@@ -382,7 +389,7 @@ class Admin extends CI_Controller
 		if ($allOrders) {
 			$placedOrders = $allOrders->result()[0]->cnt;
 		}
-		
+
 		//$condition2_1['vendorordermaster.orderStatus'] = 'PLC';
 		//$condition2_1['vendorordermaster.paymentStatus'] = 'PID';
 		$groupBy2_1 = array();
@@ -391,7 +398,7 @@ class Admin extends CI_Controller
 		if ($allOrders) {
 			$placedOrders += $allOrders->result()[0]->cnt;
 		}
-        
+
 		$condition3['ordermaster.orderStatus'] = 'PUP';
 		$condition3['ordermaster.isActive'] = '1';
 		$groupBy3 = array();
@@ -400,8 +407,8 @@ class Admin extends CI_Controller
 		if ($allOrders) {
 			$pickedOrders = $allOrders->result()[0]->cnt;
 		}
-		
-		
+
+
 		$condition3_1['vendorordermaster.orderStatus'] = 'PUP';
 		$condition3_1['vendorordermaster.isActive'] = '1';
 		$groupBy3_1 = array();
@@ -422,26 +429,26 @@ class Admin extends CI_Controller
 
 
 		$condition5['ordermaster.orderStatus'] = 'DEL';
-		$condition5['ordermaster.isActive']=1;
+		$condition5['ordermaster.isActive'] = 1;
 		$groupBy5 = array();
 		$extraCondition5 = " (ordermaster.editDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
 		$delOrders = $this->GlobalModel->selectQuery("count(distinct ordermaster.code) as cnt", "ordermaster", $condition5, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy5, $extraCondition5);
 		if ($delOrders) {
 			$deliveredOrders = $delOrders->result()[0]->cnt;
 		}
-		
-		$condition19['vendorordermaster.orderStatus']="DEL";
-		$condition19['vendorordermaster.isActive']=1;
+
+		$condition19['vendorordermaster.orderStatus'] = "DEL";
+		$condition19['vendorordermaster.isActive'] = 1;
 		$extraCondition19 = " (vendorordermaster.editDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
 		$delRestoOrders = $this->GlobalModel->selectQuery("count(distinct ordermaster.code) as cnt", "ordermaster", $condition5, $orderBy, $join, $joinType, $like, $limit, $offset, array(), $extraCondition19);
 		if ($delRestoOrders) {
 			$deliveredOrders += $delRestoOrders->result()[0]->cnt;
 		}
-		
+
 		$condition6['deliveryboystatuslines.orderStatus'] = 'REL';
 		$groupBy6 = array();
 		$joinType6 = array('vendorordermaster' => "inner");
-		$join6 = array('vendorordermaster'=>'vendorordermaster.code=deliveryboystatuslines.orderCode');  
+		$join6 = array('vendorordermaster' => 'vendorordermaster.code=deliveryboystatuslines.orderCode');
 		$extraCondition6 = " (vendorordermaster.deliveryBoyCode='' or  vendorordermaster.deliveryBoyCode IS NULL) and (deliveryboystatuslines.addDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
 		$allOrders = $this->GlobalModel->selectQuery("count(deliveryboystatuslines.orderCode) as cnt", "deliveryboystatuslines", $condition6, $orderBy, $join6, $joinType6, $like, $limit, $offset, $groupBy6, $extraCondition6);
 		//echo $this->db->last_query();
@@ -451,7 +458,7 @@ class Admin extends CI_Controller
 		$conditiongroc['deliveryboystatuslines.orderStatus'] = 'REL';
 		$groupBygroc = array();
 		$joinTypegroc = array('ordermaster' => "inner");
-		$joingroc = array('ordermaster'=>'ordermaster.code=deliveryboystatuslines.orderCode');  
+		$joingroc = array('ordermaster' => 'ordermaster.code=deliveryboystatuslines.orderCode');
 		$extraConditiongroc = " (ordermaster.deliveryBoyCode='' or ordermaster.deliveryBoyCode is null) and (deliveryboystatuslines.addDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
 		$allOrdersgroc = $this->GlobalModel->selectQuery("count(deliveryboystatuslines.orderCode) as cnt", "deliveryboystatuslines", $conditiongroc, $orderBy, $joingroc, $joinTypegroc, $like, $limit, $offset, $groupBygroc, $extraConditiongroc);
 		///echo $this->db->last_query();
@@ -467,74 +474,74 @@ class Admin extends CI_Controller
 		if ($allOrders) {
 			$cancelledOrders = $allOrders->result()[0]->cnt;
 		}
-		
+
 		//echo $this->db->last_query();
 		//exit();  
-		 
+
 		$condition8['usermaster.isActive'] = '1';
 		$condition8['deliveryBoyActiveOrder.isActive'] = '1';
 		$condition8['usermaster.role'] = 'DLB';
-		$groupBy8 = array(); 
+		$groupBy8 = array();
 		$join8['deliveryBoyActiveOrder'] = "deliveryBoyActiveOrder.deliveryBoyCode=usermaster.code";
-		$joinType8['deliveryBoyActiveOrder'] ='inner';
+		$joinType8['deliveryBoyActiveOrder'] = 'inner';
 		$delBoys = $this->GlobalModel->selectQuery(" (select Count(usermaster.code) from usermaster INNER JOIN `deliveryBoyActiveOrder` ON `deliveryBoyActiveOrder`.`deliveryBoyCode`=`usermaster`.`code` where deliveryType='food' and usermaster.isActive=1 and `deliveryBoyActiveOrder`.`isActive` = 1 and usermaster.role='DLB') as foodCnt, (select Count(usermaster.code) from usermaster INNER JOIN `deliveryBoyActiveOrder` ON `deliveryBoyActiveOrder`.`deliveryBoyCode`=`usermaster`.`code` where deliveryType='slot' and usermaster.isActive=1 and `deliveryBoyActiveOrder`.`isActive` = 1 and  usermaster.role='DLB') as vegeCnt", "usermaster", $condition8, $orderBy, $join8, $joinType8, $like, 1, $offset, $groupBy8, "");
 		//echo $this->db->last_query();
 		if ($delBoys) {
 			$totalDelvBoysFood = $delBoys->result()[0]->foodCnt;
-			$totalDelvBoysVege = $delBoys->result()[0]->vegeCnt;  
+			$totalDelvBoysVege = $delBoys->result()[0]->vegeCnt;
 		}
-		
+
 		$condition9['deliveryBoyActiveOrder.loginStatus'] = '1';
 		$condition9['deliveryBoyActiveOrder.isActive'] = '1';
 		$condition9['usermaster.isActive'] = '1';
 		$condition9['usermaster.deliveryType'] = 'food';
 		$condition9['usermaster.role'] = 'DLB';
 		$join9['usermaster'] = "deliveryBoyActiveOrder.deliveryBoyCode=usermaster.code";
-		$joinType9['usermaster'] ='inner';
-		$groupBy9 = array(); 
-		$delBoys = $this->GlobalModel->selectQuery("count(distinct deliveryBoyActiveOrder.deliveryBoyCode) as cnt", "deliveryBoyActiveOrder", $condition9, $orderBy, $join9, $joinType9, $like, $limit, $offset, $groupBy9, "");  
+		$joinType9['usermaster'] = 'inner';
+		$groupBy9 = array();
+		$delBoys = $this->GlobalModel->selectQuery("count(distinct deliveryBoyActiveOrder.deliveryBoyCode) as cnt", "deliveryBoyActiveOrder", $condition9, $orderBy, $join9, $joinType9, $like, $limit, $offset, $groupBy9, "");
 		//echo $this->db->last_query();
-		
+
 		if ($delBoys) {
-			$presentDelBoysFood = $delBoys->result()[0]->cnt;   
+			$presentDelBoysFood = $delBoys->result()[0]->cnt;
 		}
-		
+
 		$condition14['deliveryBoyActiveOrder.loginStatus'] = '1';
 		$condition14['deliveryBoyActiveOrder.isActive'] = '1';
 		$condition14['usermaster.deliveryType'] = 'slot';
 		$condition14['usermaster.isActive'] = '1';
 		$condition14['usermaster.role'] = 'DLB';
 		$join14['usermaster'] = "deliveryBoyActiveOrder.deliveryBoyCode=usermaster.code";
-		$joinType14['usermaster'] ='inner';
-		$groupBy14 = array(); 
+		$joinType14['usermaster'] = 'inner';
+		$groupBy14 = array();
 		$delBoys = $this->GlobalModel->selectQuery("count(distinct deliveryBoyActiveOrder.deliveryBoyCode) as cnt", "deliveryBoyActiveOrder", $condition14, $orderBy, $join14, $joinType14, $like, $limit, $offset, $groupBy14, "");
 		//echo $this->db->last_query();
 		if ($delBoys) {
 			$presentDelBoysVege = $delBoys->result()[0]->cnt;
 		}
-		
+
 		$condition10['deliveryBoyActiveOrder.loginStatus'] = '0';
 		$condition10['deliveryBoyActiveOrder.isActive'] = '1';
 		$condition10['usermaster.deliveryType'] = 'food';
 		$condition10['usermaster.role'] = 'DLB';
 		$condition10['usermaster.isActive'] = '1';
 		$join10['usermaster'] = "deliveryBoyActiveOrder.deliveryBoyCode=usermaster.code";
-		$joinType10['usermaster'] ='inner';
-		$groupBy10 = array(); 
+		$joinType10['usermaster'] = 'inner';
+		$groupBy10 = array();
 		$delBoys = $this->GlobalModel->selectQuery("count(distinct deliveryBoyActiveOrder.deliveryBoyCode) as cnt", "deliveryBoyActiveOrder", $condition10, $orderBy, $join10, $joinType10, $like, $limit, $offset, $groupBy10, "");
 		//echo $this->db->last_query();
 		//exit();
 		if ($delBoys) {
 			$absentDelvBoysFood = $delBoys->result()[0]->cnt;
-		}		
+		}
 		$condition13['deliveryBoyActiveOrder.loginStatus'] = '0';
 		$condition13['deliveryBoyActiveOrder.isActive'] = '1';
 		$condition13['usermaster.deliveryType'] = 'slot';
 		$condition13['usermaster.role'] = 'DLB';
 		$condition13['usermaster.isActive'] = '1';
 		$join13['usermaster'] = "deliveryBoyActiveOrder.deliveryBoyCode=usermaster.code";
-		$joinType13['usermaster'] ='inner';
-		$groupBy13 = array(); 
+		$joinType13['usermaster'] = 'inner';
+		$groupBy13 = array();
 		$delBoys = $this->GlobalModel->selectQuery("count(distinct deliveryBoyActiveOrder.deliveryBoyCode) as cnt", "deliveryBoyActiveOrder", $condition13, $orderBy, $join13, $joinType13, $like, $limit, $offset, $groupBy13, "");
 		//echo $this->db->last_query();
 		//exit();
@@ -548,8 +555,8 @@ class Admin extends CI_Controller
 		$condition11['usermaster.role'] = 'DLB';
 		$condition11['usermaster.isActive'] = '1';
 		$join11['usermaster'] = "deliveryBoyActiveOrder.deliveryBoyCode=usermaster.code";
-		$joinType11['usermaster'] ='inner';
-		$groupBy11 = array(); 
+		$joinType11['usermaster'] = 'inner';
+		$groupBy11 = array();
 		$delBoys = $this->GlobalModel->selectQuery("count(distinct deliveryBoyActiveOrder.deliveryBoyCode) as cnt", "deliveryBoyActiveOrder", $condition11, $orderBy, $join11, $joinType11, $like, $limit, $offset, $groupBy11, "");
 		//echo $this->db->last_query();
 		if ($delBoys) {
@@ -562,12 +569,12 @@ class Admin extends CI_Controller
 		$condition12['usermaster.role'] = 'DLB';
 		$condition12['usermaster.isActive'] = '1';
 		$join12['usermaster'] = "deliveryBoyActiveOrder.deliveryBoyCode=usermaster.code";
-		$joinType12['usermaster'] ='inner';
-		$groupBy12 = array(); 
+		$joinType12['usermaster'] = 'inner';
+		$groupBy12 = array();
 		$delBoys = $this->GlobalModel->selectQuery("count(distinct deliveryBoyActiveOrder.deliveryBoyCode) as cnt", "deliveryBoyActiveOrder", $condition12, $orderBy, $join12, $joinType12, $like, $limit, $offset, $groupBy12, "");
 		if ($delBoys) {
 			$orderAssignedDelvBoyVege = $delBoys->result()[0]->cnt;
-		}		
+		}
 		$res['cancelledOrders'] = $cancelledOrders;
 		$res['releasedOrders'] = $releasedOrders;
 		$res['deliveredOrders'] = $deliveredOrders;
@@ -575,7 +582,7 @@ class Admin extends CI_Controller
 		$res['pickedOrders'] = $pickedOrders;
 		$res['placedOrders'] = $placedOrders;
 		$res['pendingOrders'] = $pendingOrders;
-		$res['totalOrders'] = $totalOrders; 
+		$res['totalOrders'] = $totalOrders;
 		$res['totalDelvBoysFood'] = $totalDelvBoysFood;
 		$res['totalDelvBoysVege'] = $totalDelvBoysVege;
 		$res['presentDelBoysFood'] = $presentDelBoysFood;
@@ -590,22 +597,22 @@ class Admin extends CI_Controller
 	public function getVegeGroceryReleasedOrders()
 	{
 		$today = date('Y-m-d');
-		$total = 0; 
-		$tableName = 'deliveryboystatuslines'; 
-		$whereConditionArray =array('deliveryboystatuslines.orderStatus'=>'REL');
-		$orderColumnsArray = array('deliveryboystatuslines.deliveryBoyCode,deliveryboystatuslines.orderCode,deliveryboystatuslines.reason,deliveryboystatuslines.addDate,clientmaster.name,ordermaster.totalPrice'); 
+		$total = 0;
+		$tableName = 'deliveryboystatuslines';
+		$whereConditionArray = array('deliveryboystatuslines.orderStatus' => 'REL');
+		$orderColumnsArray = array('deliveryboystatuslines.deliveryBoyCode,deliveryboystatuslines.orderCode,deliveryboystatuslines.reason,deliveryboystatuslines.addDate,clientmaster.name,ordermaster.totalPrice');
 		$orderBy = array('deliveryboystatuslines.id' => 'DESC');
-		$joinType = array('ordermaster' => "inner",'clientmaster' => 'inner');
-		$join = array('ordermaster'=>'ordermaster.code=deliveryboystatuslines.orderCode','clientmaster' => 'clientmaster.code=ordermaster.clientCode');  
+		$joinType = array('ordermaster' => "inner", 'clientmaster' => 'inner');
+		$join = array('ordermaster' => 'ordermaster.code=deliveryboystatuslines.orderCode', 'clientmaster' => 'clientmaster.code=ordermaster.clientCode');
 		$like = array();
 		$limit = $this->input->GET("length");
 		$offset = $this->input->GET("start");
 		$groupByColumn = array();
-		$extraCondition = " (ordermaster.deliveryBoyCode='' or ordermaster.deliveryBoyCode is null) and deliveryboystatuslines.addDate BETWEEN '" .$today . " 00:00:01' and '" . $today . " 23:59:59'";
+		$extraCondition = " (ordermaster.deliveryBoyCode='' or ordermaster.deliveryBoyCode is null) and deliveryboystatuslines.addDate BETWEEN '" . $today . " 00:00:01' and '" . $today . " 23:59:59'";
 		$Records = $this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		$srno = $offset + 1;
 		$data = array();
-		$dataCount = 0; 
+		$dataCount = 0;
 		//echo $this->db->last_query();
 		if ($Records) {
 			foreach ($Records->result() as $row) {
@@ -617,40 +624,41 @@ class Admin extends CI_Controller
 					$conditionDLB = array('usermaster.code' => $dlbCode);
 					$RecordsDLB = $this->GlobalModel->selectQuery($orderColumnsDLB, $tableNameDLB, $conditionDLB);
 					if ($RecordsDLB) {
-						$dlbName = $RecordsDLB->result()[0]->name . ' ( '.$RecordsDLB->result()[0]->mobile.' )'.'<br><b>Reason : </b>'.$row->reason;
+						$dlbName = $RecordsDLB->result()[0]->name . ' ( ' . $RecordsDLB->result()[0]->mobile . ' )' . '<br><b>Reason : </b>' . $row->reason;
 					}
-				} else {
+				}
+				else {
 					$dlbName = '';
-				} 
+				}
 				$orderDate = date('d-m-Y h:i:s', strtotime($row->addDate));
-				 $actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('Order/view/' . $row->orderCode). '"><i class="ti-eye"></i> Open</a>';
-			    $data[] = array($srno, $row->orderCode, $orderDate, $row->name, $row->totalPrice, $dlbName ,$actionHtml); 
-				$srno++; 
+				$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('Order/view/' . $row->orderCode) . '"><i class="ti-eye"></i> Open</a>';
+				$data[] = array($srno, $row->orderCode, $orderDate, $row->name, $row->totalPrice, $dlbName, $actionHtml);
+				$srno++;
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
-		} 
+		}
 		$output = array("draw" => intval($this->input->GET("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
 		echo json_encode($output);
 	}
 	public function getFoodReleasedOrders()
 	{
 		$today = date('Y-m-d');
-		$total = 0; 
-		$tableName = 'deliveryboystatuslines'; 
-		$whereConditionArray =array('deliveryboystatuslines.orderStatus'=>'REL');
-		$orderColumnsArray = array('deliveryboystatuslines.deliveryBoyCode,vendorordermaster.vendorCode,vendor.entityName,deliveryboystatuslines.orderCode,deliveryboystatuslines.reason,deliveryboystatuslines.addDate,clientmaster.name,vendorordermaster.grandTotal'); 
+		$total = 0;
+		$tableName = 'deliveryboystatuslines';
+		$whereConditionArray = array('deliveryboystatuslines.orderStatus' => 'REL');
+		$orderColumnsArray = array('deliveryboystatuslines.deliveryBoyCode,vendorordermaster.vendorCode,vendor.entityName,deliveryboystatuslines.orderCode,deliveryboystatuslines.reason,deliveryboystatuslines.addDate,clientmaster.name,vendorordermaster.grandTotal');
 		$orderBy = array('deliveryboystatuslines.id' => 'DESC');
-		$joinType = array('vendorordermaster' => "inner",'clientmaster' => 'inner','vendor'=>'inner');
-		$join = array('vendorordermaster'=>'vendorordermaster.code=deliveryboystatuslines.orderCode','vendor' => 'vendor.code=vendorordermaster.vendorCode','clientmaster' => 'clientmaster.code=vendorordermaster.clientCode');  
+		$joinType = array('vendorordermaster' => "inner", 'clientmaster' => 'inner', 'vendor' => 'inner');
+		$join = array('vendorordermaster' => 'vendorordermaster.code=deliveryboystatuslines.orderCode', 'vendor' => 'vendor.code=vendorordermaster.vendorCode', 'clientmaster' => 'clientmaster.code=vendorordermaster.clientCode');
 		$like = array();
 		$limit = $this->input->GET("length");
 		$offset = $this->input->GET("start");
 		$groupByColumn = array();
-		$extraCondition = " (vendorordermaster.deliveryBoyCode='' or vendorordermaster.deliveryBoyCode is null) and deliveryboystatuslines.addDate BETWEEN '" .$today . " 00:00:01' and '" . $today . " 23:59:59'";
+		$extraCondition = " (vendorordermaster.deliveryBoyCode='' or vendorordermaster.deliveryBoyCode is null) and deliveryboystatuslines.addDate BETWEEN '" . $today . " 00:00:01' and '" . $today . " 23:59:59'";
 		$Records = $this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		$srno = $offset + 1;
 		$data = array();
-		$dataCount = 0; 
+		$dataCount = 0;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$dlbName = '';
@@ -661,110 +669,116 @@ class Admin extends CI_Controller
 					$conditionDLB = array('usermaster.code' => $dlbCode);
 					$RecordsDLB = $this->GlobalModel->selectQuery($orderColumnsDLB, $tableNameDLB, $conditionDLB);
 					if ($RecordsDLB) {
-						$dlbName = $RecordsDLB->result()[0]->name . ' ( '.$RecordsDLB->result()[0]->mobile.' )'.'<br><b>Reason : </b>'.$row->reason;
+						$dlbName = $RecordsDLB->result()[0]->name . ' ( ' . $RecordsDLB->result()[0]->mobile . ' )' . '<br><b>Reason : </b>' . $row->reason;
 					}
-				} else {
+				}
+				else {
 					$dlbName = '';
-				} 
+				}
 				$orderDate = date('d-m-Y h:i A', strtotime($row->addDate));
-				 $actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('foodOrderList/FoodOrderList/view/' . $row->orderCode). '"><i class="ti-eye"></i> Open</a>';
-			    $data[] = array($srno, $row->orderCode, $orderDate, $row->name,$row->entityName,$row->grandTotal,$dlbName,$actionHtml); 
-				$srno++; 
+				$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('foodOrderList/FoodOrderList/view/' . $row->orderCode) . '"><i class="ti-eye"></i> Open</a>';
+				$data[] = array($srno, $row->orderCode, $orderDate, $row->name, $row->entityName, $row->grandTotal, $dlbName, $actionHtml);
+				$srno++;
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
-		} 
+		}
 		$output = array("draw" => intval($this->input->GET("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
 		echo json_encode($output);
 	}
 	public function getVegeGroceryOrders()
 	{
 		$today = date('Y-m-d');
-		$total = 0; 
-		$orderStatus = $this->input->get('orderStatus'); 
-		$tableName = 'ordermaster'; 
-		$whereConditionArray =array();
-		if($orderStatus!="all"){
-			if($orderStatus=="PLC"){
-				$whereConditionArray =array();
-			}else{
-			    $whereConditionArray['ordermaster.orderStatus'] = $orderStatus;
+		$total = 0;
+		$orderStatus = $this->input->get('orderStatus');
+		$tableName = 'ordermaster';
+		$whereConditionArray = array();
+		if ($orderStatus != "all") {
+			if ($orderStatus == "PLC") {
+				$whereConditionArray = array();
+			}
+			else {
+				$whereConditionArray['ordermaster.orderStatus'] = $orderStatus;
 			}
 		}
 		$whereConditionArray['ordermaster.isActive'] = 1;
 		//$whereConditionArray['ordermaster.paymentStatus'] = "PID";
-		$orderColumnsArray = array('ordermaster.*,ordermaster.editDate as edate,ordermaster.code as orderCode,ordermaster.addDate as orderaddDate,ordermaster.editID as orderEditID,clientmaster.*,clientprofile.pincode,customaddressmaster.*'); 
+		$orderColumnsArray = array('ordermaster.*,ordermaster.editDate as edate,ordermaster.code as orderCode,ordermaster.addDate as orderaddDate,ordermaster.editID as orderEditID,clientmaster.*,clientprofile.pincode,customaddressmaster.*');
 		$orderBy = array('ordermaster' . '.id' => 'DESC');
 		$joinType = array('clientmaster' => 'inner', 'clientprofile' => 'inner', 'customaddressmaster' => "left");
-		$join = array('customaddressmaster' => 'customaddressmaster.code = ordermaster.areaCode', 'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode', 'clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode');  
+		$join = array('customaddressmaster' => 'customaddressmaster.code = ordermaster.areaCode', 'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode', 'clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode');
 		$like = array();
 		$limit = $this->input->GET("length");
 		$offset = $this->input->GET("start");
 		$groupByColumn = array("ordermaster.code");
-		$extraCondition="";
-		if($orderStatus!='all'){
-		    if($orderStatus=="PND"){
-		       $extraCondition ="";
-		    }
-		    else if($orderStatus=="PLC")
-		    {
-		      $extraCondition = "(ordermaster.orderStatus not in('PND','RJT', 'CAN','DEL','REL','RCH')) and (ordermaster.editDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";    
-		    }else if($orderStatus=="DEL"){
-				$extraCondition="ordermaster.editDate BETWEEN '" .$today . " 00:00:01' and '" . $today . " 23:59:59'";
+		$extraCondition = "";
+		if ($orderStatus != 'all') {
+			if ($orderStatus == "PND") {
+				$extraCondition = "";
 			}
-			
-		} else{
-			$extraCondition = "(ordermaster.orderStatus not in('RJT','CAN')) and ordermaster.addDate BETWEEN '" .$today . " 00:00:01' and '" . $today . " 23:59:59'";
-		} 
+			else if ($orderStatus == "PLC") {
+				$extraCondition = "(ordermaster.orderStatus not in('PND','RJT', 'CAN','DEL','REL','RCH')) and (ordermaster.editDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
+			}
+			else if ($orderStatus == "DEL") {
+				$extraCondition = "ordermaster.editDate BETWEEN '" . $today . " 00:00:01' and '" . $today . " 23:59:59'";
+			}
+
+		}
+		else {
+			$extraCondition = "(ordermaster.orderStatus not in('RJT','CAN')) and ordermaster.addDate BETWEEN '" . $today . " 00:00:01' and '" . $today . " 23:59:59'";
+		}
 		$Records = $this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		
-		$r= $this->db->last_query();
+
+		$r = $this->db->last_query();
 		//echo $r;
 		$srno = $offset + 1;
 		$data = array();
-		$dataCount = 0; 
+		$dataCount = 0;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$dlbName = '';
 				$dlbCode = $row->deliveryBoyCode;
 				if ($dlbCode != '') {
-					$tableNameDLB = "usermaster"; 
+					$tableNameDLB = "usermaster";
 					$orderColumnsDLB = array("usermaster.*");
 					$conditionDLB = array('usermaster.code' => $dlbCode);
 					$RecordsDLB = $this->GlobalModel->selectQuery($orderColumnsDLB, $tableNameDLB, $conditionDLB);
 					if ($RecordsDLB) {
-						$dlbName = $RecordsDLB->result()[0]->name . ' ('.$RecordsDLB->result()[0]->mobile.')';
+						$dlbName = $RecordsDLB->result()[0]->name . ' (' . $RecordsDLB->result()[0]->mobile . ')';
 					}
-				} else {
+				}
+				else {
 					$dlbName = '';
-				} 
-				if($orderStatus!='all'){
+				}
+				if ($orderStatus != 'all') {
 					$orderDate = date('d-m-Y h:i A', strtotime($row->edate));
-				} else {
+				}
+				else {
 					$orderDate = date('d-m-Y h:i A', strtotime($row->orderaddDate));
 				}
-				$orderStatus = $row->orderStatus; 
-				 $actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('Order/view/' . $row->orderCode). '"><i class="ti-eye"></i> Open</a>';
-			    $data[] = array($srno, $row->orderCode, $orderDate, $row->name, $row->totalPrice, $dlbName ,$actionHtml); 
-				$srno++; 
+				$orderStatus = $row->orderStatus;
+				$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('Order/view/' . $row->orderCode) . '"><i class="ti-eye"></i> Open</a>';
+				$data[] = array($srno, $row->orderCode, $orderDate, $row->name, $row->totalPrice, $dlbName, $actionHtml);
+				$srno++;
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
-		} 
-		$output = array("draw" => intval($this->input->GET("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total,"r"=>$r);
+		}
+		$output = array("draw" => intval($this->input->GET("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total, "r" => $r);
 		echo json_encode($output);
 	}
 
 	public function getFoodOrders()
 	{
-	   $today = date('Y-m-d'); 
-		$orderStatus = $this->input->get('orderStatus'); 
+		$today = date('Y-m-d');
+		$orderStatus = $this->input->get('orderStatus');
 		$tableName = "vendorordermaster";
 		$orderColumns = array("vendorordermaster.*,clientmaster.name,clientmaster.mobile,vendor.entityName,usermaster.empCode,vendororderstatusmaster.statusSName,vendorordermaster.code");
 		$condition = array();
-		if($orderStatus!="all"){
-			if($orderStatus=="PLC"){
-				$whereConditionArray =array();
-			}else{
-			     $condition['vendorordermaster.orderStatus'] = $orderStatus;
+		if ($orderStatus != "all") {
+			if ($orderStatus == "PLC") {
+				$whereConditionArray = array();
+			}
+			else {
+				$condition['vendorordermaster.orderStatus'] = $orderStatus;
 			}
 		}
 		$condition['vendorordermaster.isActive'] = 1;
@@ -775,32 +789,33 @@ class Admin extends CI_Controller
 		$groupByColumn = array("vendorordermaster.code");
 		$limit = $this->input->GET("length");
 		$offset = $this->input->GET("start");
-		$extraCondition="";
-		if($orderStatus!='all'){
-		    if($orderStatus=="PND"){
-		       $extraCondition ="";
-		    }
-		    else if($orderStatus=="PLC")
-		    {
-		      $extraCondition = "(vendorordermaster.orderStatus not in('PND','RJT', 'CAN','DEL','REL','RCH')) and (vendorordermaster.editDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";    
-		    }else if($orderStatus=="DEL"){
-				$extraCondition="vendorordermaster.editDate BETWEEN '" .$today . " 00:00:01' and '" . $today . " 23:59:59'";
+		$extraCondition = "";
+		if ($orderStatus != 'all') {
+			if ($orderStatus == "PND") {
+				$extraCondition = "";
 			}
-			
-		} else{
-			$extraCondition = "(vendorordermaster.orderStatus not in('RJT','CAN')) and vendorordermaster.addDate BETWEEN '" .$today . " 00:00:01' and '" . $today . " 23:59:59'";
-		}  
+			else if ($orderStatus == "PLC") {
+				$extraCondition = "(vendorordermaster.orderStatus not in('PND','RJT', 'CAN','DEL','REL','RCH')) and (vendorordermaster.editDate between '" . $today . " 00:00:00' and '" . $today . " 23:59:59')";
+			}
+			else if ($orderStatus == "DEL") {
+				$extraCondition = "vendorordermaster.editDate BETWEEN '" . $today . " 00:00:01' and '" . $today . " 23:59:59'";
+			}
+
+		}
+		else {
+			$extraCondition = "(vendorordermaster.orderStatus not in('RJT','CAN')) and vendorordermaster.addDate BETWEEN '" . $today . " 00:00:01' and '" . $today . " 23:59:59'";
+		}
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-	    //echo $this->db->last_query();
+		//echo $this->db->last_query();
 		//exit();
-		
+
 		$dataCount = 0;
 		$data = array();
 		$srno = $_GET['start'] + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
-			
+
 				$dlbName = '';
 				$dlbCode = $row->deliveryBoyCode;
 				if ($dlbCode != '') {
@@ -812,18 +827,20 @@ class Admin extends CI_Controller
 					$joinDLB = array();
 					$RecordsDLB = $this->GlobalModel->selectQuery($orderColumnsDLB, $tableNameDLB, $conditionDLB, $orderByDLB, $joinDLB, $joinTypeDLB);
 					if ($RecordsDLB) {
-						$dlbName = $RecordsDLB->result()[0]->name.' ('.$RecordsDLB->result()[0]->mobile.')';
+						$dlbName = $RecordsDLB->result()[0]->name . ' (' . $RecordsDLB->result()[0]->mobile . ')';
 					}
-				} else {
+				}
+				else {
 					$dlbName = '';
 				}
-				
-				if($orderStatus!='all'){
+
+				if ($orderStatus != 'all') {
 					$orderDate = date('d-m-Y h:i A', strtotime($row->editDate));
-				} else {
+				}
+				else {
 					$orderDate = date('d-m-Y h:i A', strtotime($row->addDate));
 				}
-				 $actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('foodOrderList/FoodOrderList/view/' . $row->code). '"><i class="ti-eye"></i> Open</a>';
+				$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('foodOrderList/FoodOrderList/view/' . $row->code) . '"><i class="ti-eye"></i> Open</a>';
 				$data[] = array(
 					$srno,
 					$row->code,
@@ -838,191 +855,208 @@ class Admin extends CI_Controller
 				$srno++;
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
-		}  
+		}
 		$output = array(
-			"draw"			  =>     intval($_GET["draw"]),
-			"recordsTotal"    =>      $dataCount,
-			"recordsFiltered" =>     $dataCount,
-			"data"            =>     $data, 
+			"draw" => intval($_GET["draw"]),
+			"recordsTotal" => $dataCount,
+			"recordsFiltered" => $dataCount,
+			"data" => $data,
 		);
 		echo json_encode($output);
 	}
-	
-	public function getDeliveryBoys(){
+
+	public function getDeliveryBoys()
+	{
 		$statusType = $this->input->get('statusType');
 		$data = array();
-		 $limit = $this->input->GET("length");
-        $offset = $this->input->GET("start");
-		$dataCount= 0;
+		$limit = $this->input->GET("length");
+		$offset = $this->input->GET("start");
+		$dataCount = 0;
 		$table = "usermaster";
 		$orderColumns = array("usermaster.*");
-		$condition =array("usermaster.isActive"=>1,"usermaster.role"=>"DLB");
-		$orderBy = array("usermaster.id"=>"ASC");
-		$like= array();
+		$condition = array("usermaster.isActive" => 1, "usermaster.role" => "DLB");
+		$orderBy = array("usermaster.id" => "ASC");
+		$like = array();
 		$groupBy = array();
-		$extraCondition ="";
-		$orderShowFlag=false;
-		if($statusType=='all'){
+		$extraCondition = "";
+		$orderShowFlag = false;
+		if ($statusType == 'all') {
 			$condition['deliveryBoyActiveOrder.isActive'] = '1';
-			$join = array("deliveryBoyActiveOrder"=>"usermaster.code=deliveryBoyActiveOrder.deliveryBoyCode");
-			$joinType = array("deliveryBoyActiveOrder"=>"inner");
-		} else {
-			 if($statusType=='present'){
-					$condition['deliveryBoyActiveOrder.loginStatus'] = '1';
-					$condition['deliveryBoyActiveOrder.isActive'] = '1';
-			} else if($statusType=='absent') {
-				$condition['deliveryBoyActiveOrder.loginStatus']=  '0';
+			$join = array("deliveryBoyActiveOrder" => "usermaster.code=deliveryBoyActiveOrder.deliveryBoyCode");
+			$joinType = array("deliveryBoyActiveOrder" => "inner");
+		}
+		else {
+			if ($statusType == 'present') {
+				$condition['deliveryBoyActiveOrder.loginStatus'] = '1';
 				$condition['deliveryBoyActiveOrder.isActive'] = '1';
-			} else {
+			}
+			else if ($statusType == 'absent') {
+				$condition['deliveryBoyActiveOrder.loginStatus'] = '0';
+				$condition['deliveryBoyActiveOrder.isActive'] = '1';
+			}
+			else {
 				$condition['deliveryBoyActiveOrder.loginStatus'] = '1';
 				$condition['deliveryBoyActiveOrder.orderCount'] = '1';
 				$condition['deliveryBoyActiveOrder.isActive'] = '1';
-				$orderShowFlag=true;
+				$orderShowFlag = true;
 			}
-			array_push($orderColumns,"deliveryBoyActiveOrder.orderCode");
-			array_push($orderColumns,"deliveryBoyActiveOrder.orderType");
-			$join = array("deliveryBoyActiveOrder"=>"usermaster.code=deliveryBoyActiveOrder.deliveryBoyCode");
-			$joinType = array("deliveryBoyActiveOrder"=>"inner");
-			
+			array_push($orderColumns, "deliveryBoyActiveOrder.orderCode");
+			array_push($orderColumns, "deliveryBoyActiveOrder.orderType");
+			$join = array("deliveryBoyActiveOrder" => "usermaster.code=deliveryBoyActiveOrder.deliveryBoyCode");
+			$joinType = array("deliveryBoyActiveOrder" => "inner");
+
 		}
-		
-		$Result =$this->GlobalModel->selectQuery($orderColumns,$table,$condition,$orderBy,$join,$joinType,$like,$limit,$offset,$groupBy,$extraCondition);
+
+		$Result = $this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy, $extraCondition);
 		//echo $this->db->last_query();
 		//exit();
-		if($Result){ 
-			$srno=1;
+		if ($Result) {
+			$srno = 1;
 			foreach ($Result->result_array() as $key) {
-				if($key['deliveryType']=="slot"){
+				if ($key['deliveryType'] == "slot") {
 					$status = '<span class="label label-success">Slot</span>';
-				} else {
+				}
+				else {
 					$status = '<span class="label label-warning">Food/Vege/Grocery</span>';
 				}
-				$actionHtml="";
-				if($orderShowFlag){
-				    if($key['orderType']=="food"){
-				        $status = '<span class="label label-warning">FoodVege/Grocery</span>';
-						$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('foodOrderList/FoodOrderList/view/' . $key["orderCode"]). '"><i class="ti-eye"></i> Open Order</a>';
-				    }
-				    else
-				    {
-				        $status = '<span class="label label-success">Slot</span>';
-				        $actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('Order/view/' . $key["orderCode"]). '"><i class="ti-eye"></i> Open Order</a>';
-				    }
+				$actionHtml = "";
+				if ($orderShowFlag) {
+					if ($key['orderType'] == "food") {
+						$status = '<span class="label label-warning">FoodVege/Grocery</span>';
+						$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('foodOrderList/FoodOrderList/view/' . $key["orderCode"]) . '"><i class="ti-eye"></i> Open Order</a>';
+					}
+					else {
+						$status = '<span class="label label-success">Slot</span>';
+						$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url('Order/view/' . $key["orderCode"]) . '"><i class="ti-eye"></i> Open Order</a>';
+					}
 				}
-				
+
 				$data[] = array(
 					$srno,
 					$key['name'],
 					$key['mobile'],
-					$status .$actionHtml
+					$status . $actionHtml
 				);
 				$srno++;
 			}
-			
-			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns,$table,$condition,$orderBy,$join,$joinType,$like,"","",$groupBy,$extraCondition)->result());
+
+			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, "", "", $groupBy, $extraCondition)->result());
 		}
-		
+
 		$output = array(
-			"draw"			  =>     intval($_GET["draw"]),
-			"recordsTotal"    =>      $dataCount,
-			"recordsFiltered" =>     $dataCount,
-			"data"            =>     $data
+			"draw" => intval($_GET["draw"]),
+			"recordsTotal" => $dataCount,
+			"recordsFiltered" => $dataCount,
+			"data" => $data
 		);
 		echo json_encode($output);
 	}
-	
-	public function sendForgotPasswordOTP(){
+
+	public function sendForgotPasswordOTP()
+	{
 		$mobileNumber = $this->input->post("mobileNumber");
-		$checkUser = $this->db->query("select usermaster.mobile from usermaster where (usermaster.mobile='".$mobileNumber."' or usermaster.username='".$mobileNumber."') and usermaster.role != 'DLB'");
-		if($checkUser->num_rows()>0){
+		$checkUser = $this->db->query("select usermaster.mobile from usermaster where (usermaster.mobile='" . $mobileNumber . "' or usermaster.username='" . $mobileNumber . "') and usermaster.role != 'DLB'");
+		if ($checkUser->num_rows() > 0) {
 			$mobile = $checkUser->result_array()[0]['mobile'];
 			/*$otp = rand(1000,9999);
-			$result = $this->sendsms->sendOtpMessage($otp,$mobileNumber);*/
-			$otp='123123';
-			$result['status']='success';
-			if($result['status']=='success'){
+			 $result = $this->sendsms->sendOtpMessage($otp,$mobileNumber);*/
+			$otp = '123123';
+			$result['status'] = 'success';
+			if ($result['status'] == 'success') {
 				$data = array(
 					'contactNumber' => $mobile,
-					'otp'=>$otp,
+					'otp' => $otp,
 				);
-				$check = $this->db->query("select id from registerOTP where contactNumber='".$mobile."'");
-				if($check->num_rows()>0){
+				$check = $this->db->query("select id from registerOTP where contactNumber='" . $mobile . "'");
+				if ($check->num_rows() > 0) {
 					$id = $check->result()[0]->id;
-					$code = $this->GlobalModel->doEditWithField($data, 'registerOTP','id',$id);
-				}else{
-					$code = $this->GlobalModel->addWithoutYear($data, 'registerOTP','OTP');
+					$code = $this->GlobalModel->doEditWithField($data, 'registerOTP', 'id', $id);
 				}
-				$response['status']=true;
-				$response['message']="OTP Sent Successfully";
-			}else{
-				$response['status']=false;
-				$response['message']="Failed to send OTP";
+				else {
+					$code = $this->GlobalModel->addWithoutYear($data, 'registerOTP', 'OTP');
+				}
+				$response['status'] = true;
+				$response['message'] = "OTP Sent Successfully";
 			}
-		}else{
-			$response['status']=false;
-			$response['message']="Invalid Username or Mobile";
+			else {
+				$response['status'] = false;
+				$response['message'] = "Failed to send OTP";
+			}
+		}
+		else {
+			$response['status'] = false;
+			$response['message'] = "Invalid Username or Mobile";
 		}
 		echo json_encode($response);
 	}
-	
-	public function resetPassword(){ 
+
+	public function resetPassword()
+	{
 		$password = trim($this->input->post("password"));
 		$otp = trim($this->input->post("otp"));
 		$mobileNumber = trim($this->input->post("mobileNumber"));
-		$checkUser = $this->db->query("select usermaster.mobile from usermaster where (usermaster.mobile='".$mobileNumber."' or usermaster.username='".$mobileNumber."') and usermaster.role != 'DLB'");
-		if($checkUser->num_rows()>0){
+		$checkUser = $this->db->query("select usermaster.mobile from usermaster where (usermaster.mobile='" . $mobileNumber . "' or usermaster.username='" . $mobileNumber . "') and usermaster.role != 'DLB'");
+		if ($checkUser->num_rows() > 0) {
 			$mobile = $checkUser->result_array()[0]['mobile'];
-			$result=$this->verifyOTP($otp,$mobile);
-			if($result==1){
-				$data['password']=md5($password);
-				$update = $this->GlobalModel->doEditWithField($data,"usermaster","mobile",$mobile);
-				if($update!=false){
+			$result = $this->verifyOTP($otp, $mobile);
+			if ($result == 1) {
+				$data['password'] = md5($password);
+				$update = $this->GlobalModel->doEditWithField($data, "usermaster", "mobile", $mobile);
+				if ($update != false) {
 					$response['status'] = true;
 					$response['message'] = "Password updated successfully";
-				}else{
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "Failed to update password";
-					$response['errorno']=3;
-				}
-			}else{
-				if($result==2){
-					$response['status'] = false;
-					$response['message'] = "Invalid OTP. Please enter correct OTP";
-					$response['errorno']=1;
-				}else{
-					$response['status'] = false;
-					$response['message'] = "Something went wrong. Please resend OTP";
-					$response['errorno']=2;
+					$response['errorno'] = 3;
 				}
 			}
-		}else{
+			else {
+				if ($result == 2) {
+					$response['status'] = false;
+					$response['message'] = "Invalid OTP. Please enter correct OTP";
+					$response['errorno'] = 1;
+				}
+				else {
+					$response['status'] = false;
+					$response['message'] = "Something went wrong. Please resend OTP";
+					$response['errorno'] = 2;
+				}
+			}
+		}
+		else {
 			$response['status'] = false;
 			$response['message'] = "Something went wrong. Please resend OTP";
-			$response['errorno']=2;
+			$response['errorno'] = 2;
 		}
 		echo json_encode($response);
 	}
-	
-	public function verifyOTP($otp,$mobileNumber)
+
+	public function verifyOTP($otp, $mobileNumber)
 	{
-		$checkData = $this->GlobalModel->selectQuery('registerOTP.*','registerOTP',array('registerOTP.contactNumber'=>$mobileNumber));
-		if($checkData){
+		$checkData = $this->GlobalModel->selectQuery('registerOTP.*', 'registerOTP', array('registerOTP.contactNumber' => $mobileNumber));
+		if ($checkData) {
 			$otpTbl = $checkData->result_array()[0]['otp'];
-			if($otpTbl == $otp){
+			if ($otpTbl == $otp) {
 				$this->GlobalModel->deleteForeverFromField('contactNumber', $mobileNumber, 'registerOTP');
 				return 1;
-			}else {
+			}
+			else {
 				return 2;
 			}
-		}else{
+		}
+		else {
 			return 3;
 		}
 	}
-	
-	public function userDeleteProcess(){
-        $this->load->view('sample');
+
+	public function userDeleteProcess()
+	{
+		$this->load->view('sample');
 	}
-	
-	
+
+
+
 }
 ?>

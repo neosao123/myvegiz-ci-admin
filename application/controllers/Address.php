@@ -60,8 +60,8 @@ class Address extends CI_Controller
         $joinType = array('citymaster' => 'left');
         $join = array('citymaster' => 'customaddressmaster.cityCode=citymaster.code');
         $groupByColumn = array();
-        $limit = $this->input->post("length");
-        $offset = $this->input->post("start");
+        $limit = $this->input->post("length") ?? $this->input->get("length");
+        $offset = $this->input->post("start") ?? $this->input->get("start");
         $extraCondition = " (customaddressmaster.isDelete ='0' or customaddressmaster.isDelete IS NULL) ";
         $like = array('customaddressmaster.code' => $search . '~both', 'customaddressmaster.place' => $search . '~both', 'customaddressmaster.state' => $search . '~both', 'customaddressmaster.district' => $search . '~both', 'customaddressmaster.pincode' => $search . '~both');
         $Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -95,12 +95,12 @@ class Address extends CI_Controller
                 $srno++;
             }
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', $groupByColumn, $extraCondition)->result());
-            $output = array("draw" => intval($this->input->post("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+            $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
             echo json_encode($output);
         }
         else {
             $dataCount = 0;
-            $output = array("draw" => intval($this->input->post("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+            $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
             echo json_encode($output);
         }
     }

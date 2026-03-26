@@ -1,58 +1,64 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
-class Tag extends CI_Controller {
+defined('BASEPATH') or exit('No direct script access allowed');
+class Tag extends CI_Controller
+{
     var $session_key;
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->helper('form', 'url', 'html');
         $this->load->library('form_validation');
         $this->load->model('GlobalModel');
         $this->load->model('GlobalModel1');
         $this->session_key = $this->session->userdata('key' . SESS_KEY);
-        if(!isset($this->session->userdata['logged_in' . $this->session_key]['code'])){
-			redirect('Admin/login','refresh');
-		}
+        if (!isset($this->session->userdata['logged_in' . $this->session_key]['code'])) {
+            redirect('Admin/login', 'refresh');
+        }
     }
-    public function listRecords() {
+    public function listRecords()
+    {
         $data['error'] = $this->session->flashdata('response');
         $data['query'] = $this->GlobalModel->selectDataExcludeDelete('citymaster');
         $this->load->view('dashboard/header');
         $this->load->view('dashboard/Tag/list', $data);
         $this->load->view('dashboard/footer');
     }
-    
-   
-    public function getTagList() {
-		$search = strtolower(($this->input->post("search") ?? $this->input->get("search")) ['value']);
-		$activeKey = "";
-		if ($search == "active"){
+
+
+    public function getTagList()
+    {
+        $search = strtolower(($this->input->post("search") ?? $this->input->get("search"))['value']);
+        $activeKey = "";
+        if ($search == "active") {
             $activeKey = "1";
             $search = "";
-        }else if ($search == "inactive"){
+        }
+        else if ($search == "inactive") {
             $activeKey = "0";
             $search = "";
-		}
+        }
         $table = "tagmaster";
         $orderColumns = array("tagmaster.*");
-        $condition = array("tagmaster.isActive" => $activeKey); 
-        $orderBy = array("tagmaster.isActive" => "DESC","tagmaster.id" => "DESC");
+        $condition = array("tagmaster.isActive" => $activeKey);
+        $orderBy = array("tagmaster.isActive" => "DESC", "tagmaster.id" => "DESC");
         $join = array();
         $joinType = array();
         $groupBy = array();
-        $limit = $this->input->post("length") ?? $this->input->get("length"); 
+        $limit = $this->input->post("length") ?? $this->input->get("length");
         $offset = $this->input->post("start") ?? $this->input->get("start");
         $like = array("tagmaster.code" => $search . "~both", "tagmaster.tagTitle" => $search . "~both", "tagmaster.tagColor" => $search . "~both");
-        $extraCondition=" (tagmaster.isDelete=0 or tagmaster.isDelete is null)";
-		$Records = $this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy, $extraCondition);
-		$r = $this->db->last_query();
-        $srno = $offset + 1;
+        $extraCondition = " (tagmaster.isDelete=0 or tagmaster.isDelete is null)";
+        $Records = $this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupBy, $extraCondition);
+        $r = $this->db->last_query();
+        $srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
         $data = array();
-		$dataCount=0;
-		if($Records!=false){
+        $dataCount = 0;
+        if ($Records != false) {
             foreach ($Records->result() as $row) {
                 if ($row->isActive == "1") {
                     $status = " <span class='label label-sm label-success'>Active</span>";
-                } else {
+                }
+                else {
                     $status = " <span class='label label-sm label-warning'>Inactive</span>";
                 }
                 $actionHtml = '<div class="btn-group">
@@ -66,21 +72,22 @@ class Tag extends CI_Controller {
                                   
                                 </div>
                             </div>';
-                $data[] = array($srno, $row->code, $row->tagTitle,$row->tagColor, $status , $actionHtml);
+                $data[] = array($srno, $row->code, $row->tagTitle, $row->tagColor, $status, $actionHtml);
                 $srno++;
             }
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, "", "", $groupBy, $extraCondition)->result());
-		}
+        }
         $output = array(
-			"draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), 
-			"recordsTotal" => $dataCount, 
-			"recordsFiltered" => $dataCount, 
-			"data" => $data,
-			"extra" => $r,
-		);
+            "draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+            "recordsTotal" => $dataCount,
+            "recordsFiltered" => $dataCount,
+            "data" => $data,
+            "extra" => $r,
+        );
         echo json_encode($output);
     }
-    public function save() {
+    public function save()
+    {
         $code = trim($this->input->post("code"));
         $tagTitle = trim($this->input->post("tagTitle"));
         $tagColor = trim($this->input->post("tagColor"));
@@ -92,50 +99,54 @@ class Tag extends CI_Controller {
         switch ($userRole) {
             case "ADM":
                 $role = "Admin";
-            break;
+                break;
             case "USR":
                 $role = "User";
-            break;
+                break;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
-        $text = $role . " " . $userName . ' added new tag "' . $tagTitle . '" with color "'.$tagColor.'" from ' . $ip;
+        $text = $role . " " . $userName . ' added new tag "' . $tagTitle . '" with color "' . $tagColor . '" from ' . $ip;
         $log_text = array('code' => "demo", 'addID' => $addID, 'logText' => $text);
-        $result = $this->GlobalModel->checkDuplicateRecordNotEqualtoCode('tagTitle', $tagTitle, 'tagmaster',$code);
+        $result = $this->GlobalModel->checkDuplicateRecordNotEqualtoCode('tagTitle', $tagTitle, 'tagmaster', $code);
         if ($result != FALSE) {
             $response['status'] = false;
             $response['message'] = "Duplicate Tag";
-        } else {
-			$data = array(
-				'tagTitle' => $tagTitle,
-				'tagColor' => $tagColor,
-				'isActive' => trim($this->input->post("isActive")),
-				'isDelete' => 0,
-			);
-			if($code!="" && $code!=NULL){
-				$data['editID'] = $addID;
-				$data['editIP'] = $ip;
-				$result = $this->GlobalModel->doEdit($data, 'tagmaster', $code);
-				$message="Tag Successfully Updated.";
-				$inMsg="Failed To Update Tag";
-			}else{
-				$data['addID'] = $addID;
-				$data['addIP'] = $ip;
-				$result = $this->GlobalModel->addWithoutYear($data, 'tagmaster', 'T');
-				$message="Tag Successfully Added.";
-				$inMsg="Failed To Add Tag";
-			}
+        }
+        else {
+            $data = array(
+                'tagTitle' => $tagTitle,
+                'tagColor' => $tagColor,
+                'isActive' => trim($this->input->post("isActive")),
+                'isDelete' => 0,
+            );
+            if ($code != "" && $code != NULL) {
+                $data['editID'] = $addID;
+                $data['editIP'] = $ip;
+                $result = $this->GlobalModel->doEdit($data, 'tagmaster', $code);
+                $message = "Tag Successfully Updated.";
+                $inMsg = "Failed To Update Tag";
+            }
+            else {
+                $data['addID'] = $addID;
+                $data['addIP'] = $ip;
+                $result = $this->GlobalModel->addWithoutYear($data, 'tagmaster', 'T');
+                $message = "Tag Successfully Added.";
+                $inMsg = "Failed To Add Tag";
+            }
             if ($result != 'false') {
-				$response['status'] = true;
+                $response['status'] = true;
                 $response['message'] = $message;
                 $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-            } else {
+            }
+            else {
                 $response['status'] = false;
                 $response['message'] = $inMsg;
             }
-		}
-		echo json_encode($response);
+        }
+        echo json_encode($response);
     }
-    public function delete() {
+    public function delete()
+    {
         $code = $this->input->post('code');
         //Activity Track Starts
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
@@ -145,10 +156,10 @@ class Tag extends CI_Controller {
         switch ($userRole) {
             case "ADM":
                 $role = "Admin";
-            break;
+                break;
             case "USR":
                 $role = "User";
-            break;
+                break;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
         $dataQ = $this->GlobalModel->selectDataByField('code', $code, 'tagmaster');
@@ -164,7 +175,8 @@ class Tag extends CI_Controller {
         //Activity Track Ends
         echo $this->GlobalModel->delete($code, 'tagmaster');
     }
-    public function view() {
+    public function view()
+    {
         $code = $this->input->post('code') ?? $this->input->get('code');
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
         $userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
@@ -173,10 +185,10 @@ class Tag extends CI_Controller {
         switch ($userRole) {
             case "ADM":
                 $role = "Admin";
-            break;
+                break;
             case "USR":
                 $role = "User";
-            break;
+                break;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
         $table_name = 'tagmaster';
@@ -192,10 +204,11 @@ class Tag extends CI_Controller {
         foreach ($Records->result() as $row) {
             if ($row->isActive == "1") {
                 $activeStatus = '<span class="label label-sm label-success">Active</span>';
-            } else {
+            }
+            else {
                 $activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
             }
-            $modelHtml.= '<div class="form-row">
+            $modelHtml .= '<div class="form-row">
                         <div class="col-md-6 mb-3">
                             <label><b>Code:</b> </label>
 						    <input type="text" value="' . $row->code . '" class="form-control-line"  readonly>
@@ -211,7 +224,7 @@ class Tag extends CI_Controller {
 					        <input type="text" value="' . $row->tagColor . '" class="form-control-line"  readonly>
 					    </div>
 						<div class="col-md-6 mb-3 " style="margin-top:25px;">
-						'.$activeStatus.'
+						' . $activeStatus . '
 						</div>
 					</div> ';
             //for activity
@@ -219,10 +232,11 @@ class Tag extends CI_Controller {
             $log_text = array('code' => "demo", 'addID' => $addID, 'logText' => $text);
             $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
         }
-        $modelHtml.= '</form>';
+        $modelHtml .= '</form>';
         echo $modelHtml;
     }
-	
-    
+
+
+
 }
 ?>

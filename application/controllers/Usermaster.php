@@ -45,7 +45,7 @@ class Usermaster extends CI_Controller
 		$sessionUserRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
 		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$tableName = "usermaster";
-		$search = $this->input->post("search")['value'] ?? $this->input->get("search")['value'];
+		$search = $this->input->post("search")['value'] ?? $this->input->get("search")['value'] ?? '';
 		$orderColumns = array("usermaster.*,citymaster.cityName,usermaster.name,deliveryBoyActiveOrder.loginStatus");
 		$condition = array('usermaster.code' => $username, 'usermaster.role' => $role, 'usermaster.cityCode' => $cityCode);
 		$orderBy = array('usermaster' . '.id' => 'DESC');
@@ -57,27 +57,27 @@ class Usermaster extends CI_Controller
 		$extraCondition = " (usermaster.isDelete ='0' or usermaster.isDelete IS NULL) ";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = intval($offset) + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		$data = array();
 
 		$dataCount = 0;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				if ($row->role == "ADM") {
-					$role = "<span class='label label-sm label-primary'>Admin</span>";
+					$role_disp = "<span class='label label-sm label-primary'>Admin</span>";
 				}
 				else if ($row->role == "DLB") {
-					$role = "<span class='label label-sm label-primary'>Delivery Boy</span>";
+					$role_disp = "<span class='label label-sm label-primary'>Delivery Boy</span>";
 					if ($row->deliveryType == 'food') {
-						$role .= "<div class='mt-2'>Accepts : <span class='badge badge-info'>Food/Vege/Grocery Orders</span></div>";
+						$role_disp .= "<div class='mt-2'>Accepts : <span class='badge badge-info'>Food/Vege/Grocery Orders</span></div>";
 					}
 					else {
-						$role .= "<div class='mt-2'>Accepts : <span class='badge badge-success'>Slot Orders</span></div>";
+						$role_disp .= "<div class='mt-2'>Accepts : <span class='badge badge-success'>Slot Orders</span></div>";
 					}
 
 				}
 				else {
-					$role = "<span class='label label-sm label-primary'>User</span>";
+					$role_disp = "<span class='label label-sm label-primary'>User</span>";
 				}
 				if ($row->isActive == "1") {
 					$status = "<span class='label t1 label-sm label-success'>Active</span>";
@@ -107,13 +107,13 @@ class Usermaster extends CI_Controller
 				}
 				$actionHtml .= '</div>
 					</div>';
-				$data[] = array($srno, $row->code, $row->cityName, $row->name, $row->username, $role, $status, $actionHtml);
+				$data[] = array($srno, $row->code, $row->cityName, $row->name, $row->username, $role_disp, $status, $actionHtml);
 				$srno++;
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result_array());
 		}
 
-		$output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+		$output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
 		echo json_encode($output);
 	}
 	public function save()
@@ -728,7 +728,7 @@ class Usermaster extends CI_Controller
 
 	public function getUserAccessEditList()
 	{
-		$userCode = $this->input->get('userCode');
+		$userCode = $this->input->post('userCode') ?? $this->input->get('userCode');
 		$filename = 'assets/rights/' . $userCode . '.json';
 		if (file_exists($filename)) {
 			$json = file_get_contents($filename);
@@ -762,8 +762,8 @@ class Usermaster extends CI_Controller
 
 	public function checkPassword()
 	{ ////nitin more 19-12-2018
-		$code = $this->input->get('code');
-		$password = $this->input->get('password');
+		$code = $this->input->post('code') ?? $this->input->get('code');
+		$password = $this->input->post('password') ?? $this->input->get('password');
 		$password = md5($password);
 		$Result = $this->GlobalModel->selectDataByField('code', $code, 'usermaster');
 		$dbPassword = $Result->result()[0]->password;
@@ -776,7 +776,7 @@ class Usermaster extends CI_Controller
 	}
 	public function checkUserName()
 	{
-		$userName = $this->input->get('userName');
+		$userName = $this->input->post('userName') ?? $this->input->get('userName');
 		$Result = $this->GlobalModel->selectDataByField('username', $userName, 'usermaster');
 		$name = $Result->result();
 		$count = sizeof($name);
@@ -790,8 +790,8 @@ class Usermaster extends CI_Controller
 	/* for online/offline check added by ani on 13-3-2021 */
 	public function checkDeliveryBoyOrders()
 	{
-		$deliveryBoyCode = $this->input->get('code');
-		$userRole = $this->input->get('userRole');
+		$deliveryBoyCode = $this->input->post('code') ?? $this->input->get('code');
+		$userRole = $this->input->post('userRole') ?? $this->input->get('userRole');
 		$Result = $this->GlobalModel->selectDataByField('deliveryBoyCode', $deliveryBoyCode, 'deliveryBoyActiveOrder');
 		$res = $Result->result()[0]->orderCount;
 		if ($res == '0') {
@@ -917,7 +917,7 @@ class Usermaster extends CI_Controller
 
 	public function duplicateMobileNumber()
 	{
-		$mobile = $this->input->get("mobile");
+		$mobile = $this->input->post("mobile") ?? $this->input->get("mobile");
 		$condition = array('mobile' => $mobile);
 		$duplicateCon = $this->GlobalModel->checkDuplicateRecordNew($condition, 'usermaster');
 
@@ -935,7 +935,7 @@ class Usermaster extends CI_Controller
 
 	public function duplicateEmail()
 	{
-		$email = $this->input->get("email");
+		$email = $this->input->post("email") ?? $this->input->get("email");
 		$condition = array('userEmail' => $email);
 		$duplicateCon = $this->GlobalModel->checkDuplicateRecordNew($condition, 'usermaster');
 
@@ -953,8 +953,8 @@ class Usermaster extends CI_Controller
 
 	public function duplicateMobileForEdit()
 	{
-		$mobile = $this->input->get("mobile");
-		$code = $this->input->get("code");
+		$mobile = $this->input->post("mobile") ?? $this->input->get("mobile");
+		$code = $this->input->post("code") ?? $this->input->get("code");
 		$duplicateCon = $this->GlobalModel->checkDuplicateRecordInUpdate('mobile', $mobile, $code, 'usermaster');
 		if ($duplicateCon == true) {
 			$res['message'] = "Mobile number already exist.";
@@ -970,8 +970,8 @@ class Usermaster extends CI_Controller
 
 	public function duplicateEmailForEdit()
 	{
-		$email = $this->input->get("email");
-		$code = $this->input->get("code");
+		$email = $this->input->post("email") ?? $this->input->get("email");
+		$code = $this->input->post("code") ?? $this->input->get("code");
 		$duplicateCon = $this->GlobalModel->checkDuplicateRecordInUpdate('userEmail', $email, $code, 'usermaster');
 		if ($duplicateCon == true) {
 			$res['message'] = "Email already exist.";

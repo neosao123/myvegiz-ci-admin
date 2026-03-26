@@ -72,17 +72,17 @@ class Product extends CI_Controller
 		}
 		$like = array("productmaster.productName" => $search . "~both", "categorymaster.categoryName" => $search . "~both", "subcategorymaster.subcategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = intval($offset) + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$code = $row->code;
 				$productPhoto = "";
 
 				$tblname = 'productphotos';
-				$limit = 1;
+				$limit_photos = 1;
 				$condData = array('isDelete' => 0, 'productCode' => $code);
 				$offsetArr = array();
-				$photosData = $this->ApiModel->selectData($tblname, $limit, $offsetArr, $condData);
+				$photosData = $this->ApiModel->selectData($tblname, $limit_photos, $offsetArr, $condData);
 				$start = '<div class="d-flex align-items-center">';
 				$end = ' <h5 class="m-b-0 font-16 font-medium">' . $row->productName . '</h5></div></div>';
 				foreach ($photosData->result() as $ph) {
@@ -94,13 +94,15 @@ class Product extends CI_Controller
 				$productName = $start . $productPhoto . $end;
 				if ($row->isActive == 1) {
 					$status = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$status = "<span class='label label-sm label-warning'>Inactive</span>";
 				}
 
 				if ($row->isPopular == 1) {
 					$popular = "<span class='label label-sm label-success'>Yes</span>";
-				} else {
+				}
+				else {
 					$popular = "<span class='label label-sm label-warning'>No</span>";
 				}
 
@@ -115,7 +117,7 @@ class Product extends CI_Controller
 					</div>
 				</div>';
 				$DateFormat = DateTime::createFromFormat('Y-m-d', substr($row->addDate, 0, 10));
-				$Date = $DateFormat->format('d/m/Y');
+				$Date = $DateFormat ? $DateFormat->format('d/m/Y') : $row->addDate;
 				$data[] = array(
 					$srno,
 					$row->code,
@@ -133,20 +135,21 @@ class Product extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw")),
-				"recordsTotal"    =>      $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
-		} else {
+		}
+		else {
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($this->input->post("draw") ?? $this->input->get("draw")),
-				"recordsTotal"    =>     $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
 		}
@@ -221,7 +224,8 @@ class Product extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/product/add', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$this->form_validation->set_rules('productName', 'Product Name', 'required');
 			$this->form_validation->set_rules('productCategory', 'Product Category Name', 'required');
 
@@ -244,13 +248,15 @@ class Product extends CI_Controller
 				$this->load->view('dashboard/header');
 				$this->load->view('dashboard/product/add', $data);
 				$this->load->view('dashboard/footer');
-			} else {
+			}
+			else {
 				$images = "";
 				$description = trim($this->input->post("productDescription"));
 				if (strpos($description, 'class="table table-bordered" border="1"') !== false) {
-					$description =  str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
-				} else {
-					$description =  str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
+					$description = str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
+				}
+				else {
+					$description = str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
 				}
 				$data = array(
 					'productName' => $productName,
@@ -270,23 +276,25 @@ class Product extends CI_Controller
 				);
 				if ($this->input->post("tagCode") == 1) {
 					$data['tagCode'] = NULL;
-				} else {
+				}
+				else {
 					$data['tagCode'] = $this->input->post("tagCode");
 				}
 				$code = $this->GlobalModel->addWithoutYear($data, 'productmaster', 'PRODT');
 				if ($code != 'false') {
 					if ($imageData[0] != '') {
-						if (!file_exists(FCPATH . 'uploads/product/' . $code)) mkdir(FCPATH . 'uploads/product/' . $code, 0755, false);
+						if (!file_exists(FCPATH . 'uploads/product/' . $code))
+							mkdir(FCPATH . 'uploads/product/' . $code, 0755, false);
 						$uploadRootDir = 'uploads/';
 						$uploadDir = 'uploads/product/' . $code . '/';
 						if (!empty($_FILES['images']['name'])) {
 							$filesCount = count($_FILES['images']['name']);
 							for ($i = 0; $i < $filesCount; $i++) {
-								$_FILES['file']['name']     = $_FILES['images']['name'][$i];
-								$_FILES['file']['type']     = $_FILES['images']['type'][$i];
+								$_FILES['file']['name'] = $_FILES['images']['name'][$i];
+								$_FILES['file']['type'] = $_FILES['images']['type'][$i];
 								$_FILES['file']['tmp_name'] = $_FILES['images']['tmp_name'][$i];
-								$_FILES['file']['error']    = $_FILES['images']['error'][$i];
-								$_FILES['file']['size']     = $_FILES['images']['size'][$i];
+								$_FILES['file']['error'] = $_FILES['images']['error'][$i];
+								$_FILES['file']['size'] = $_FILES['images']['size'][$i];
 								// File upload configuration
 								$uploadPath = $uploadDir;
 								$config['upload_path'] = $uploadPath;
@@ -304,16 +312,17 @@ class Product extends CI_Controller
 									$config['source_image'] = $uploadDir . $fileData['file_name'];
 									$config['create_thumb'] = FALSE;
 									$config['maintain_ratio'] = FALSE;
-									$config['quality']     = '100%';
-									$config['width']     = 400;
-									$config['height']   = 400;
+									$config['quality'] = '100%';
+									$config['width'] = 400;
+									$config['height'] = 400;
 									$this->load->library('image_lib', $config);
 									$this->image_lib->initialize($config);
 									$this->image_lib->resize();
 									$images = $fileData['file_name'];
 									$subData = array('productCode' => $code, 'productPhoto' => $images);
 									$filedoc = $this->GlobalModel->addNew($subData, 'productphotos', 'PDP');
-								} else {
+								}
+								else {
 									$error = array('error' => $this->upload->display_errors());
 									print_r($error);
 								}
@@ -331,11 +340,13 @@ class Product extends CI_Controller
 
 								);
 								$addLineDataResult = $this->GlobalModel->addNew($addLineTableData, 'productbenefits', 'PRB');
-								if ($addLineDataResult) $addResultFlag = true;
+								if ($addLineDataResult)
+									$addResultFlag = true;
 							}
 						}
 						$result['AddData'] = $addResultFlag;
-					} else {
+					}
+					else {
 						$result['AddData'] = false;
 					}
 
@@ -352,12 +363,12 @@ class Product extends CI_Controller
 						for ($j = 0; $j < sizeof($cityCodes); $j++) {
 							if ($cityCodes[$j] != '') {
 								$addLineTableData = array(
-									'productCode' 	=> $code,
-									'cityCode' 		=> $cityCodes[$j],
-									'sellingUnit'	=> $subUnit[$j],
-									'quantity'		=> $quantity[$j],
-									'sellingPrice' 	=> $sellingPrice[$j],
-									'regularPrice' 	=> $regularPrice[$j],
+									'productCode' => $code,
+									'cityCode' => $cityCodes[$j],
+									'sellingUnit' => $subUnit[$j],
+									'quantity' => $quantity[$j],
+									'sellingPrice' => $sellingPrice[$j],
+									'regularPrice' => $regularPrice[$j],
 									'productStatus' => $productStatus[$j],
 									'isActive' => 1,
 									'isDelete' => 0,
@@ -365,7 +376,8 @@ class Product extends CI_Controller
 									'addIP' => $ip
 								);
 								$addLineDataResult = $this->GlobalModel->addNew($addLineTableData, 'productratelineentries', 'PRL');
-								if ($addLineDataResult) $addResultFlagNew = true;
+								if ($addLineDataResult)
+									$addResultFlagNew = true;
 							}
 						}
 						$this->GlobalModel->set_main_variant($code);
@@ -375,7 +387,8 @@ class Product extends CI_Controller
 					$response['status'] = true;
 					$response['message'] = "Product Successfully Added.";
 					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "Failed To Add Product";
 				}
@@ -388,7 +401,7 @@ class Product extends CI_Controller
 	public function rshow()
 	{
 		print_r($this->GlobalModel->selectData('productmaster')->result());
-		//print_r($this->GlobalModel->selectDataByField('productCode','PRODT_23','productphotos')->result());
+	//print_r($this->GlobalModel->selectDataByField('productCode','PRODT_23','productphotos')->result());
 	}
 
 	public function edit()
@@ -403,7 +416,7 @@ class Product extends CI_Controller
 		$data['query'] = $query;
 		$categoryCode = '';
 		$categoryName = $query->result()[0]->productCategory;
-		
+
 		$category = $this->GlobalModel->selectQuery("categorymaster.code", "categorymaster", array('categorymaster.categorySName' => $categoryName));
 		if ($category) {
 			$categoryCode = $category->result_array()[0]['code'];
@@ -450,7 +463,7 @@ class Product extends CI_Controller
 	public function update()
 	{
 		$productName = trim($this->input->post("productName"));
-		$code =  $this->input->post('code');
+		$code = $this->input->post('code');
 		$productBenefitAdd = $this->input->post("productBenefit");
 		$imageData = $_FILES['images']['name'];
 		//Activity Track Starts 
@@ -508,12 +521,14 @@ class Product extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/product/edit', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$description = trim($this->input->post("productDescription"));
 			if (strpos($description, 'class="table table-bordered" border="1"') !== false) {
-				$description =  str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
-			} else {
-				$description =  str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
+				$description = str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
+			}
+			else {
+				$description = str_replace('class="table table-bordered"', 'class="table table-bordered" border="1"', $description);
 			}
 			$data = array(
 				'productName' => $productName,
@@ -532,7 +547,8 @@ class Product extends CI_Controller
 			);
 			if ($this->input->post("tagCode") == 1) {
 				$data['tagCode'] = NULL;
-			} else {
+			}
+			else {
 				$data['tagCode'] = $this->input->post("tagCode");
 			}
 			$result = $this->GlobalModel->doEdit($data, 'productmaster', $code);
@@ -541,18 +557,19 @@ class Product extends CI_Controller
 			$photoCode = '';
 			if ($imageData[0] != '') {
 				//echo 'in';
-				if (!file_exists(FCPATH . 'uploads/product/' . $code)) 	mkdir(FCPATH . 'uploads/product/' . $code, 0755, false);
+				if (!file_exists(FCPATH . 'uploads/product/' . $code))
+					mkdir(FCPATH . 'uploads/product/' . $code, 0755, false);
 				$uploadRootDir = 'uploads/';
 				$uploadDir = 'uploads/product/' . $code . '/';
 				if (!empty($_FILES['images']['name'])) {
 					$filesCount = count($_FILES['images']['name']);
 
 					for ($i = 0; $i < $filesCount; $i++) {
-						$_FILES['file']['name']     = $_FILES['images']['name'][$i];
-						$_FILES['file']['type']     = $_FILES['images']['type'][$i];
+						$_FILES['file']['name'] = $_FILES['images']['name'][$i];
+						$_FILES['file']['type'] = $_FILES['images']['type'][$i];
 						$_FILES['file']['tmp_name'] = $_FILES['images']['tmp_name'][$i];
-						$_FILES['file']['error']    = $_FILES['images']['error'][$i];
-						$_FILES['file']['size']     = $_FILES['images']['size'][$i];
+						$_FILES['file']['error'] = $_FILES['images']['error'][$i];
+						$_FILES['file']['size'] = $_FILES['images']['size'][$i];
 
 						// File upload configuration
 						$uploadPath = $uploadDir;
@@ -573,7 +590,7 @@ class Product extends CI_Controller
 							$config['source_image'] = $uploadDir . $fileData['file_name'];
 							$config['create_thumb'] = FALSE;
 							$config['maintain_ratio'] = FALSE;
-							$config['quality']  = '100%';
+							$config['quality'] = '100%';
 							$config['width'] = 400;
 							$config['height'] = 400;
 							$this->load->library('image_lib', $config);
@@ -582,7 +599,8 @@ class Product extends CI_Controller
 							$images = $fileData['file_name'];
 							$subData = array('productCode' => $code, 'productPhoto' => $images);
 							$filedoc = $this->GlobalModel->addNew($subData, 'productphotos', 'PDP');
-						} else {
+						}
+						else {
 							$error = array('error' => $this->upload->display_errors());
 						}
 					}
@@ -592,16 +610,16 @@ class Product extends CI_Controller
 
 			$lineCode = $this->input->post("lineCode");
 			/*$productBenefit = $this->input->post("productBenefit");
-			if ($productBenefit == "") {
-				$productBenefit = array();
-			}
-			$editResultFlag = false;
-			for ($k = 0; $k < sizeof($productBenefit); $k++) {
-				$editTableData = array('productBenefit' => $productBenefit[$k]);
-				// print_r($editTableData);
-				$editLineDataResult = $this->GlobalModel->doEdit($editTableData, 'productbenefits', $lineCode[$k]);
-				if ($editLineDataResult == 'true') $editResultFlag = true;
-			}*/
+			 if ($productBenefit == "") {
+			 $productBenefit = array();
+			 }
+			 $editResultFlag = false;
+			 for ($k = 0; $k < sizeof($productBenefit); $k++) {
+			 $editTableData = array('productBenefit' => $productBenefit[$k]);
+			 // print_r($editTableData);
+			 $editLineDataResult = $this->GlobalModel->doEdit($editTableData, 'productbenefits', $lineCode[$k]);
+			 if ($editLineDataResult == 'true') $editResultFlag = true;
+			 }*/
 			// strat to add productBenefit
 
 			//$productBenefitAdd = $this->input->post("productBenefit");  
@@ -613,11 +631,13 @@ class Product extends CI_Controller
 					if ($productBenefitAdd[$j] != '') {
 						$addLineTableData = array('productCode' => $code, 'productBenefit' => $productBenefitAdd[$j]);
 						$addLineDataResult = $this->GlobalModel->addNew($addLineTableData, 'productbenefits', 'PRB');
-						if ($addLineDataResult) $addResultFlag = true;
+						if ($addLineDataResult)
+							$addResultFlag = true;
 					}
 				}
 				$responseRes['AddData'] = $addResultFlag;
-			} else {
+			}
+			else {
 				$responseRes['AddData'] = false;
 			}
 			$cityCodes = $this->input->post('cityCode');
@@ -632,43 +652,43 @@ class Product extends CI_Controller
 				for ($j = 0; $j < sizeof($cityCodes); $j++) {
 					if ($cityCodes[$j] != '') {
 						/*$dataCode = $this->GlobalModel->selectQuery("productratelineentries.code", "productratelineentries", array("productratelineentries.productCode" => $code, "productratelineentries.cityCode" => $cityCodes[$j]), array());
-						if ($dataCode) {
-							$codea = $dataCode->result_array()[0]['code'];
-							$addLineTableData = array(
-							    'productCode' 	=> $code,
-								'cityCode' 		=> $cityCodes[$j],
-								'sellingUnit'	=> $subUnit[$j],
-								'quantity'		=> $quantity[$j],
-								'sellingPrice' 	=> $sellingPrice[$j],
-								'regularPrice' 	=> $regularPrice[$j],
-								'productStatus' => $productStatus[$j],
-								'editID' => $addID,
-								'editIP' => $ip	
-							);
-							$addLineDataResult = $this->GlobalModel->doEdit($addLineTableData, 'productratelineentries', $codea);
-						} else {
-							$addLineTableData = array(
-								'productCode' 	=> $code,
-								'cityCode' 		=> $cityCodes[$j],
-								'sellingUnit'	=> $subUnit[$j],
-								'quantity'		=> $quantity[$j],
-								'sellingPrice' 	=> $sellingPrice[$j],
-								'regularPrice' 	=> $regularPrice[$j],
-								'productStatus' => $productStatus[$j],
-								'addID' => $addID,
-								'addIP' => $ip
-							);
-							$addLineDataResult = $this->GlobalModel->addNew($addLineTableData, 'productratelineentries', 'PRL');
-						}
-						if ($addLineDataResult) $addResultFlag = true;*/
+						 if ($dataCode) {
+						 $codea = $dataCode->result_array()[0]['code'];
+						 $addLineTableData = array(
+						 'productCode' 	=> $code,
+						 'cityCode' 		=> $cityCodes[$j],
+						 'sellingUnit'	=> $subUnit[$j],
+						 'quantity'		=> $quantity[$j],
+						 'sellingPrice' 	=> $sellingPrice[$j],
+						 'regularPrice' 	=> $regularPrice[$j],
+						 'productStatus' => $productStatus[$j],
+						 'editID' => $addID,
+						 'editIP' => $ip	
+						 );
+						 $addLineDataResult = $this->GlobalModel->doEdit($addLineTableData, 'productratelineentries', $codea);
+						 } else {
+						 $addLineTableData = array(
+						 'productCode' 	=> $code,
+						 'cityCode' 		=> $cityCodes[$j],
+						 'sellingUnit'	=> $subUnit[$j],
+						 'quantity'		=> $quantity[$j],
+						 'sellingPrice' 	=> $sellingPrice[$j],
+						 'regularPrice' 	=> $regularPrice[$j],
+						 'productStatus' => $productStatus[$j],
+						 'addID' => $addID,
+						 'addIP' => $ip
+						 );
+						 $addLineDataResult = $this->GlobalModel->addNew($addLineTableData, 'productratelineentries', 'PRL');
+						 }
+						 if ($addLineDataResult) $addResultFlag = true;*/
 
 						$addLineTableData = array(
-							'productCode' 	=> $code,
-							'cityCode' 		=> $cityCodes[$j],
-							'sellingUnit'	=> $subUnit[$j],
-							'quantity'		=> $quantity[$j],
-							'sellingPrice' 	=> $sellingPrice[$j],
-							'regularPrice' 	=> $regularPrice[$j],
+							'productCode' => $code,
+							'cityCode' => $cityCodes[$j],
+							'sellingUnit' => $subUnit[$j],
+							'quantity' => $quantity[$j],
+							'sellingPrice' => $sellingPrice[$j],
+							'regularPrice' => $regularPrice[$j],
 							'productStatus' => $productStatus[$j],
 							'isActive' => 1,
 							'isDelete' => 0
@@ -678,7 +698,8 @@ class Product extends CI_Controller
 							$addLineTableData['editDate'] = date('Y-m-d H:i:s');
 							$addLineTableData['editID'] = $addID;
 							$this->GlobalModel->doEdit($addLineTableData, 'productratelineentries', $lineCodes[$j]);
-						} else {
+						}
+						else {
 							$addLineTableData['addIP'] = $ip;
 							$addLineTableData['addDate'] = date('Y-m-d H:i:s');
 							$addLineTableData['addID'] = $addID;
@@ -693,7 +714,8 @@ class Product extends CI_Controller
 			$response['status'] = true;
 			$response['message'] = "Product Successfully Updated.";
 			$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-		} else {
+		}
+		else {
 			$response['status'] = false;
 			$response['message'] = "No change In Product";
 		}
@@ -735,7 +757,7 @@ class Product extends CI_Controller
 
 		$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 
-		$data = array('deleteID' => $addID, 'deleteIP' => $ip,'isActive'=>0,'isDelete'=>1);
+		$data = array('deleteID' => $addID, 'deleteIP' => $ip, 'isActive' => 0, 'isDelete' => 1);
 
 		$resultData = $this->GlobalModel->doEdit($data, 'productmaster', $code);
 
@@ -747,7 +769,7 @@ class Product extends CI_Controller
 
 		foreach ($dataPhoto->result() as $row) {
 			$photoCode = $row->code;
-			$dataDelete  = array('isDelete'	=>	'1','isActive'=>0);
+			$dataDelete = array('isDelete' => '1', 'isActive' => 0);
 			$this->GlobalModel->doEditWithField($dataDelete, 'productphotos', 'code', $photoCode);
 		}
 
@@ -815,13 +837,13 @@ class Product extends CI_Controller
 			//$minStock = $stockData->result()[0]->minStock;
 			$tableName1 = "productratelineentries";
 			$orderColumns1 = array("productratelineentries.*,citymaster.cityName");
-			$condition1 = array("productratelineentries.productCode" => $code,"productratelineentries.isActive" =>1,"productratelineentries.isDelete" =>0);
+			$condition1 = array("productratelineentries.productCode" => $code, "productratelineentries.isActive" => 1, "productratelineentries.isDelete" => 0);
 			$orderBy1 = array();
 			$joinType1 = array('citymaster' => "inner");
 			$join1 = array("citymaster" => "citymaster.code = productratelineentries.cityCode");
 			$groupByColumn1 = array();
-			$limit1 = $this->input->GET("length");
-			$offset1 = $this->input->GET("start");
+			$limit1 = $this->input->post("length") ?? $this->input->get("length");
+			$offset1 = $this->input->post("start") ?? $this->input->get("start");
 			$extraCondition1 = "";
 			$like1 = array();
 			$res = $this->GlobalModel->selectQuery($orderColumns1, $tableName1, $condition1, $orderBy1, $join1, $joinType1, $like1, $limit1, $offset1, $groupByColumn1, $extraCondition1);
@@ -829,7 +851,8 @@ class Product extends CI_Controller
 			foreach ($res->result() as $price) {
 				if ($price->productStatus == 'AVL') {
 					$sta = 'Available';
-				} else {
+				}
+				else {
 					$sta = 'Out Off Stock';
 				}
 				$priceData .= '<div class="col-md-4"><label>' . $price->cityName . '</label></div>
@@ -865,13 +888,15 @@ class Product extends CI_Controller
 
 			if ($row->isActive == "1") {
 				$activeStatus = '<span class="label label-sm label-success">Active</span>';
-			} else {
+			}
+			else {
 				$activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
 			}
 
 			if ($row->isPopular == "1") {
 				$popularStatus = '<span class="label label-sm label-success">Yes</span>';
-			} else {
+			}
+			else {
 				$popularStatus = '<span class="label label-sm label-warning">No</span>';
 			}
 
@@ -977,7 +1002,7 @@ class Product extends CI_Controller
 
 			$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 
-			//Activity Track Ends
+		//Activity Track Ends
 		}
 
 		$modelHtml .= '</form>';
@@ -991,9 +1016,9 @@ class Product extends CI_Controller
 		$productCode = $Result->result()[0]->productCode;
 		$productPhoto = $Result->result()[0]->productPhoto;
 		unlink('uploads/product/' . $productCode . '/' . $productPhoto);
-		echo  $deleteData = $this->GlobalModel->deleteForever($code, 'productphotos');
-		// echo base_url().'uploads/product/'.$photos->productCode.'/'.$photos->productPhoto;
-		//print_r($data->result());
+		echo $deleteData = $this->GlobalModel->deleteForever($code, 'productphotos');
+	// echo base_url().'uploads/product/'.$photos->productCode.'/'.$photos->productPhoto;
+	//print_r($data->result());
 
 	}
 
@@ -1026,8 +1051,8 @@ class Product extends CI_Controller
 		$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 		$data = array('isActive' => 0, 'isDelete' => 1, 'deleteID' => $addID, 'deleteIP' => $ip);
 		$resultData = $this->GlobalModel->doEdit($data, 'productratelineentries', $lineCode);
-		//Activity Track Ends 
-		//echo $this->GlobalModel->deleteForever($lineCode, 'productratelineentries');
+	//Activity Track Ends 
+	//echo $this->GlobalModel->deleteForever($lineCode, 'productratelineentries');
 	}
 
 	public function delete_all_rate_entries()
@@ -1036,7 +1061,8 @@ class Product extends CI_Controller
 		$result = $this->db->where('productratelineentries.productCode', $productCode)->delete('productratelineentries');
 		if ($result) {
 			echo true;
-		} else {
+		}
+		else {
 			echo false;
 		}
 	}
@@ -1063,7 +1089,7 @@ class Product extends CI_Controller
 	public function getSubUnitsold()
 	{
 		$html = "";
-		$mainUnit =  $this->input->get('unit');
+		$mainUnit = $this->input->post('unit') ?? $this->input->get('unit');
 		$orderColumns = "uommaster.subunit,uommaster.subunitSName";
 		$table = "uommaster";
 		$condition = ["uommaster.uomSName" => $mainUnit, "uommaster.isActive" => 1];
@@ -1081,7 +1107,7 @@ class Product extends CI_Controller
 	public function getSubUnits()
 	{
 		$html = "";
-		$mainUnit =  $this->input->get('unit');
+		$mainUnit = $this->input->post('unit') ?? $this->input->get('unit');
 		$orderColumns = array("subunit.*,uommaster.uomName");
 		$tableName = "subunit";
 		$condition = ["uommaster.uomSName" => $mainUnit];
@@ -1098,15 +1124,16 @@ class Product extends CI_Controller
 		}
 		echo $html;
 	}
-	
-	public function update_product_rate(){
+
+	public function update_product_rate()
+	{
 		$table_name1 = "productmaster";
 		$orderColumns1 = array("productmaster.code");
 		$cond1 = array('productmaster' . '.isDelete' => 0, 'productmaster' . '.isActive' => 1);
 		$get_data = $this->GlobalModel->selectQuery($orderColumns1, $table_name1, $cond1);
 		foreach ($get_data->result() as $r) {
 			$this->GlobalModel->set_main_variant($r->code);
-			
+
 		}
 	}
 }

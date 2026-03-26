@@ -35,10 +35,10 @@
 										<input type="text" class="form-control" list="coupanlist" id="coupanCode" name="coupanCode" placeholder="Enter coupon Code Here ">
 										<datalist id="coupanlist">
 											<?php if ($coupan) {
-												foreach ($coupan->result() as $p) {
-													echo '<option value="' . $p->code . '">' . $p->coupanCode . '</option>';
-												}
-											} ?>
+	foreach ($coupan->result() as $p) {
+		echo '<option value="' . $p->code . '">' . $p->coupanCode . '</option>';
+	}
+}?>
 										</datalist>
 									</div>
 								</div>
@@ -62,10 +62,10 @@
 										<input type="text" class="form-control" list="discountlist" id="discountCode" name="discountCode" placeholder="Enter Discount Here ">
 										<datalist id="discountlist">
 											<?php if ($discount) {
-												foreach ($discount->result() as $p) {
-													echo '<option value="' . $p->code . '">' . $p->discount . '</option>';
-												}
-											} ?>
+	foreach ($discount->result() as $p) {
+		echo '<option value="' . $p->code . '">' . $p->discount . '</option>';
+	}
+}?>
 										</datalist>
 									</div>
 								</div>

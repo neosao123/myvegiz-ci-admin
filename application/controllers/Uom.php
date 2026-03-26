@@ -82,14 +82,13 @@ class Uom extends CI_Controller
 		$groupByColumn = array();
 		$limit = $this->input->post("length") ?? $this->input->get("length");
 		$offset = $this->input->post("start") ?? $this->input->get("start");
-		$srno = $offset + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		$like = array();
 		$extraCondition = " (uommaster.isDelete=0 or uommaster.isDelete is null)";
 		$like = array("uommaster.uomDescription" => $search . "~both", "uommaster.code" => $search . "~both", "uommaster.uomName" => $search . "~both", "uommaster.uomSName" => $search . "~both");
 		$data = array();
 		$dataCount = 0;
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		$data = array();
 		if ($Records) {
 			foreach ($Records->result() as $row) {
@@ -123,7 +122,7 @@ class Uom extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
 		}
-		$output = array("draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+		$output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
 		echo json_encode($output);
 	}
 	public function save()

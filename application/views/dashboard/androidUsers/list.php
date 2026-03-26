@@ -14,7 +14,7 @@
                         <div class="d-flex align-items-center">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="<?php echo base_url().'index.php/admin/index';?>">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="<?php echo base_url() . 'index.php/admin/index'; ?>">Home</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Android Users List</li>
                                 </ol>
 
@@ -52,10 +52,9 @@
                                      <input type="text" id="code" list="clientNameList" name="code" value=""  class="form-control" placeholder="Enter Client Name Here" > 
 									<datalist id="clientNameList">
 									                                           
-									  <?php foreach($query->result() as $row)
-									  {
-										echo "<option value='".$row->code."'>".$row->name."</option>"; 
-									  }?>
+									  <?php foreach ($query->result() as $row) {
+	echo "<option value='" . $row->code . "'>" . $row->name . "</option>";
+}?>
 								 
 									</datalist>
 							</div>
@@ -66,9 +65,9 @@
 									<select  class="form-control" id="cityCode" name="cityCode">
 										<option value="">Select City</option>
 										<?php
-										foreach ($city->result() as $c) {
-											echo '<option value="' . $c->code . '">' . $c->cityName . '</option>';
-										} ?>
+foreach ($city->result() as $c) {
+	echo '<option value="' . $c->code . '">' . $c->cityName . '</option>';
+}?>
 									</select>
 								</div>
 							</div>
@@ -77,10 +76,9 @@
 								<span> <label for="mobile">Mobile Number :</label> </span>
 							<input type="text"  class="form-control" list="mobileNumberList" id="mobile" name="mobile" placeholder="Enter Mobile Number Here">
 								<datalist id="mobileNumberList">
-								<?php foreach($query->result() as $row)
-									  {
-										echo "<option value='".$row->mobile."'>".$row->mobile."</option>"; 
-									  }?>
+								<?php foreach ($query->result() as $row) {
+	echo "<option value='" . $row->mobile . "'>" . $row->mobile . "</option>";
+}?>
 								 
 									 
 								</datalist>
@@ -91,10 +89,9 @@
 								<span> <label for="emailId">Email Id:</label> </span>
 							<input type="text"  class="form-control" list="emailIdList" id="emailId" name="emailId" placeholder="Enter Email Id Here">
 									<datalist id="emailIdList">
-									<?php foreach($query->result() as $row)
-									  {
-										echo "<option value='".$row->emailId."'>".$row->emailId."</option>"; 
-									  }?>
+									<?php foreach ($query->result() as $row) {
+	echo "<option value='" . $row->emailId . "'>" . $row->emailId . "</option>";
+}?>
 								 
 									</datalist>
 							</div>

@@ -31,7 +31,7 @@ class Vendor extends CI_Controller
 
 	public function getAddressess()
 	{
-		$code = $this->input->get('cityCode');
+		$code = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$menusubcategory = $this->GlobalModel->selectQuery('customaddressmaster.code,customaddressmaster.place', 'customaddressmaster', array("customaddressmaster.cityCode" => $code, 'customaddressmaster.isActive' => 1));
 		$html = "";
 		if ($menusubcategory) {
@@ -97,7 +97,8 @@ class Vendor extends CI_Controller
 		$extraConditions = array();
 		$Records = $this->GlobalModel1->make_datatables($tables, $requiredColumns, $conditions, $extraConditionColumnNames, $extraConditions);
 		// print_r($Records->result());
-		$srno = $_GET['start'] + 1;
+		$offset = $this->input->post('start') ?? $this->input->get('start') ?? 0;
+		$srno = $offset + 1;
 		$data = array();
 		foreach ($Records->result() as $row) {
 
@@ -136,7 +137,7 @@ class Vendor extends CI_Controller
 		}
 		$dataCount = $this->GlobalModel1->get_all_data($tables, $requiredColumns, $conditions, $extraConditionColumnNames, $extraConditions);
 		$output = array(
-			"draw" => intval($_GET["draw"]),
+			"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 			"recordsTotal" => $dataCount,
 			"recordsFiltered" => $dataCount,
 			"data" => $data
@@ -146,27 +147,24 @@ class Vendor extends CI_Controller
 
 	public function getVendorList()
 	{
-		$code = $this->input->post('vendorCode');
-		$ownerContact = $this->input->post('ownerContact');
-		$entitycategoryCode = $this->input->post('entitycategoryCode');
-		// $endDate=$this->input->post('endDate');
+		$code = $this->input->post('vendorCode') ?? $this->input->get('vendorCode');
+		$ownerContact = $this->input->post('ownerContact') ?? $this->input->get('ownerContact');
+		$entitycategoryCode = $this->input->post('entitycategoryCode') ?? $this->input->get('entitycategoryCode');
 
-		$search = strtolower($this->input->post("search")['value'] ?? '');
+		$search = strtolower($this->input->post("search")['value'] ?? $this->input->get("search")['value'] ?? '');
 		$tableName = "vendor";
 		$orderColumns = array("vendor.*");
 		$condition = array('vendor.code' => $code, 'vendor.ownerContact' => $ownerContact, 'vendor.entitycategoryCode' => $entitycategoryCode);
-		// $condition=array();
 		$orderBy = array('vendor' . '.id' => 'DESC');
 		$joinType = array();
 		$join = array();
 		$groupByColumn = array();
-		$limit = $this->input->post("length");
-		$offset = $this->input->post("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = "vendor.isDelete=0 OR vendor.isDelete IS NULL";
-		// $like = array();
 		$like = array('vendor.entityName' => $search . '~both', 'vendor.ownerContact' => $search . '~both', 'vendor.firstName' => $search . '~both', 'vendor.lastName' => $search . '~both', 'vendor.code' => $search . '~both');
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = intval($offset) + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				if ($row->isActive == 1) {
@@ -216,7 +214,7 @@ class Vendor extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw" => intval($this->input->post("draw")),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal" => $dataCount,
 				"recordsFiltered" => $dataCount,
 				"data" => $data
@@ -227,7 +225,7 @@ class Vendor extends CI_Controller
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw" => intval($this->input->post("draw")),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
 				"recordsTotal" => $dataCount,
 				"recordsFiltered" => $dataCount,
 				"data" => $data

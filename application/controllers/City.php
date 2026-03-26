@@ -61,7 +61,7 @@ class City extends CI_Controller
         $srno = $offset + 1;
         $like = array();
         $extraCondition = " (citymaster.isDelete=0 or citymaster.isDelete is null)";
-        $like = array("citymaster.code" => $search . "~both","citymaster.cityName" => $search . "~both");
+        $like = array("citymaster.code" => $search . "~both", "citymaster.cityName" => $search . "~both");
         $data = array();
         $dataCount = 0;
         $Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -70,7 +70,8 @@ class City extends CI_Controller
             foreach ($Records->result() as $row) {
                 if ($row->isActive == "1") {
                     $status = " <span class='label label-sm label-success'>Active</span>";
-                } else {
+                }
+                else {
                     $status = " <span class='label label-sm label-warning'>Inactive</span>";
                 }
                 $actionHtml = '<div class="btn-group">
@@ -83,12 +84,12 @@ class City extends CI_Controller
                                     <a class="dropdown-item mywarning " data-seq="' . $row->code . '" id="' . $row->code . '"><i class="ti-trash" ></i> Delete</a>
                                 </div>
                             </div>';
-                $data[] = array($srno, $row->code, $row->cityName, $status, /*$row->minOrder, $row->deliveryCharge,*/ $actionHtml);
+                $data[] = array($srno, $row->code, $row->cityName, $status, /*$row->minOrder, $row->deliveryCharge,*/$actionHtml);
                 $srno++;
             }
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
         }
-        $output = array("draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+        $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
         echo json_encode($output);
     }
 
@@ -119,7 +120,8 @@ class City extends CI_Controller
             $this->load->view('dashboard/header');
             $this->load->view('dashboard/city/add', $data);
             $this->load->view('dashboard/footer');
-        } else {
+        }
+        else {
             $this->form_validation->set_rules('cityName', 'City Name', 'trim|required|min_length[2]|max_length[50]');
             //$this->form_validation->set_rules('minOrder', 'Minimum Order', 'trim|required|numeric');
             //$this->form_validation->set_rules('deliveryCharge', 'City Name', 'trim|required|numeric');
@@ -133,22 +135,24 @@ class City extends CI_Controller
                 $this->load->view('dashboard/header');
                 $this->load->view('dashboard/city/add', $data);
                 $this->load->view('dashboard/footer');
-            } else {
+            }
+            else {
                 $data = array('cityName' => trim($this->input->post('cityName')), 'addID' => $addID, 'addIP' => $ip, 'isActive' => trim($this->input->post("isActive")));
                 //$data['minOrder'] = trim($this->input->post('minOrder'));
                 //$data['deliveryCharge'] = trim($this->input->post('deliveryCharge'));
-                $//data['minOrderCurrency'] = trim($this->input->post('minOrderCurrency'));
-                //$data['deliveryChargeCurrency'] = trim($this->input->post('deliveryChargeCurrency'));
-                //$data['deliveryChargesPerKm'] = trim($this->input->post('deliveryChargesPerKm'));
-                //$data['minFreeDeliveryKm'] = trim($this->input->post('minFreeDeliveryKm'));
-                $data['latitude'] = trim($this->input->post('latitude'));
+                $ //data['minOrderCurrency'] = trim($this->input->post('minOrderCurrency'));
+                    //$data['deliveryChargeCurrency'] = trim($this->input->post('deliveryChargeCurrency'));
+                    //$data['deliveryChargesPerKm'] = trim($this->input->post('deliveryChargesPerKm'));
+                    //$data['minFreeDeliveryKm'] = trim($this->input->post('minFreeDeliveryKm'));
+                    $data['latitude'] = trim($this->input->post('latitude'));
                 $data['longitude'] = trim($this->input->post('longitude'));
                 $result = $this->GlobalModel->addWithoutYear($data, 'citymaster', 'CTY');
                 if ($result != 'false') {
                     $response['status'] = true;
                     $response['message'] = "City Successfully Added.";
                     $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-                } else {
+                }
+                else {
                     $response['status'] = false;
                     $response['message'] = "Failed To Add City";
                 }
@@ -179,66 +183,69 @@ class City extends CI_Controller
         $text = $role . " " . $userName . ' updated City "' . $cityName . '" from ' . $ip;
         $log_text = array('code' => "demo", 'addID' => $addID, 'logText' => $text);
         //Activity Track Ends
-		
-		$condition2 = array('cityName' =>$cityName, 'code!=' => $code);
-		$result = $this->GlobalModel->checkDuplicateRecordNew($condition2, 'citymaster');
-		if ($result == 1) {
-			$data['error_message'] = 'Duplicate City Name';
-			$table_name = 'citymaster';
-			$orderColumns = array("citymaster.*");
-			$cond = array('citymaster' . '.code' => $code);
-			$data['currency'] = $this->GlobalModel->selectData('currencymaster');
-			$data['query'] = $this->GlobalModel->selectQuery($orderColumns, $table_name, $cond);
-			$this->load->view('dashboard/header');
-			$this->load->view('dashboard/city/edit', $data);
-			$this->load->view('dashboard/footer');
-		}else{
-		
-			$this->form_validation->set_rules('cityName', 'City Name', 'trim|required|min_length[2]|max_length[50]');
-			//$this->form_validation->set_rules('minOrder', 'Minimum Order', 'trim|required|numeric');
-			//$this->form_validation->set_rules('deliveryCharge', 'City Name', 'trim|required|numeric');
-			//$this->form_validation->set_rules('minOrderCurrency', 'Min. Order Currency', 'trim|required');
-			//$this->form_validation->set_rules('deliveryChargeCurrency', 'Delivery Currency', 'trim|required');
-			$this->form_validation->set_rules('latitude', 'GPS Latitude', 'trim|required|numeric');
-			$this->form_validation->set_rules('longitude', 'GPS Longitude', 'trim|required|numeric');
-			if ($this->form_validation->run() == FALSE) {
-				$data['error_message'] = '* Fields are Required!';
-				$table_name = 'citymaster';
-				$orderColumns = array("citymaster.*");
-				$cond = array('citymaster' . '.code' => $code);
-				$data['currency'] = $this->GlobalModel->selectData('currencymaster');
-				$data['query'] = $this->GlobalModel->selectQuery($orderColumns, $table_name, $cond);
-				$this->load->view('dashboard/header');
-				$this->load->view('dashboard/city/edit', $data);
-				$this->load->view('dashboard/footer');
-			} else {
-				$data = array(
-					'cityName' => $cityName,
-					'editID' => $addID,
-					'editIP' => $ip,
-					'isActive' => trim($this->input->post("isActive"))
-				);
-				//$data['minOrder'] = trim($this->input->post('minOrder'));
-				//$data['deliveryCharge'] = trim($this->input->post('deliveryCharge'));
-				//$data['minOrderCurrency'] = trim($this->input->post('minOrderCurrency'));
-				//$data['deliveryChargeCurrency'] = trim($this->input->post('deliveryChargeCurrency'));
-				//$data['deliveryChargesPerKm'] = trim($this->input->post('deliveryChargesPerKm'));
-				//$data['minFreeDeliveryKm'] = trim($this->input->post('minFreeDeliveryKm'));
-				$data['latitude'] = trim($this->input->post('latitude'));
-				$data['longitude'] = trim($this->input->post('longitude'));
-				$result = $this->GlobalModel->doEdit($data, 'citymaster', $code);
-				if ($result != 'false') {
-					$response['status'] = true;
-					$response['message'] = "City Successfully Updated.";
-					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
-					$response['status'] = false;
-					$response['message'] = "No change In City";
-				}
-				$this->session->set_flashdata('response', json_encode($response));
-				redirect(base_url() . 'city/listRecords');
-			}
-		}
+
+        $condition2 = array('cityName' => $cityName, 'code!=' => $code);
+        $result = $this->GlobalModel->checkDuplicateRecordNew($condition2, 'citymaster');
+        if ($result == 1) {
+            $data['error_message'] = 'Duplicate City Name';
+            $table_name = 'citymaster';
+            $orderColumns = array("citymaster.*");
+            $cond = array('citymaster' . '.code' => $code);
+            $data['currency'] = $this->GlobalModel->selectData('currencymaster');
+            $data['query'] = $this->GlobalModel->selectQuery($orderColumns, $table_name, $cond);
+            $this->load->view('dashboard/header');
+            $this->load->view('dashboard/city/edit', $data);
+            $this->load->view('dashboard/footer');
+        }
+        else {
+
+            $this->form_validation->set_rules('cityName', 'City Name', 'trim|required|min_length[2]|max_length[50]');
+            //$this->form_validation->set_rules('minOrder', 'Minimum Order', 'trim|required|numeric');
+            //$this->form_validation->set_rules('deliveryCharge', 'City Name', 'trim|required|numeric');
+            //$this->form_validation->set_rules('minOrderCurrency', 'Min. Order Currency', 'trim|required');
+            //$this->form_validation->set_rules('deliveryChargeCurrency', 'Delivery Currency', 'trim|required');
+            $this->form_validation->set_rules('latitude', 'GPS Latitude', 'trim|required|numeric');
+            $this->form_validation->set_rules('longitude', 'GPS Longitude', 'trim|required|numeric');
+            if ($this->form_validation->run() == FALSE) {
+                $data['error_message'] = '* Fields are Required!';
+                $table_name = 'citymaster';
+                $orderColumns = array("citymaster.*");
+                $cond = array('citymaster' . '.code' => $code);
+                $data['currency'] = $this->GlobalModel->selectData('currencymaster');
+                $data['query'] = $this->GlobalModel->selectQuery($orderColumns, $table_name, $cond);
+                $this->load->view('dashboard/header');
+                $this->load->view('dashboard/city/edit', $data);
+                $this->load->view('dashboard/footer');
+            }
+            else {
+                $data = array(
+                    'cityName' => $cityName,
+                    'editID' => $addID,
+                    'editIP' => $ip,
+                    'isActive' => trim($this->input->post("isActive"))
+                );
+                //$data['minOrder'] = trim($this->input->post('minOrder'));
+                //$data['deliveryCharge'] = trim($this->input->post('deliveryCharge'));
+                //$data['minOrderCurrency'] = trim($this->input->post('minOrderCurrency'));
+                //$data['deliveryChargeCurrency'] = trim($this->input->post('deliveryChargeCurrency'));
+                //$data['deliveryChargesPerKm'] = trim($this->input->post('deliveryChargesPerKm'));
+                //$data['minFreeDeliveryKm'] = trim($this->input->post('minFreeDeliveryKm'));
+                $data['latitude'] = trim($this->input->post('latitude'));
+                $data['longitude'] = trim($this->input->post('longitude'));
+                $result = $this->GlobalModel->doEdit($data, 'citymaster', $code);
+                if ($result != 'false') {
+                    $response['status'] = true;
+                    $response['message'] = "City Successfully Updated.";
+                    $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
+                }
+                else {
+                    $response['status'] = false;
+                    $response['message'] = "No change In City";
+                }
+                $this->session->set_flashdata('response', json_encode($response));
+                redirect(base_url() . 'city/listRecords');
+            }
+        }
     }
     public function delete()
     {
@@ -269,7 +276,7 @@ class City extends CI_Controller
         $resultData = $this->GlobalModel->doEdit($data, 'citymaster', $code);
         //Activity Track Ends
         echo $this->GlobalModel->delete($code, 'citymaster');
-        // redirect(base_url() . 'index.php/City/listrecords', 'refresh');
+    // redirect(base_url() . 'index.php/City/listrecords', 'refresh');
 
     }
     public function view()
@@ -301,7 +308,8 @@ class City extends CI_Controller
         foreach ($Records->result() as $row) {
             if ($row->isActive == "1") {
                 $activeStatus = '<span class="label label-sm label-success">Active</span>';
-            } else {
+            }
+            else {
                 $activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
             }
             $modelHtml .= '<div class="form-row">
@@ -335,7 +343,7 @@ class City extends CI_Controller
             $text = $role . " " . $userName . ' viewed City "' . $row->cityName . '" from ' . $ip;
             $log_text = array('code' => "demo", 'addID' => $addID, 'logText' => $text);
             $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-            //Activity Track Ends
+        //Activity Track Ends
 
         }
         $modelHtml .= '</form>';

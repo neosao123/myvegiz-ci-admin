@@ -31,77 +31,80 @@ class Vendorcommission extends CI_Controller
 
 	public function updateVendorPaymentFlag()
 	{
-	   	$vendorCode = $this->input->post('vendorCode');  
-		$paymentDate = $this->input->post('paymentDate');  
-		$dateFrom = date('Y-m-d',strtotime(str_replace('/','-',$paymentDate))); 
-		$dateTo = date('Y-m-d',strtotime(str_replace('/','-',$paymentDate))); 
-		
-		$result = $this->db->query("update vendorordermaster set vendorAmountPaid=1,vendorPaymentDate='".date('Y-m-d H:i:s')."' where vendorCode='".$vendorCode."' and (addDate between '".$dateFrom."  00:00:00' and '".$dateTo." 23:59:59')");
-		if($result==true){
-		    echo true;
-		} else {
-		    echo false;
+		$vendorCode = $this->input->post('vendorCode');
+		$paymentDate = $this->input->post('paymentDate');
+		$dateFrom = date('Y-m-d', strtotime(str_replace('/', '-', $paymentDate)));
+		$dateTo = date('Y-m-d', strtotime(str_replace('/', '-', $paymentDate)));
+
+		$result = $this->db->query("update vendorordermaster set vendorAmountPaid=1,vendorPaymentDate='" . date('Y-m-d H:i:s') . "' where vendorCode='" . $vendorCode . "' and (addDate between '" . $dateFrom . "  00:00:00' and '" . $dateTo . " 23:59:59')");
+		if ($result == true) {
+			echo true;
+		}
+		else {
+			echo false;
 		}
 	}
-	
+
 	public function getVendorCommissionList()
-	{   
-		
-		$vendorCode = $this->input->get('vendorCode'); 
-		$dateSearch = $this->input->GET('date'); 
-		
+	{
+
+		$vendorCode = $this->input->post('vendorCode') ?? $this->input->get('vendorCode');
+		$dateSearch = $this->input->post('date') ?? $this->input->get('date');
+
 		$tableName = array('vendorordermaster');
-	
-		$orderColumns = array("vendor.code as vendorCode,vendor.entityName,ROUND(ifNull( sum( vendorordermaster.grandTotal ), 0 )) AS totalorderAmount,ROUND(ifNull( sum( vendorordermaster.grandTotal *( 15 / 100 )), 0 )) AS deliverAmount,ROUND((ifNull( sum( vendorordermaster.grandTotal ), 0 ) - ifNull( sum( vendorordermaster.grandTotal *( 15 / 100 )), 0 ))) AS vendorAmount");		
-		$condition = array("vendorordermaster.orderStatus" => 'DEL',"vendorordermaster.vendorAmountPaid"=>0);
-		if($vendorCode){
-			$condition["vendorordermaster.vendorCode"]=$vendorCode;
+
+		$orderColumns = array("vendor.code as vendorCode,vendor.entityName,ROUND(ifNull( sum( vendorordermaster.grandTotal ), 0 )) AS totalorderAmount,ROUND(ifNull( sum( vendorordermaster.grandTotal *( 15 / 100 )), 0 )) AS deliverAmount,ROUND((ifNull( sum( vendorordermaster.grandTotal ), 0 ) - ifNull( sum( vendorordermaster.grandTotal *( 15 / 100 )), 0 ))) AS vendorAmount");
+		$condition = array("vendorordermaster.orderStatus" => 'DEL', "vendorordermaster.vendorAmountPaid" => 0);
+		if ($vendorCode) {
+			$condition["vendorordermaster.vendorCode"] = $vendorCode;
 		}
-		if($dateSearch!=""){
-			$date = date('Y-m-d',strtotime(str_replace('/','-',$dateSearch))); 
-			$date=date('Y-m-d',strtotime($date.' -1 days'));
-			$where = " ( vendorordermaster.addDate between '".$date." 00:00:00' and '".$date." 23:59:59')";
-		} else {
+		if ($dateSearch != "") {
+			$date = date('Y-m-d', strtotime(str_replace('/', '-', $dateSearch)));
+			$date = date('Y-m-d', strtotime($date . ' -1 days'));
+			$where = " ( vendorordermaster.addDate between '" . $date . " 00:00:00' and '" . $date . " 23:59:59')";
+		}
+		else {
 			$date = date('Y-m-d');
-			$date=date('Y-m-d',strtotime($date.' -1 days'));
-			$where = " ( vendorordermaster.addDate between '".$date." 00:00:00' and '".$date." 23:59:59')";
+			$date = date('Y-m-d', strtotime($date . ' -1 days'));
+			$where = " ( vendorordermaster.addDate between '" . $date . " 00:00:00' and '" . $date . " 23:59:59')";
 		}
 		$orderBy = array('vendorordermaster' . '.id' => 'DESC');
-		$joinType = array('vendor' => 'inner'); 
+		$joinType = array('vendor' => 'inner');
 		$join = array('vendor' => 'vendor.code=vendorordermaster.vendorCode');
 		$groupByColumn = array("vendorordermaster.vendorCode");
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
-		$extraCondition = " (vendorordermaster.isDelete is NUll or vendorordermaster.isDelete = 0) and ".$where;       
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
+		$extraCondition = " (vendorordermaster.isDelete is NUll or vendorordermaster.isDelete = 0) and " . $where;
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		//echo $this->db->last_query();
-		$srno = $_GET['start'] + 1;
-		$data = array(); 
+		$srno = ($this->input->post('start') ?? $this->input->get('start')) + 1;
+		$data = array();
 		if ($Records) {
-			foreach ($Records->result() as $row) {  				
-                $actionHtml='<div class="btn-group">  <button type="button" class="btn btn-success paybtn" data-id="'.$row->vendorCode.'">Pay</button></div>';
-				
-				$data[] = array($srno,$row->entityName,$row->totalorderAmount,$row->deliverAmount,$row->vendorAmount,$actionHtml);
+			foreach ($Records->result() as $row) {
+				$actionHtml = '<div class="btn-group">  <button type="button" class="btn btn-success paybtn" data-id="' . $row->vendorCode . '">Pay</button></div>';
+
+				$data[] = array($srno, $row->entityName, $row->totalorderAmount, $row->deliverAmount, $row->vendorAmount, $actionHtml);
 				$srno++;
 			}
 			$dataCount = sizeOf($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, '', '', $groupByColumn, $extraCondition)->result());
-		} else {
+		}
+		else {
 			$dataCount = 0;
-		}		
+		}
 		$output = array(
-			"draw" => intval($_GET["draw"]),
+			"draw" => intval($this->input->post("draw") ?? $this->input->get("draw")),
 			"recordsTotal" => $dataCount,
 			"recordsFiltered" => $dataCount,
 			"data" => $data
-		); 
+		);
 		echo json_encode($output);
-	
+
 	}
 
 	public function viewCurrentHistory()
 	{
-		$code = $this->input->GET('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		$array = array('userCode' => $code, 'isActive' => 1);
 		$Records = $this->GlobalModel->selectQuery('commissiontemp.*', 'commissiontemp', $array);
 		$data['commissionData'] = $Records;
@@ -129,8 +132,8 @@ class Vendorcommission extends CI_Controller
 				break;
 		}
 		$entryDate = date('Y-m-d h:i:s');
-		$month =  date('m');
-		$year =  date('Y');
+		$month = date('m');
+		$year = date('Y');
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$text = $role . " " . $userName . " paid commision for month " . $month . " & year " . $year . " from " . $ip;
 
@@ -163,17 +166,19 @@ class Vendorcommission extends CI_Controller
 			if ($result != false) {
 				$this->GlobalModel->deleteForeverFromField('userCode', $code, 'commissiontemp');
 				echo 'true';
-			} else {
+			}
+			else {
 				echo 'false';
 			}
-		} else {
+		}
+		else {
 			echo 'false';
 		}
 	}
 
 	public function showhistory()
 	{
-		$code = $this->input->GET('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		$tableName = array('usermaster');
 		$orderColumns = array("employeemaster.firstName,employeemaster.lastName,usermaster.code as userCode");
 		$condition = array('usermaster.code' => $code);
@@ -181,8 +186,8 @@ class Vendorcommission extends CI_Controller
 		$joinType = array('employeemaster' => 'inner');
 		$join = array('employeemaster' => 'employeemaster.code=usermaster.empCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (usermaster.isDelete is NUll or usermaster.isDelete = 0)";
 		$like = array();
 		$resultar = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);

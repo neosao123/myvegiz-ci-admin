@@ -28,7 +28,7 @@ class MenuSubcategory extends CI_Controller
 
 	public function add()
 	{
-		$data['query1'] = $this->GlobalModel->selectQuery('menucategory.*', 'menucategory', array("menucategory.isActive" => 1),array("menucategory.menuCategoryName"=>"ASC"));
+		$data['query1'] = $this->GlobalModel->selectQuery('menucategory.*', 'menucategory', array("menucategory.isActive" => 1), array("menucategory.menuCategoryName" => "ASC"));
 		$this->load->view('dashboard/menusubcategory/add', $data);
 	}
 
@@ -36,7 +36,7 @@ class MenuSubcategory extends CI_Controller
 	{
 		$code = $this->input->post('code');
 		$data['query'] = $this->GlobalModel->selectDataById($code, 'menusubcategory');
-		$data['query1'] = $this->GlobalModel->selectQuery('menucategory.*', 'menucategory', array("menucategory.isActive" => 1),array("menucategory.menuCategoryName"=>"ASC"));
+		$data['query1'] = $this->GlobalModel->selectQuery('menucategory.*', 'menucategory', array("menucategory.isActive" => 1), array("menucategory.menuCategoryName" => "ASC"));
 		$this->load->view('dashboard/menusubcategory/edit', $data);
 	}
 
@@ -53,7 +53,7 @@ class MenuSubcategory extends CI_Controller
 		$limit = $this->input->post("length") ?? $this->input->get("length");
 		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (menusubcategory.isDelete=0 OR menusubcategory.isDelete IS NULL)";
-		$like = array("menusubcategory.code" => $search . "~both","menusubcategory.menuSubCategoryName" => $search . "~both","menucategory.menuCategoryName" => $search . "~both");
+		$like = array("menusubcategory.code" => $search . "~both", "menusubcategory.menuSubCategoryName" => $search . "~both", "menucategory.menuCategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		$dataCount = 0;
@@ -61,12 +61,13 @@ class MenuSubcategory extends CI_Controller
 		$query = $this->db->last_query();
 		if ($Records) {
 			foreach ($Records->result() as $row) {
-				$code = $row->code; 
+				$code = $row->code;
 				if ($row->isActive == 1) {
 					$status = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$status = "<span class='label label-sm label-warning'>Inactive</span>";
-				} 
+				}
 				$actionHtml = '<div class="btn-group">
 								<button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									<i class="ti-settings"></i>
@@ -90,11 +91,11 @@ class MenuSubcategory extends CI_Controller
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, '', '', $groupByColumn, $extraCondition)->result());
 		}
 		$output = array(
-			"draw"			  =>     intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
-			"recordsTotal"    =>     $dataCount,
-			"recordsFiltered" =>     $dataCount,
-			"data"            =>     $data,
-			"query"			  => 	 $query
+			"draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
+			"recordsTotal" => $dataCount,
+			"recordsFiltered" => $dataCount,
+			"data" => $data,
+			"query" => $query
 		);
 		echo json_encode($output);
 	}
@@ -107,7 +108,7 @@ class MenuSubcategory extends CI_Controller
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
 		$userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
 		$userName = $this->session->userdata['logged_in' . $this->session_key]['username'];
-		$role = ""; 
+		$role = "";
 		switch ($userRole) {
 			case "ADM":
 				$role = "Admin";
@@ -115,21 +116,22 @@ class MenuSubcategory extends CI_Controller
 			case "USR":
 				$role = "User";
 				break;
-		} 
+		}
 		$ip = $_SERVER['REMOTE_ADDR'];
-		$text = $role . " " . $userName . ' added new Sub-menu Category "' . $menuSubCategoryName . '" from ' . $ip; 
+		$text = $role . " " . $userName . ' added new Sub-menu Category "' . $menuSubCategoryName . '" from ' . $ip;
 		$log_text = array(
 			'code' => "demo",
 			'addID' => $addID,
 			'logText' => $text
-		); 
+		);
 		//Activity Track Ends 
-		$result = $this->GlobalModel->checkDuplicateRecord('menuSubCategoryName', $menuSubCategoryName, 'menusubcategory'); 
+		$result = $this->GlobalModel->checkDuplicateRecord('menuSubCategoryName', $menuSubCategoryName, 'menusubcategory');
 		if ($result == true) {
 			$data = array('error_message' => 'Duplicate Sub-menu Category Name');
 			$response['status'] = 'error';
 			$response['message'] = 'Duplicate Sub-menu Category Name';
-		} else {
+		}
+		else {
 			$data = array(
 				'menuCategoryCode' => $menuCategoryCode,
 				'menuSubCategoryName' => $menuSubCategoryName,
@@ -144,7 +146,8 @@ class MenuSubcategory extends CI_Controller
 				$response['status'] = 'true';
 				$response['message'] = "Sub-menu Category Successfully Added.";
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-			} else {
+			}
+			else {
 				$response['status'] = 'false';
 				$response['message'] = "Failed To Add Sub-menu Category";
 			}
@@ -154,13 +157,14 @@ class MenuSubcategory extends CI_Controller
 
 	public function update()
 	{
-		$code =  $this->input->post('code');
+		$code = $this->input->post('code');
 		$menuSubCategoryName = trim($this->input->post("menuSubCategoryName"));
 		$menuCategoryCode = trim($this->input->post("menuCategoryCode"));
 		$isActive = trim($this->input->post("isActive"));
-		if($isActive!=1){
+		if ($isActive != 1) {
 			$isActive = 0;
-		} else {
+		}
+		else {
 			$isActive = 1;
 		}
 		//Activity Track Starts
@@ -195,20 +199,22 @@ class MenuSubcategory extends CI_Controller
 			$data = array('error_message' => 'Duplicate Sub-menu Category Name');
 			$response['status'] = 'error';
 			$response['message'] = 'Duplicate Sub-menu Category Name';
-		} else {
+		}
+		else {
 			$data = array(
 				'menuCategoryCode' => $menuCategoryCode,
 				'menuSubCategoryName' => $menuSubCategoryName,
 				'editID' => $addID,
 				'editIP' => $ip,
-				'isActive' =>$isActive
+				'isActive' => $isActive
 			);
 			$result = $this->GlobalModel->doEdit($data, 'menusubcategory', $code);
-			if ($result != 'false') { 
+			if ($result != 'false') {
 				$response['status'] = 'true';
 				$response['message'] = "Sub-menu Category Successfully Updated.";
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-			} else {
+			}
+			else {
 				$response['status'] = 'false';
 				$response['message'] = "No change In Sub-menu Category";
 			}
@@ -244,12 +250,12 @@ class MenuSubcategory extends CI_Controller
 			'addID' => $addID,
 			'logText' => $text
 		);
-		$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT'); 
+		$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 		$data = array(
 			'deleteID' => $addID,
 			'deleteIP' => $ip
-		); 
-		$resultData = $this->GlobalModel->doEdit($data, 'menusubcategory', $code); 
+		);
+		$resultData = $this->GlobalModel->doEdit($data, 'menusubcategory', $code);
 		echo $this->GlobalModel->delete($code, 'menusubcategory');
 	}
 }

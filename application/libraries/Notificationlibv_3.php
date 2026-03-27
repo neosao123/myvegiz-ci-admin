@@ -20,14 +20,20 @@ class Notificationlibv_3 {
 		$serviceAccountPath = FCPATH . 'myvegiz-a3615-firebase-adminsdk-k1wrf-c87a10b550.json';
 
 		if (!file_exists($serviceAccountPath)) {
-			throw new Exception('Service account key file not found: ' . $serviceAccountPath);
+			log_message('error', 'Service account key file not found: ' . $serviceAccountPath);
+			return array();
 		}
 
-		$credentials = new ServiceAccountCredentials(
-			'https://www.googleapis.com/auth/firebase.messaging',
-			$serviceAccountPath
-		);
-		$accessToken = $credentials->fetchAuthToken()['access_token'];
+		try {
+			$credentials = new ServiceAccountCredentials(
+				'https://www.googleapis.com/auth/firebase.messaging',
+				$serviceAccountPath
+			);
+			$accessToken = $credentials->fetchAuthToken()['access_token'];
+		} catch (Exception $e) {
+			log_message('error', 'Firebase Credentials Error: ' . $e->getMessage());
+			return array();
+		}
 
 		$responses = [];
 
@@ -100,14 +106,20 @@ class Notificationlibv_3 {
 		$serviceAccountPath = FCPATH . 'myvegiz-a3615-firebase-adminsdk-k1wrf-c87a10b550.json';
 
 		if (!file_exists($serviceAccountPath)) {
-			throw new Exception('Service account key file not found: ' . $serviceAccountPath);
+			log_message('error', 'Service account key file not found: ' . $serviceAccountPath);
+			return array();
 		}
 
-		$credentials = new ServiceAccountCredentials(
-			'https://www.googleapis.com/auth/firebase.messaging',
-			$serviceAccountPath
-		);
-		$accessToken = $credentials->fetchAuthToken()['access_token'];
+		try {
+			$credentials = new ServiceAccountCredentials(
+				'https://www.googleapis.com/auth/firebase.messaging',
+				$serviceAccountPath
+			);
+			$accessToken = $credentials->fetchAuthToken()['access_token'];
+		} catch (Exception $e) {
+			log_message('error', 'Firebase Credentials Error: ' . $e->getMessage());
+			return array();
+		}
 
 		$responses = [];
 
@@ -174,15 +186,21 @@ class Notificationlibv_3 {
 		$serviceAccountPath = FCPATH . 'myvegiz-a3615-firebase-adminsdk-k1wrf-c87a10b550.json';
 
 			if (!file_exists($serviceAccountPath)) {
-				throw new Exception('Service account key file not found: ' . $serviceAccountPath);
+				log_message('error', 'Service account key file not found: ' . $serviceAccountPath);
+				return array();
 			}
 
 			// Get access token from service account
-			$credentials = new \Google\Auth\Credentials\ServiceAccountCredentials(
-				'https://www.googleapis.com/auth/firebase.messaging',
-				$serviceAccountPath
-			);
-			$accessToken = $credentials->fetchAuthToken()['access_token'];
+			try {
+				$credentials = new \Google\Auth\Credentials\ServiceAccountCredentials(
+					'https://www.googleapis.com/auth/firebase.messaging',
+					$serviceAccountPath
+				);
+				$accessToken = $credentials->fetchAuthToken()['access_token'];
+			} catch (Exception $e) {
+				log_message('error', 'Firebase Credentials Error: ' . $e->getMessage());
+				return array();
+			}
 
 			$responses = [];
 

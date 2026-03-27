@@ -3221,7 +3221,12 @@ class Api extends REST_Controller
 			if (isset($response_all['status']) && $response_all['status'] == 'OK' && !empty($response_all['rows'][0]['elements'][0]['distance'])) {
 				$element = $response_all['rows'][0]['elements'][0];
 				if ($element['status'] == 'OK') {
-					$distance = $element['distance']['value'] / 1000;
+					$distance_raw = $element['distance']['value'] / 1000;
+					if ($distance_raw > (floor($distance_raw) + 0.5)) {
+						$distance = ceil($distance_raw);
+					} else {
+						$distance = floor($distance_raw);
+					}
 					$shortestdistance = $distance;
 
 					if ($fixedDeliveryFlag == 1) {
@@ -3230,7 +3235,7 @@ class Api extends REST_Controller
 					else {
 						if ($distance > $minimumKmForFixedCharges) {
 							// Example: Base charge for first 3km, then $perKm for each extra KM
-							$extraKm = ceil($distance - $minimumKmForFixedCharges);
+							$extraKm = ($distance - $minimumKmForFixedCharges);
 							$charges = $minimumChargesForFixedKm + ($extraKm * $perKmCharges);
 						}
 						else {
@@ -3255,7 +3260,7 @@ class Api extends REST_Controller
 			$charges = $minimumChargesForFixedKm;
 		}
 
-		$result['shortestdistance'] = round($shortestdistance, 2) . ' Kms';
+		$result['shortestdistance'] = $shortestdistance . ' Kms';
 		$result['charges'] = round($charges, 2);
 		return $result;
 	}

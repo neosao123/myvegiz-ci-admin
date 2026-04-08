@@ -1547,7 +1547,10 @@ class Api extends REST_Controller
 		$postData = $this->post();
 		if (isset($postData["clientCode"]) && $postData["clientCode"] != '') {
 			$clientCode = $postData["clientCode"];
-			$cityCode = '';
+			$clientData = $this->GlobalModel->selectQuery("clientmaster.cityCode", "clientmaster", array("clientmaster.isActive" => "1", "clientmaster.code" => $clientCode));
+			if ($clientData != false && $clientData->num_rows() > 0) {
+				$cityCode = $clientData->result_array()[0]['cityCode'];
+			}
 			$clientLatitude = '';
 			$clientLongitude = '';
 			$cartAmount = 0;
@@ -1557,18 +1560,24 @@ class Api extends REST_Controller
 			$addressLatitudeData = $this->GlobalModel->selectQuery("clientprofile.latitude,clientprofile.longitude,clientprofile.cityCode", "clientprofile", array("clientprofile.isActive" => "1", "clientprofile.isSelected" => "1", "clientprofile.clientCode" => $clientCode));
 			if ($addressLatitudeData != false) {
 				$data = $addressLatitudeData->result_array()[0];
-				$cityCode = $data['cityCode'];
 				$clientLatitude = $data['latitude'];
 				$clientLongitude = $data['longitude'];
-				if ($clientLatitude == "" || $clientLongitude == "") {
-					$this->response(array("status" => "300", "message" => "something went wrong please check your location."), 200);
-				}
+				// if ($clientLatitude == "" || $clientLongitude == "") {
+				// 	$this->response(array("status" => "300", "message" => "something went wrong please check your location."), 200);
+				// }
 
 			}
-			if ($cityCode == "") {
-				$clientData = $this->GlobalModel->selectQuery("clientmaster.cityCode", "clientmaster", array("clientmaster.isActive" => "1", "clientmaster.code" => $clientCode));
-				$getdata = $clientData->result_array()[0];
-				$cityCode = $getdata['cityCode'];
+
+			if ($clientLatitude == "" || $clientLongitude == "") {
+				// use city's lat long as default
+				if ($cityCode != '') {
+					$cityLoc = $this->GlobalModel->selectQuery("citymaster.latitude,citymaster.longitude", "citymaster", array("citymaster.code" => $cityCode, "citymaster.isActive" => 1));
+					if ($cityLoc != false && $cityLoc->num_rows() > 0) {
+						$cdata = $cityLoc->result_array()[0];
+						$clientLatitude = $cdata['latitude'];
+						$clientLongitude = $cdata['longitude'];
+					}
+				}
 			}
 
 			$deliverySlotsList = $this->db->query("select code,slotTitle,startTime,endTime,ifnull(deliveryCharge,0) as deliveryCharge from deliveryChargesSlots where isActive=1 and (code='DSLT_1' OR ((startTime > '" . date('H:i:s') . "') or ('" . date('H:i:s') . "' between startTime and endTime))) order by startTime");
@@ -1577,7 +1586,7 @@ class Api extends REST_Controller
 			$cond = array("clientcarts.clientCode" => $clientCode, "productratelineentries.cityCode" => $cityCode, "productmaster.isActive" => 1, "productratelineentries.isActive" => 1, "productratelineentries.isDelete" => 0);
 			$orderBy = array('clientcarts' . ".id" => 'DESC');
 			$join = array('productmaster' => 'clientcarts.productCode=productmaster.code', "productratelineentries" => 'productmaster.code=productratelineentries.productCode AND clientcarts.rateQuantity=productratelineentries.quantity');
-			$joinType = array('productmaster' => 'inner', 'productratelineentries' => 'inner');
+			$joinType = array('productmaster' => 'inner', 'productratelineentries' => 'left');
 			$res = $this->GlobalModel->selectQuery($orderColumns, $tableName, $cond, $orderBy, $join, $joinType);
 			//echo $this->db->last_query();
 			$totalRec = 0;
@@ -1646,6 +1655,24 @@ class Api extends REST_Controller
 						array_push($imageArray, base_url() . 'uploads/product/' . $productCode . '/' . $images_result[$img]['productPhoto']);
 					}
 					$clientCartList[$j]['images'] = $imageArray;
+
+					if ($clientCartList[$j]['sellingPrice'] == null || $clientCartList[$j]['sellingPrice'] == '') {
+						// fetch main variant
+						$mainCond = array('productmaster.code' => $productCode, 'productratelineentries.cityCode' => $cityCode, 'productratelineentries.isMainVariant' => 1, 'productratelineentries.isActive' => 1, 'productratelineentries.isDelete' => 0, 'productmaster.isActive' => 1);
+						$mainJoin = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode');
+						$mainJoinType = array('productratelineentries' => 'inner');
+						$mainColumns = array("productratelineentries.sellingUnit,productratelineentries.productStatus,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingPrice,productratelineentries.quantity,productratelineentries.code as variantsCode");
+						$mainResult = $this->GlobalModel->selectQuery($mainColumns, 'productmaster', $mainCond, array(), $mainJoin, $mainJoinType);
+						if ($mainResult && $mainResult->num_rows() > 0) {
+							$mainData = $mainResult->result_array()[0];
+							$clientCartList[$j]['sellingUnit'] = $mainData['sellingUnit'];
+							$clientCartList[$j]['productStatus'] = $mainData['productStatus'];
+							$clientCartList[$j]['regularPrice'] = $mainData['regularPrice'];
+							$clientCartList[$j]['sellingPrice'] = $mainData['sellingPrice'];
+							$clientCartList[$j]['quantity'] = $mainData['quantity'];
+							$clientCartList[$j]['variantsCode'] = $mainData['variantsCode'];
+						}
+					}
 
 					// Senior Implementation: Separate Base Price and Tax logic
 					$unitPrice = $clientCartList[$j]['sellingPrice'];

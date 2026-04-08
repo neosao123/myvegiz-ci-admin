@@ -1548,6 +1548,8 @@ class Api extends REST_Controller
 		if (isset($postData["clientCode"]) && $postData["clientCode"] != '') {
 			$clientCode = $postData["clientCode"];
 			$cityCode = '';
+			$clientLatitude = '';
+			$clientLongitude = '';
 			$cartAmount = 0;
 			$totalTax = 0;
 			$cartAmountWithTax = 0;

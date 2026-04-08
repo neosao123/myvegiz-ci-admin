@@ -218,7 +218,7 @@ class Admin extends CI_Controller
 		else {
 
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?: 1),
 				"recordsTotal" => 0,
 				"recordsFiltered" => 0,
 				"data" => '',
@@ -812,7 +812,7 @@ class Admin extends CI_Controller
 
 		$dataCount = 0;
 		$data = array();
-		$srno = $_GET['start'] + 1;
+		$srno = ($this->input->post('start') ?: 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 
@@ -857,7 +857,7 @@ class Admin extends CI_Controller
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 		}
 		$output = array(
-			"draw" => intval($_GET["draw"]),
+			"draw" => intval($this->input->post("draw") ?: 1),
 			"recordsTotal" => $dataCount,
 			"recordsFiltered" => $dataCount,
 			"data" => $data,
@@ -944,7 +944,7 @@ class Admin extends CI_Controller
 		}
 
 		$output = array(
-			"draw" => intval($_GET["draw"]),
+			"draw" => intval($this->input->post("draw") ?: 1),
 			"recordsTotal" => $dataCount,
 			"recordsFiltered" => $dataCount,
 			"data" => $data

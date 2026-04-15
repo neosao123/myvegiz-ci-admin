@@ -133,16 +133,16 @@ class Resetpassword extends CI_Controller {
 	  
 	function getrestpasswordList() {
 		$tableName = "resetpassword";
-		$cityCode = $this->input->get('cityCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$orderColumns = array("clientmaster.code,resetpassword.userCode,resetpassword.id,clientmaster.mobile,clientmaster.emailId,clientmaster.name,citymaster.cityName");
 		$orderBy = array('resetpassword' . '.id' => 'DESC');
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search")['value'] ?? $this->input->get("search")['value']);
 		$condition = array('citymaster.isActive'=>1,'clientmaster.cityCode'=>$cityCode);
 		$joinType = array('clientmaster' =>'inner','citymaster'=>'left');
 		$join = array('clientmaster'=>'clientmaster.code=resetpassword.userCode','citymaster'=>'citymaster.code=clientmaster.cityCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = "";
 		$like = array('clientmaster.emailId' => $search.'~both','clientmaster.mobile' => $search.'~both','clientmaster.code' => $search.'~both','clientmaster.name'=>$search.'~both');
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -167,7 +167,7 @@ class Resetpassword extends CI_Controller {
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType)->result());
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw")),
 				"recordsTotal" => $dataCount,
 				"recordsFiltered" => $dataCount,
 				"data" => $data
@@ -175,7 +175,7 @@ class Resetpassword extends CI_Controller {
 		} else {
 			$dataCount = 0;
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw")),
 				"recordsTotal" => $dataCount,
 				"recordsFiltered" => $dataCount,
 				"data" => $data
@@ -225,17 +225,17 @@ class Resetpassword extends CI_Controller {
 	}
 	
 	function getDeliveryBoyPasswordList() {
-		$cityCode = $this->input->get('cityCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$tableName = "resetpassword";
 		$orderColumns = array("resetpassword.userCode,resetpassword.id,usermaster.*,citymaster.cityName");
 		$orderBy = array('resetpassword' . '.id' => 'DESC');
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search")['value'] ?? $this->input->get("search")['value']);
 		$condition = array('usermaster.role'=>'DLB','citymaster.isActive'=>1,'usermaster.cityCode'=>$cityCode);
 		$joinType = array('usermaster' =>'inner','citymaster'=>'left');
 		$join = array('usermaster'=>'usermaster.code=resetpassword.userCode','citymaster'=>'citymaster.code=usermaster.cityCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = "";
 		$like = array('usermaster.username' => $search.'~both','usermaster.userEmail' => $search.'~both','usermaster.code' => $search.'~both','usermaster.empCode'=>$search.'~both');
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -260,7 +260,7 @@ class Resetpassword extends CI_Controller {
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType)->result());
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw")),
 				"recordsTotal" => $dataCount,
 				"recordsFiltered" => $dataCount,
 				"data" => $data
@@ -270,7 +270,7 @@ class Resetpassword extends CI_Controller {
 		else
 		{
 			$output = array(
-				"draw" => intval($_GET["draw"]),
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw")),
 				"recordsTotal" => 0,
 				"recordsFiltered" => 0,
 				"data" => '',

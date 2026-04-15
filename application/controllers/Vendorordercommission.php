@@ -121,10 +121,10 @@ class Vendorordercommission extends CI_Controller
 
 	public function getVendorCommissionViewList()
 	{
-		$userCode = $this->input->GET('vendorCode');
-		$fromDate = $this->input->GET('fromDate');
-		$toDate = $this->input->GET('toDate');
-		$orderType = $this->input->GET('orderType');
+		$userCode = $this->input->post('vendorCode');
+		$fromDate = $this->input->post('fromDate');
+		$toDate = $this->input->post('toDate');
+		$orderType = $this->input->post('orderType');
 		$tableName = array('vendorordercommission');
 		$orderColumns = array("vendorordercommission.isPaid,vendorordercommission.orderCode,vendorordercommission.deliveryBoyCode,vendorordercommission.grandTotal,vendorordercommission.subTotal,vendorordercommission.comissionPercentage,vendorordercommission.comissionAmount,vendorordercommission.vendorAmount, vendor.firstName,vendor.entityName, vendor.lastName, vendor.code as userCode");
 		$condition = array('vendorordercommission.deliveryBoyCode' => $userCode, "vendorordercommission.commissionType" => "regular");
@@ -142,12 +142,12 @@ class Vendorordercommission extends CI_Controller
 		$joinType = array('vendor' => 'inner');
 		$join = array('vendor' => 'vendorordercommission.deliveryBoyCode=vendor.code');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length");
+		$offset = $this->input->post("start");
 		$extraCondition = "vendorordercommission.addDate between '" . $startDate . "' And '" . $endDate . "'";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = intval($this->input->post('start')) + 1;
 		$data = array();
 		$vendorAmount1 = 0;
 		//echo $this->db->last_query();
@@ -172,7 +172,7 @@ class Vendorordercommission extends CI_Controller
 			$dataCount = 0;
 		}
 		$output = array(
-			"draw" => intval($_GET["draw"]),
+			"draw" => intval($this->input->post("draw")),
 			"recordsTotal" => $dataCount,
 			"recordsFiltered" => $dataCount,
 			"vendorAmount1" => $vendorAmount1,
@@ -185,9 +185,9 @@ class Vendorordercommission extends CI_Controller
 
 	public function viewCurrentHistory()
 	{
-		$vendorCode = $this->input->GET('vendorCode');
-		$fromDate = $this->input->GET('fromDate');
-		$toDate = $this->input->GET('toDate');
+		$vendorCode = $this->input->post('vendorCode');
+		$fromDate = $this->input->post('fromDate');
+		$toDate = $this->input->post('toDate');
 		if ($fromDate != "" && $toDate != '') {
 			$startDate = date('Y-m-d', strtotime(str_replace('/', '-', $fromDate)));
 			$endDate = date('Y-m-d', strtotime(str_replace('/', '-', $toDate)));
@@ -213,9 +213,9 @@ class Vendorordercommission extends CI_Controller
 
 	public function viewUnpaid()
 	{
-		$vendorCode = $this->input->GET('vendorCode');
-		$fromDate = $this->input->GET('fromDate');
-		$toDate = $this->input->GET('toDate');
+		$vendorCode = $this->input->post('vendorCode');
+		$fromDate = $this->input->post('fromDate');
+		$toDate = $this->input->post('toDate');
 		$tableName = array('vendorordercommission');
 		$orderColumns = array("vendorordercommission.deliveryBoyCode,sum(vendorordercommission.vendorAmount) as vendorAmount, vendor.firstName,vendor.entityName, vendor.lastName, vendor.code as userCode");
 		$condition = array('vendorordercommission.deliveryBoyCode' => $vendorCode, "vendorordercommission.commissionType" => "regular", "vendorordercommission.isPaid" => 0);
@@ -274,9 +274,9 @@ class Vendorordercommission extends CI_Controller
 
 	public function paidStatus()
 	{
-		$vendorCode = $this->input->GET('vendorCode');
-		$fromDate = $this->input->GET('fromDate');
-		$toDate = $this->input->GET('toDate');
+		$vendorCode = $this->input->post('vendorCode');
+		$fromDate = $this->input->post('fromDate');
+		$toDate = $this->input->post('toDate');
 		$tableName = array('vendorordercommission');
 		$orderColumns = array("vendorordercommission.code,vendorordercommission.deliveryBoyCode");
 		$condition = array('vendorordercommission.deliveryBoyCode' => $vendorCode, "vendorordercommission.commissionType" => "regular", "vendorordercommission.isPaid" => 0);

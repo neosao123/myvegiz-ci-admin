@@ -754,7 +754,7 @@ class Groceryproduct extends CI_Controller
 
 	public function view()
 	{
-		$code = $this->input->get('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		//Activity Track Starts		
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
 		$userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
@@ -785,8 +785,8 @@ class Groceryproduct extends CI_Controller
 		$joinType = array('categorymaster' => "inner", "subcategorymaster" => "left");
 		$join = array("categorymaster" => "categorymaster.categorySName = productmaster.productCategory", "subcategorymaster" => "subcategorymaster.code=productmaster.subCategoryCode");
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = "";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);

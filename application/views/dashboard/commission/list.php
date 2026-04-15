@@ -255,14 +255,14 @@
                             'fromDate': p_fromDate,
                             'toDate': p_toDate
                         },
-                        type: "GET",
+                        type: "POST",
                         complete: function (json) {
                             $(".blue").click(function () {
                                 var code = $(this).data('seq');
                                 $("#dBoyCode").val(code);
                                 $.ajax({
                                     url: base_path + "Commission/viewUnpaid",
-                                    type: "GET",
+                                    type: "POST",
                                     data: {
                                         code: code,
                                         fromDate: p_fromDate,
@@ -297,7 +297,7 @@
 								}
 								 $.ajax({
                                     url: base_path + "Commission/viewUnpaid",
-                                    type: "GET",
+                                    type: "POST",
                                     data: {
                                         code: code,
                                         fromDate: fromDate,
@@ -318,7 +318,7 @@
 								$('#responsive-modal').modal('hide');
 								$.ajax({
                                     url: base_path + "Commission/paidStatus",
-                                    type: "GET",
+                                    type: "POST",
                                     data: {
                                         code: code,
                                         fromDate: fromDate,

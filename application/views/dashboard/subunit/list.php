@@ -14,7 +14,7 @@
                         <div class="d-flex align-items-center">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="<?php echo base_url().'index.php/admin/index';?>">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="<?php echo base_url() . 'index.php/admin/index'; ?>">Home</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Sub Unit List</li>
                                 </ol>
 
@@ -24,7 +24,7 @@
                     <div class="col-7 align-self-center">
                         <div class="d-flex no-block justify-content-end align-items-center">
                             
-                            <div class=""><a class="btn btn-myve" href="<?php echo base_url().'index.php/Subunit/add';?>">Create Sub Unit</a></div>
+                            <div class=""><a class="btn btn-myve" href="<?php echo base_url() . 'index.php/Subunit/add'; ?>">Create Sub Unit</a></div>
                         </div>
                     </div>
                 </div>
@@ -106,14 +106,14 @@
 				   "searching": true,
 				   "ajax":{  
 						url: base_path+"Subunit/getSubunitList",  
-						type:"GET" , 
+						type:"POST" , 
 				   
 				    "complete": function(response) {
 					 $(".blue").click(function(){
 									 var code=$(this).data('seq');
 									 $.ajax({
 											url: base_path+"Subunit/view",  
-											method:"GET",
+											method:"POST",
 											data:{code:code},
 											datatype:"text",
 											success: function(data)

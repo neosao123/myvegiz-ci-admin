@@ -255,7 +255,7 @@
 				   "ajax":{ 
 				   
 						url: base_path+"Food/Vendoritem/getVendorItemList",  
-						type:"GET",
+						type:"POST",
 						data:{
 						'call':'call from pending',						 
 						'placeList':0,
@@ -277,7 +277,7 @@
 					 
 					 {
 							url: base_path+"Food/Vendoritem/view",  
-							method:"GET",
+							method:"POST",
 							data:{code:code},
 							datatype:"text",
 							success: function(data)

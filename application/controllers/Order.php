@@ -75,14 +75,14 @@ class Order extends CI_Controller
 	public function placedTotal()
 	{
 		$total = 0;
-		$pincode = $this->input->get('pincode');
-		$orderCode = $this->input->get('orderCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
-		$areaCode = $this->input->get('areaCode');
-		$cityCode = $this->input->get('cityCode');
-		$deliveryCode = $this->input->get('deliveryCode');
+		$pincode = $this->input->post('pincode') ?? $this->input->get('pincode');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
+		$areaCode = $this->input->post('areaCode') ?? $this->input->get('areaCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
+		$deliveryCode = $this->input->post('deliveryCode') ?? $this->input->get('deliveryCode');
 		$tableName = 'ordermaster';
 		//$whereConditionArray = array('ordermaster.paymentStatus'=>"PID",'customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode);
 		$whereConditionArray = array('customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode);
@@ -113,14 +113,14 @@ class Order extends CI_Controller
 	public function getPlacedOrders()
 	{
 		$total = 0;
-		$pincode = $this->input->post('pincode');
-		$orderCode = $this->input->post('orderCode');
-		$orderStatus = $this->input->post('orderStatus');
-		$fromDate = $this->input->post('fromDate');
-		$toDate = $this->input->post('toDate');
-		$areaCode = $this->input->post('areaCode');
-		$deliveryCode = $this->input->post('deliveryCode');
-		$cityCode = $this->input->post('cityCode');
+		$pincode = $this->input->post('pincode') ?? $this->input->get('pincode');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
+		$areaCode = $this->input->post('areaCode') ?? $this->input->get('areaCode');
+		$deliveryCode = $this->input->post('deliveryCode') ?? $this->input->get('deliveryCode');
+		$cityCode = $this->input->post('cityCode') ?? $this->input->get('cityCode');
 		$tableName = 'ordermaster';
 		//$whereConditionArray = array('ordermaster.paymentStatus'=>"PID",'customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode,"ordermaster.isActive"=>1);
 		$whereCondition = array('customaddressmaster.isService' => 1, 'ordermaster.code' => $orderCode, 'ordermaster.orderStatus' => $orderStatus, 'clientprofile.pincode' => $pincode, 'ordermaster' . '.areaCode' => $areaCode, 'ordermaster' . '.editID' => $deliveryCode, "ordermaster.cityCode" => $cityCode, "ordermaster.isActive" => 1);
@@ -129,8 +129,8 @@ class Order extends CI_Controller
 		$joinType = array('citymaster' => 'left', 'clientmaster' => 'inner', 'clientprofile' => 'inner', 'customaddressmaster' => "left");
 		$join = array('citymaster' => 'ordermaster.cityCode=citymaster.code', 'customaddressmaster' => 'customaddressmaster.code = ordermaster.areaCode', 'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode', 'clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode'); //'clientmaster' => 'clientmaster' . '.code=' . 'ordermaster' . '.clientCode','clientprofile' => 'clientprofile' . '.clientCode=' . 'ordermaster' . '.clientCode','customaddressmaster'=>'customaddressmaster.code = ordermaster.areaCode'
 		$like = array();
-		$limit = $this->input->post("length");
-		$offset = $this->input->post("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$groupByColumn = array("ordermaster.code");
 		$dateCondition = "";
 		if ($fromDate != "") {
@@ -165,7 +165,8 @@ class Order extends CI_Controller
 					if ($RecordsDLB) {
 						$dlbName = $RecordsDLB->result()[0]->name;
 					}
-				} else {
+				}
+				else {
 					$dlbName = '';
 				}
 				$chkSHP = '';
@@ -232,7 +233,8 @@ class Order extends CI_Controller
 				}
 				if ($row->shippingCharges == "") {
 					$shippingCharges = "0";
-				} else {
+				}
+				else {
 					$shippingCharges = $row->shippingCharges;
 				}
 				$productcount = 0;
@@ -246,7 +248,8 @@ class Order extends CI_Controller
 				if ($odStatus == 'PND' || $odStatus == 'CAN' || $odStatus == 'RJT') {
 					$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url() . 'Order/view/' . $row->orderCode . '"><i class="ti-eye"></i> Open</a>';
 					$data[] = array($srno, $row->orderCode . $itemcount, $row->name . $fromCity, $row->place, $row->address, $row->phone, $orderStatus . $radio, $row->totalPrice, $orderDate, $actionHtml);
-				} else {
+				}
+				else {
 					$trans = "";
 					if ($odStatus == 'PLC') {
 						$trans = '<a class="dropdown-item  transfer" data-toggle="modal" data-target="#responsive-modal" data-seq="' . $row->orderCode . '"><i class="mdi mdi-repeat" href></i> Transfer</a>';
@@ -268,13 +271,15 @@ class Order extends CI_Controller
 									<label><input type="checkbox" class="orderStatus" name="OrderStatus' . $srno . '" data-toggle="tooltip" data-placement="top"  id="orderStatus' . ($id = $id + 1) . '" value="RFP-' . $row->orderCode . '" title="Ready For Pickup"> Ready For Pickup</label>
 								</div> 
 							</div>';
-					} else if ($odStatus == 'PUP') {
+					}
+					else if ($odStatus == 'PUP') {
 						$radio = '<div class="form-row">
 								<div class="col-12">
 									<label><input type="checkbox" class="orderStatus" name="OrderStatus' . $srno . '" data-toggle="tooltip" data-placement="top"  id="orderStatus' . ($id = $id + 1) . '" value="DEL-' . $row->orderCode . '" title="Reject"> Delivered</label>
 								</div> 
 							</div>';
-					} else {
+					}
+					else {
 						$radio = '';
 					}
 					$total += $row->totalPrice;
@@ -285,11 +290,12 @@ class Order extends CI_Controller
 			}
 			if ($Records) {
 				$dataCount = sizeOf($this->GlobalModel->selectQuery($orderColumns, $tableName, $whereCondition, $orderBy, $join, $joinType, $like, '', '', $groupByColumn, $extraCondition)->result());
-			} else {
+			}
+			else {
 				$dataCount = 0;
 			}
 		}
-		$output = array("draw" => intval($this->input->post("draw")), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
+		$output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data, "total" => $total);
 		echo json_encode($output);
 	}
 
@@ -348,7 +354,8 @@ class Order extends CI_Controller
 					if ($RecordsDLB) {
 						$dlbName = $RecordsDLB->result()[0]->name;
 					}
-				} else {
+				}
+				else {
 					$dlbName = '';
 				}
 				$orderDate = '';
@@ -406,7 +413,8 @@ class Order extends CI_Controller
 				}
 				if ($row->shippingCharges == "") {
 					$shippingCharges = "0";
-				} else {
+				}
+				else {
 					$shippingCharges = $row->shippingCharges;
 				}
 				$productcount = 0;
@@ -434,7 +442,8 @@ class Order extends CI_Controller
 						$orderDate,
 						$actionHtml
 					);
-				} else {
+				}
+				else {
 					$trans = "";
 					if ($odStatus == 'REL') {
 						$trans = '<a class="dropdown-item transfer" data-seq="' . $row->orderCode . '"><i class="mdi mdi-repeat" href></i> Release & Reassign</a>';
@@ -454,7 +463,7 @@ class Order extends CI_Controller
 						$srno,
 						$row->orderCode . $itemcount,
 
-						$row->name .  $fromCity,
+						$row->name . $fromCity,
 
 						$row->place,
 						$row->address,
@@ -467,7 +476,7 @@ class Order extends CI_Controller
 					);
 				}
 				$srno++;
-				//$id++;
+			//$id++;
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result());
 			$totalData = $this->GlobalModel->selectQuery("IFNULL(SUM(ordermaster.totalPrice),0)as total", $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, "", "", $groupByColumn, $extraCondition)->result();
@@ -480,16 +489,16 @@ class Order extends CI_Controller
 	public function getOrderListByOnlyDates()
 	{
 		// ,'inwardlineentries'
-		$offset = $_GET['start'];
-		$limit = $_GET['length'];
+		$offset = $this->input->post('start') ?? $_GET['start'] ?? 0;
+		$limit = $this->input->post('length') ?? $_GET['length'] ?? 10;
 		$value = array("length" => $limit, "start" => $offset);
-		$placeList = $this->input->get('placeList');
-		$clientCode = $this->input->get('clientCode');
-		$orderCode = $this->input->get('orderCode');
-		$orderStatus = $this->input->get('orderStatus');
-		$orderState = $this->input->get('orderState');
-		$fromDate = $this->input->get('fromDate');
-		$toDate = $this->input->get('toDate');
+		$placeList = $this->input->post('placeList') ?? $this->input->get('placeList');
+		$clientCode = $this->input->post('clientCode') ?? $this->input->get('clientCode');
+		$orderCode = $this->input->post('orderCode') ?? $this->input->get('orderCode');
+		$orderStatus = $this->input->post('orderStatus') ?? $this->input->get('orderStatus');
+		$orderState = $this->input->post('orderState') ?? $this->input->get('orderState');
+		$fromDate = $this->input->post('fromDate') ?? $this->input->get('fromDate');
+		$toDate = $this->input->post('toDate') ?? $this->input->get('toDate');
 		$fromDate = DateTime::createFromFormat('d/m/Y', $fromDate)->format('Y-m-d');
 		$toDate = DateTime::createFromFormat('d/m/Y', $toDate)->format('Y-m-d');
 		$tableName = 'SELECT ordermaster.*,clientmaster.name,clientmaster.code as clientCodeOf FROM ordermaster  INNER JOIN clientmaster ON ordermaster.clientCode=clientmaster.code';
@@ -497,14 +506,17 @@ class Order extends CI_Controller
 			if ($clientCode != '' || $orderCode != '') {
 				if ($clientCode != '' && $orderCode == '') {
 					$clientCodeCond = "ordermaster.clientCode = '" . $clientCode . "' AND ";
-				} else if ($orderCode != '' && $clientCode == '') {
+				}
+				else if ($orderCode != '' && $clientCode == '') {
 					$orderCodeCond = "ordermaster.code= '" . $orderCode . "' AND ";
-				} else {
+				}
+				else {
 					$clientCodeCond = "ordermaster.clientCode = '" . $clientCode . "' AND ";
 					$orderCodeCond = "ordermaster.code= '" . $orderCode . "' AND ";
 				}
 				$extraCondition = " " . $clientCodeCond . " " . $orderCodeCond . " (ordermaster.orderStatus = 'CAN' OR ordermaster.orderStatus='PND' OR ordermaster.orderStatus='RJT') AND ordermaster.addDate BETWEEN '" . $fromDate . " 01:00:01' AND '" . $toDate . " 12:59:59' AND (ordermaster.isDelete=0 OR ordermaster.isDelete IS NULL)";
-			} else {
+			}
+			else {
 				$conditionColumns = array();
 				$conditionValues = array();
 				$extraCondition = " (ordermaster.orderStatus = 'CAN' OR ordermaster.orderStatus='PND' OR ordermaster.orderStatus='RJT') AND ordermaster.addDate BETWEEN '" . $fromDate . " 01:00:01' AND '" . $toDate . " 12:59:59' AND (ordermaster.isDelete=0 OR ordermaster.isDelete IS NULL)";
@@ -518,21 +530,24 @@ class Order extends CI_Controller
 				//	echo 'else in';
 				if ($clientCode != '' && $orderCode == '') {
 					$clientCodeCond = "ordermaster.clientCode = '" . $clientCode . "' AND ";
-				} else if ($orderCode != '' && $clientCode == '') {
+				}
+				else if ($orderCode != '' && $clientCode == '') {
 					$orderCodeCond = "ordermaster.code= '" . $orderCode . "' AND ";
-				} else {
+				}
+				else {
 					$clientCodeCond = "ordermaster.clientCode = '" . $clientCode . "' AND ";
 					$orderCodeCond = "ordermaster.code= '" . $orderCode . "' AND ";
 				}
 				$extraCondition = " " . $clientCodeCond . " " . $orderCodeCond . "(ordermaster.orderStatus = 'PLC' OR ordermaster.orderStatus='SHP' OR ordermaster.orderStatus='DEL') AND ordermaster.addDate BETWEEN '" . $fromDate . " 01:00:01' AND '" . $toDate . " 12:59:59' AND (ordermaster.isDelete=0 OR ordermaster.isDelete IS NULL)";
-			} else {
+			}
+			else {
 				$extraCondition = " (ordermaster.orderStatus = 'PLC' OR ordermaster.orderStatus='SHP' OR ordermaster.orderStatus='DEL') AND ordermaster.addDate BETWEEN '" . $fromDate . " 01:00:01' AND '" . $toDate . " 12:59:59' AND (ordermaster.isDelete=0 OR ordermaster.isDelete IS NULL)";
 			}
 		}
 		$select = 1;
 		$Records = $this->GlobalModel->selectActiveDataByMultipleFields($conditionColumns, $conditionValues, $tableName, $extraCondition, $select); // Query # Get Data From Inward By Above Condition
 		//print_r($Records->result());
-		$srno = $_GET['start'] + 1;
+		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		$data = array();
 		$radio = '';
 		foreach ($Records->result() as $row) {
@@ -572,7 +587,8 @@ class Order extends CI_Controller
 			}
 			if ($odStatus == 'PND' || $odStatus == 'CAN' || $odStatus == 'RJT') {
 				$actionHtml = '  <a class="dropdown-item  blue" href="' . base_url() . 'Order/view/' . $row->code . '"><i class="ti-eye"></i> Open</a>';
-			} else {
+			}
+			else {
 				$actionHtml = '  
 							<div class="btn-group">
 									<button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -594,7 +610,7 @@ class Order extends CI_Controller
 		}
 		$forCount = $this->GlobalModel->selectActiveDataByMultipleFields($conditionColumns, $conditionValues, $tableName, $extraCondition, $select); // Query # Get Data From Inward By Above Condition
 		$dataCount = sizeOf($forCount->result());
-		$output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+		$output = array("draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
 		echo json_encode($output);
 	}
 
@@ -604,9 +620,9 @@ class Order extends CI_Controller
 		$code = $this->uri->segment(3);
 		$data['placeFlag'] = $this->uri->segment(4);
 		$data['query'] = $this->GlobalModel->selectDataById($code, 'ordermaster');
-		
+
 		//echo $this->db->last_query();
-		
+
 		$clientCode = $data['query']->result()[0]->clientCode;
 		$cityCode = $data['query']->result()[0]->cityCode;
 		$areaCode = $data['query']->result()[0]->areaCode;
@@ -656,26 +672,30 @@ class Order extends CI_Controller
 		if ($statusType == 'all') {
 			$join = array();
 			$joinType = array();
-		} else {
+		}
+		else {
 			if ($statusType == 'present') {
 				$condition['deliveryBoyActiveOrder.loginStatus'] = '1';
-			} else if ($statusType == 'absent') {
-				$condition['deliveryBoyActiveOrder.loginStatus'] =  '0';
-			} else {
+			}
+			else if ($statusType == 'absent') {
+				$condition['deliveryBoyActiveOrder.loginStatus'] = '0';
+			}
+			else {
 				$condition['deliveryBoyActiveOrder.loginStatus'] = '1';
 				$condition['deliveryBoyActiveOrder.orderCount'] = '0';
 			}
 			$join = array("deliveryBoyActiveOrder" => "usermaster.code=deliveryBoyActiveOrder.deliveryBoyCode");
 			$joinType = array("deliveryBoyActiveOrder" => "inner");
 		}
-        //echo $this->db->last_query();
+		//echo $this->db->last_query();
 		$Result = $this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, $join, $joinType, $like, "", "", $groupBy, $extraCondition);
 		$html = '<option value="" readonly>Select another delivery boy</option>';
 		if ($Result) {
 			foreach ($Result->result_array() as $key) {
-				$html .= '<option value="' . 	$key['code'] . '">' . $key['username'] . '</option>';
+				$html .= '<option value="' . $key['code'] . '">' . $key['username'] . '</option>';
 			}
-		} else {
+		}
+		else {
 			$html = false;
 		}
 		echo $html;
@@ -735,15 +755,15 @@ class Order extends CI_Controller
 			}
 			if ($bookLineResult != 'false') {
 				/*$settingResult = $this->GlobalModel->selectQuery('settings.*', 'settings', array('settings.code' => 'SET_5', 'settings.isActive' => 1));
-				if ($settingResult) {
-					$touchPoint = $settingResult->result_array()[0]['settingValue'];
-					$dataUpCnt['commissionAmount'] = $touchPoint;
-					$dataUpCnt['deliveryBoyCode'] = $deliveryBoy;
-					$dataUpCnt['orderCode'] = $orderCode;
-					$dataUpCnt['orderType'] = "vegetable";
-					$dataUpCnt['isActive'] = 1;
-					$delboyCommission = $this->GlobalModel->addNew($dataUpCnt, 'deliveryboyearncommission', 'DBEC');
-				}*/
+				 if ($settingResult) {
+				 $touchPoint = $settingResult->result_array()[0]['settingValue'];
+				 $dataUpCnt['commissionAmount'] = $touchPoint;
+				 $dataUpCnt['deliveryBoyCode'] = $deliveryBoy;
+				 $dataUpCnt['orderCode'] = $orderCode;
+				 $dataUpCnt['orderType'] = "vegetable";
+				 $dataUpCnt['isActive'] = 1;
+				 $delboyCommission = $this->GlobalModel->addNew($dataUpCnt, 'deliveryboyearncommission', 'DBEC');
+				 }*/
 
 				//send notification to delivery boy
 				$userData = $this->GlobalModel->selectQuery("usermaster.firebase_id", "usermaster", array("usermaster.code" => $deliveryBoy));
@@ -760,7 +780,7 @@ class Order extends CI_Controller
 				//notification
 				$random = rand(0, 999);
 				$dataNoti = array("title" => 'Order Successfully Placed', "message" => 'Order Successfully Placed', "order_id" => $orderCode, "random_id" => $random, 'type' => 'order');
-				$clientCode =  $this->input->post('clientCode');
+				$clientCode = $this->input->post('clientCode');
 				$checkdevices = $this->GlobalModel->selectQuery('clientdevicedetails.firebaseId', 'clientdevicedetails', array('clientdevicedetails.clientCode' => $clientCode));
 				if ($checkdevices) {
 					$DeviceIdsArr = array();
@@ -781,7 +801,7 @@ class Order extends CI_Controller
 						$notification['order_id'] = $dataNoti['order_id'];
 						$notification['random_id'] = $dataNoti['random_id'];
 						$notification['type'] = $dataNoti['type'];
-						//$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
+					//$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
 					}
 				}
 
@@ -790,7 +810,8 @@ class Order extends CI_Controller
 				$response['status'] = true;
 				$response['message'] = "Order Successfully Placed.";
 			}
-		} else {
+		}
+		else {
 			$response['status'] = false;
 			$response['message'] = "Failed To Place Order";
 		}
@@ -845,7 +866,8 @@ class Order extends CI_Controller
 		$log_text = array('addID' => $addID, 'logText' => $text);
 		if ($result != 'false') {
 			echo $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-		} else {
+		}
+		else {
 			echo 'false';
 		}
 	}
@@ -885,8 +907,9 @@ class Order extends CI_Controller
 		if ($result != 'false') {
 			$response['status'] = true;
 			$response['message'] = "Order Successfully .";
-			//$this->GlobalModel->activityAdd($log_text,'activitymaster','ACT');
-		} else {
+		//$this->GlobalModel->activityAdd($log_text,'activitymaster','ACT');
+		}
+		else {
 			$response['status'] = false;
 			$response['message'] = "Failed To Place Order";
 		}
@@ -1009,14 +1032,16 @@ class Order extends CI_Controller
 					$notify = $this->notificationlibv_3->sendDeliveryNotification($dataArr, $notification, "ringing");
 				}
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				
+
 				$this->firestore->update_order_status($orderCode, $orderStatus);
-				
+
 				$res['status'] = true;
-			} else {
+			}
+			else {
 				$res['status'] = false;
 			}
-		} else {
+		}
+		else {
 			$res['status'] = false;
 		}
 		echo json_encode($res);
@@ -1040,7 +1065,7 @@ class Order extends CI_Controller
 		$extraCondition = "orderlineentries.isActive=1";
 		$like = array();
 		$data = array();
-		
+
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 		//echo $this->db->last_query();
 		if ($Records) {
@@ -1063,7 +1088,8 @@ class Order extends CI_Controller
 				if ($noPic != 1) {
 					$productName = $start . $productPhoto . $end;
 					$data[] = array($srno, $row->productCode, $productName, $row->weight, $row->productUom, $row->productPrice, $row->quantity, $row->totalPrice, $actionHtml);
-				} else {
+				}
+				else {
 					$productName = $row->productName;
 					$data[] = array($srno, $row->productCode, $productName, $row->weight, $row->productUom, $row->productPrice, $row->quantity, $row->totalPrice);
 				}
@@ -1084,15 +1110,15 @@ class Order extends CI_Controller
 			'orderStatus' => 'RJT', 'paymentStatus' => 'RJCT', 'editDate' => $timeStamp,
 		);
 		//print_r($data);
-		
+
 		$orderData = $this->GlobalModel->selectQuery("ordermaster.*", 'ordermaster', array("ordermaster.code" => $code));
 		if ($orderData) {
 			$orderData = $orderData->result_array()[0];
-			$deliveryBoyCode = $orderData['deliveryBoyCode'];			
-			$dBoydata=array("orderCount"=>0,"orderCode"=>"","orderType"=>"");
-			$this->GlobalModel->doEditWithField($dBoydata, 'deliveryBoyActiveOrder', 'deliveryBoyCode',$deliveryBoyCode);
+			$deliveryBoyCode = $orderData['deliveryBoyCode'];
+			$dBoydata = array("orderCount" => 0, "orderCode" => "", "orderType" => "");
+			$this->GlobalModel->doEditWithField($dBoydata, 'deliveryBoyActiveOrder', 'deliveryBoyCode', $deliveryBoyCode);
 		}
-		
+
 		$result = $this->GlobalModel->doEdit($data, 'ordermaster', $code);
 		//	 print_r($result);
 		if ($result == 'true') {
@@ -1110,11 +1136,12 @@ class Order extends CI_Controller
 			$ip = $_SERVER['REMOTE_ADDR'];
 			$text = $role . " " . $userName . ' Rejected Order "' . $code . '" from ' . $ip;
 			$log_text = array('addId' => $addID, 'logText' => $text);
-			
-			
-			
+
+
+
 			echo $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-		} else {
+		}
+		else {
 			echo 'false';
 		}
 	}
@@ -1169,15 +1196,19 @@ class Order extends CI_Controller
 		// $pincode=$this->input->get('pincode');
 		if ($orderCode == '' && $orderStatus == '' && $pincode == '') {
 			$whereConditionArray = array('ordermaster' . '.orderStatus' => 'PND');
-		} elseif ($orderCode != '') {
+		}
+		elseif ($orderCode != '') {
 			$whereConditionArray = array('ordermaster' . '.code' => $orderCode);
-		} elseif ($orderStatus != '') {
+		}
+		elseif ($orderStatus != '') {
 			$whereConditionArray = array('ordermaster' . '.orderStatus' => $orderStatus);
-		} else {
+		}
+		else {
 			$whereConditionArray = array('ordermaster' . '.code' => $orderCode, 'ordermaster' . '.orderStatus' => $orderStatus);
 		}
 		$tableName = 'ordermaster';
-		if ($cityCode != "") $whereConditionArray['ordermaster.cityCode'] = $cityCode;
+		if ($cityCode != "")
+			$whereConditionArray['ordermaster.cityCode'] = $cityCode;
 		$orderColumnsArray = array('ordermaster.*,ordermaster.code as orderCode,customaddressmaster.*,clientmaster.*,clientprofile.pincode,citymaster.cityName');
 		$orderBy = array('ordermaster' . '.id' => 'DESC');
 		$joinType = array('citymaster' => 'left', 'clientmaster' => 'inner', 'clientprofile' => 'inner', 'customaddressmaster' => "inner");
@@ -1214,7 +1245,8 @@ class Order extends CI_Controller
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumnsArray, $tableName, $whereConditionArray, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition)->result());
 			$output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
 			echo json_encode($output);
-		} else {
+		}
+		else {
 			$dataCount = 0;
 			$data = array();
 			$output = array("draw" => 0, "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
@@ -1288,7 +1320,12 @@ class Order extends CI_Controller
 						$notification['order_id'] = $orderCode;
 						$notification['random_id'] = $random;
 						$notification['type'] = 'order';
-						$notify = $this->notificationlibv_3->sendDeliveryNotification($dataArr, $notification, "ringing");
+						try {
+							$notify = $this->notificationlibv_3->sendDeliveryNotification($dataArr, $notification, "ringing");
+						}
+						catch (Exception $e) {
+							log_message('error', 'Notification Exception: ' . $e->getMessage());
+						}
 						log_message("error", "notify result => " . trim(json_encode($notify)));
 					}
 				}
@@ -1297,7 +1334,8 @@ class Order extends CI_Controller
 			$response['status'] = true;
 			$response['notifyid'] = $DeviceIdsArr;
 			$response['message'] = "delivery boy successfully asssigned !";
-		} else {
+		}
+		else {
 			$response['status'] = false;
 			$response['message'] = "Failed to assign delivery boy!";
 		}
@@ -1372,7 +1410,8 @@ class Order extends CI_Controller
 					</div>
 				</div>
 			</form>';
-		} else {
+		}
+		else {
 			$modelHtml .= "Another delivery boy not available";
 		}
 		echo $modelHtml;
@@ -1402,7 +1441,7 @@ class Order extends CI_Controller
 				$statusDescription = str_replace("$", $order_code, $statusDescription);
 				$dataBookLine = array(
 					"orderCode" => $order_code,
-					"statusPutCode" =>  $addID,
+					"statusPutCode" => $addID,
 					"statusLine" => 'PND',
 					"statusTime" => date("Y-m-d H:i:s"),
 					"reason" => "Order Assigned Delivery Boy By Admin",
@@ -1447,7 +1486,8 @@ class Order extends CI_Controller
 			//end notification
 			$response['status'] = true;
 			$response['message'] = "Order was successfully Assigned to  delivery boy!";
-		} else {
+		}
+		else {
 			$response['status'] = false;
 			$response['message'] = "Failed to Assign the order!";
 		}
@@ -1462,13 +1502,15 @@ class Order extends CI_Controller
 		$res = $Result->result()[0]->deliveryBoyCode;
 		if ($res == "") {
 			$response['status'] = false;
-		} else {
+		}
+		else {
 
 			$orderResult = $this->db->query("select count(*) as cnt from deliveryBoyActiveOrder where orderCode='" . $orderCode . "' and deliveryBoyCode='" . $res . "'");
 			if ($orderResult) {
 				$response['status'] = true;
 				$response['dbCode'] = $res;
-			} else {
+			}
+			else {
 				$response['status'] = false;
 			}
 		}
@@ -1507,7 +1549,8 @@ class Order extends CI_Controller
 		if ($Records != 'false') {
 			$response['status'] = true;
 			$response['message'] = "successfully Changed Expired Status!";
-		} else {
+		}
+		else {
 			$response['status'] = false;
 			$response['message'] = "Failed to Change Expired Status!";
 		}

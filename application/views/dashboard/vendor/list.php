@@ -35,10 +35,10 @@
 								<input type="text" class="form-control" list="vendorList" id="vendorCode" name="vendorCode" placeholder="Enter Entity Name Here ">
 								<datalist id="vendorList">
 									<?php if ($vendor) {
-										foreach ($vendor->result() as $v) {
-											echo '<option value="' . $v->code . '">' . $v->entityName . '</option>';
-										}
-									} ?>
+	foreach ($vendor->result() as $v) {
+		echo '<option value="' . $v->code . '">' . $v->entityName . '</option>';
+	}
+}?>
 								</datalist>
 							</div>
 						</div>
@@ -50,10 +50,10 @@
 								<input type="text" class="form-control" list="ownerContactList" id="ownerContact" name="ownerContact" placeholder="Enter Owner Contact Here ">
 								<datalist id="ownerContactList">
 									<?php if ($vendor) {
-										foreach ($vendor->result() as $v) {
-											echo '<option value="' . $v->ownerContact . '">' . $v->ownerContact . '</option>';
-										}
-									} ?>
+	foreach ($vendor->result() as $v) {
+		echo '<option value="' . $v->ownerContact . '">' . $v->ownerContact . '</option>';
+	}
+}?>
 								</datalist>
 							</div>
 						</div>
@@ -64,10 +64,10 @@
 								<select id="entitycategoryCode" name="entitycategoryCode" class="form-control" required>
 									<option value="">Select Category</option>
 									<?php if ($entitycategory) {
-										foreach ($entitycategory->result() as $curren) {
-											echo '<option value="' . $curren->code . '">' . $curren->entityCategoryName . '</option>';
-										}
-									} ?>
+	foreach ($entitycategory->result() as $curren) {
+		echo '<option value="' . $curren->code . '">' . $curren->entityCategoryName . '</option>';
+	}
+}?>
 								</select>
 							</div>
 						</div>
@@ -162,7 +162,7 @@
 				"searching": true,
 				"ajax": {
 					url: base_path + "vendor/getVendorList",
-					type: "GET",
+					type: "POST",
 					data: {
 						'vendorCode': vendorCode,
 						'ownerContact': ownerContact,
@@ -209,7 +209,7 @@
 							var code = $(this).data('seq');
 							$.ajax({
 								url: base_path + "vendor/view",
-								method: "GET",
+								method: "POST",
 								data: {
 									code: code
 								},

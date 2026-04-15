@@ -1,19 +1,22 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
-class Address extends CI_Controller {
+defined('BASEPATH') or exit('No direct script access allowed');
+class Address extends CI_Controller
+{
     var $session_key;
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->helper('form', 'url', 'html');
         $this->load->library('form_validation');
         $this->load->model('GlobalModel');
         $this->load->model('GlobalModel1');
         $this->session_key = $this->session->userdata('key' . SESS_KEY);
-        if(!isset($this->session->userdata['logged_in' . $this->session_key]['code'])){
-            redirect('Admin/login','refresh');
+        if (!isset($this->session->userdata['logged_in' . $this->session_key]['code'])) {
+            redirect('Admin/login', 'refresh');
         }
     }
-    public function listRecords() {
+    public function listRecords()
+    {
         $data['error'] = $this->session->flashdata('response');
         $data['city'] = $this->GlobalModel->selectDistinctData('cityName', 'citymaster');
         $data['place'] = $this->GlobalModel->selectDistinctData('place', 'customaddressmaster');
@@ -23,13 +26,15 @@ class Address extends CI_Controller {
         $this->load->view('dashboard/address/list', $data);
         $this->load->view('dashboard/footer');
     }
-    public function add() {
+    public function add()
+    {
         $data['city'] = $this->GlobalModel->selectActiveData('citymaster');
         $this->load->view('dashboard/header');
         $this->load->view('dashboard/address/add', $data);
         $this->load->view('dashboard/footer');
     }
-    public function edit() {
+    public function edit()
+    {
         $code = $this->uri->segment(3);
         $data['city'] = $this->GlobalModel->selectActiveData('citymaster');
         $table_name = 'customaddressmaster';
@@ -40,37 +45,40 @@ class Address extends CI_Controller {
         $this->load->view('dashboard/address/edit', $data);
         $this->load->view('dashboard/footer');
     }
-    public function getAddrList() {
-        $state = $this->input->get('state');
-        $dist = $this->input->get('district');
-        $place = $this->input->get('place');
-        $role = $this->input->get('service');
-        $cityCode = $this->input->get('cityCode');
+    public function getAddrList()
+    {
+        $state = $this->input->post('state');
+        $dist = $this->input->post('district');
+        $place = $this->input->post('place');
+        $role = $this->input->post('service');
+        $cityCode = $this->input->post('cityCode');
         $tableName = "customaddressmaster";
-        $search = $this->input->GET("search") ['value'];
+        $search = $this->input->post("search")['value'] ?? null;
         $orderColumns = array("customaddressmaster.*,citymaster.cityName");
         $condition = array('customaddressmaster.place' => $place, 'customaddressmaster.state' => $state, 'customaddressmaster.isService' => $role, 'customaddressmaster.district' => $dist, 'citymaster.cityName' => $cityCode);
         $orderBy = array('customaddressmaster' . '.id' => 'DESC');
         $joinType = array('citymaster' => 'left');
         $join = array('citymaster' => 'customaddressmaster.cityCode=citymaster.code');
         $groupByColumn = array();
-        $limit = $this->input->GET("length");
-        $offset = $this->input->GET("start");
+        $limit = $this->input->post("length") ?? $this->input->get("length");
+        $offset = $this->input->post("start") ?? $this->input->get("start");
         $extraCondition = " (customaddressmaster.isDelete ='0' or customaddressmaster.isDelete IS NULL) ";
         $like = array('customaddressmaster.code' => $search . '~both', 'customaddressmaster.place' => $search . '~both', 'customaddressmaster.state' => $search . '~both', 'customaddressmaster.district' => $search . '~both', 'customaddressmaster.pincode' => $search . '~both');
         $Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-        $srno = $offset + 1;
+        $srno = intval($offset) + 1;
         $data = array();
         if ($Records) {
             foreach ($Records->result() as $row) {
                 if ($row->isService == "1") {
                     $service = " <span class='label label-sm label-success'>Service Available</span>";
-                } else {
+                }
+                else {
                     $service = " <span class='label label-sm label-warning'>Service Unavailable</span>";
                 }
                 if ($row->isActive == "1") {
                     $status = " <span class='label label-sm label-success'>Active</span>";
-                } else {
+                }
+                else {
                     $status = " <span class='label label-sm label-warning'>Inactive</span>";
                 }
                 $actionHtml = '<div class="btn-group">
@@ -87,15 +95,17 @@ class Address extends CI_Controller {
                 $srno++;
             }
             $dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', $groupByColumn, $extraCondition)->result());
-            $output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+            $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
             echo json_encode($output);
-        } else {
+        }
+        else {
             $dataCount = 0;
-            $output = array("draw" => intval($_GET["draw"]), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
+            $output = array("draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0), "recordsTotal" => $dataCount, "recordsFiltered" => $dataCount, "data" => $data);
             echo json_encode($output);
         }
     }
-    public function save() {
+    public function save()
+    {
         //Activity Track Starts
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
         $userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
@@ -104,10 +114,10 @@ class Address extends CI_Controller {
         switch ($userRole) {
             case "ADM":
                 $role = "Admin";
-            break;
+                break;
             case "USR":
                 $role = "User";
-            break;
+                break;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
         $text = $role . " " . $userName . ' added new address from ' . $ip;
@@ -119,16 +129,17 @@ class Address extends CI_Controller {
         $this->form_validation->set_rules('place', 'Place Name', 'required');
         $this->form_validation->set_rules('pincode', 'Pincode ', 'required');
         $this->form_validation->set_rules('taluka', 'Taluka ', 'required');
-		$this->form_validation->set_rules('longitude', 'longitude ', 'required');
+        $this->form_validation->set_rules('longitude', 'longitude ', 'required');
         $this->form_validation->set_rules('latitude', 'latitude ', 'required');
-        $this->form_validation->set_rules('radius', 'radius ', 'required'); 
+        $this->form_validation->set_rules('radius', 'radius ', 'required');
         if ($this->form_validation->run() == FALSE) {
             $data['city'] = $this->GlobalModel->selectActiveData('citymaster');
             $data['error_message'] = '* Fields are Required!';
             $this->load->view('dashboard/header');
             $this->load->view('dashboard/address/add', $data);
             $this->load->view('dashboard/footer');
-        } else {
+        }
+        else {
             // $data = array('cityCode' => trim($this->input->post('cityCode')), 'state' => trim($this->input->post('state')), 'district' => trim($this->input->post('district')), 'taluka' => trim($this->input->post('taluka')), 'pincode' => trim($this->input->post('pincode')), 'place' => ucwords(strtolower(trim($this->input->post('place')))), 'isService' => trim($this->input->post("isService")), 'addID' => $addID, 'addIP' => $ip, 'isActive' => trim($this->input->post("isActive")));
             $data = array('cityCode' => trim($this->input->post('cityCode')), 'state' => trim($this->input->post('state')), 'district' => trim($this->input->post('district')), 'taluka' => trim($this->input->post('taluka')), 'pincode' => trim($this->input->post('pincode')), 'place' => ucwords(strtolower(trim($this->input->post('place')))), 'isService' => trim($this->input->post("isService")), 'longitude' => trim($this->input->post("longitude")), 'latitude' => trim($this->input->post("latitude")), 'radius' => trim($this->input->post("radius")), 'addID' => $addID, 'addIP' => $ip, 'isActive' => trim($this->input->post("isActive")));
             $result = $this->GlobalModel->addWithoutYear($data, 'customaddressmaster', 'ADDR');
@@ -136,7 +147,8 @@ class Address extends CI_Controller {
                 $response['status'] = true;
                 $response['message'] = "Address Successfully Added.";
                 $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-            } else {
+            }
+            else {
                 $response['status'] = false;
                 $response['message'] = "Failed To Add Address";
             }
@@ -145,7 +157,8 @@ class Address extends CI_Controller {
             redirect(base_url() . 'address/listRecords');
         }
     }
-    public function update() {
+    public function update()
+    {
         $code = $this->input->post('code');
         //Activity Track Starts
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
@@ -155,10 +168,10 @@ class Address extends CI_Controller {
         switch ($userRole) {
             case "ADM":
                 $role = "Admin";
-            break;
+                break;
             case "USR":
                 $role = "User";
-            break;
+                break;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
         $text = $role . " " . $userName . ' updated Address from ' . $ip;
@@ -180,16 +193,18 @@ class Address extends CI_Controller {
             $this->load->view('dashboard/header');
             $this->load->view('dashboard/address/edit', $data);
             $this->load->view('dashboard/footer');
-        } else {
+        }
+        else {
             $data = array('cityCode' => trim($this->input->post('cityCode')), 'state' => trim($this->input->post('state')), 'district' => trim($this->input->post('district')), 'taluka' => trim($this->input->post('taluka')), 'pincode' => trim($this->input->post('pincode')), 'place' => ucwords(strtolower(trim($this->input->post('place')))), 'isService' => trim($this->input->post("isService")), 'longitude' => $this->input->post("longitude"), 'latitude' => $this->input->post("latitude"), 'radius' => $this->input->post("radius"), 'addID' => $addID, 'addIP' => $ip, 'isActive' => trim($this->input->post("isActive")));
             $result = $this->GlobalModel->doEdit($data, 'customaddressmaster', $code);
-			 
-			
+
+
             if ($result != 'false') {
                 $response['status'] = true;
                 $response['message'] = "Address Successfully Updated.";
                 $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-            } else {
+            }
+            else {
                 $response['status'] = false;
                 $response['message'] = "No change In Address";
             }
@@ -199,7 +214,8 @@ class Address extends CI_Controller {
             redirect(base_url() . 'Address/listRecords');
         }
     }
-    public function delete() {
+    public function delete()
+    {
         $code = $this->input->post('code');
         //Activity Track Starts
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
@@ -209,10 +225,10 @@ class Address extends CI_Controller {
         switch ($userRole) {
             case "ADM":
                 $role = "Admin";
-            break;
+                break;
             case "USR":
                 $role = "User";
-            break;
+                break;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
         $text = $role . " " . $userName . ' deleted Address  from ' . $ip;
@@ -222,11 +238,12 @@ class Address extends CI_Controller {
         $resultData = $this->GlobalModel->doEdit($data, 'customaddressmaster', $code);
         //Activity Track Ends
         echo $this->GlobalModel->delete($code, 'customaddressmaster');
-        // redirect(base_url() . 'index.php/uom/listrecords', 'refresh');
-        
+    // redirect(base_url() . 'index.php/uom/listrecords', 'refresh');
+
     }
-    public function view() {
-        $code = $this->input->get('code');
+    public function view()
+    {
+        $code = $this->input->post('code');
         $addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
         $userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
         $userName = $this->session->userdata['logged_in' . $this->session_key]['username'];
@@ -234,10 +251,10 @@ class Address extends CI_Controller {
         switch ($userRole) {
             case "ADM":
                 $role = "Admin";
-            break;
+                break;
             case "USR":
                 $role = "User";
-            break;
+                break;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
         $table_name = 'customaddressmaster';
@@ -253,15 +270,17 @@ class Address extends CI_Controller {
         foreach ($Records->result() as $row) {
             if ($row->isService == "1") {
                 $serviceStatus = '<span class="label label-sm label-success">Service Available</span>';
-            } else {
+            }
+            else {
                 $serviceStatus = '<span class="label label-sm label-warning">Service Unavailable</span>';
             }
             if ($row->isActive == "1") {
                 $activeStatus = '<span class="label label-sm label-success">Active</span>';
-            } else {
+            }
+            else {
                 $activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
             }
-            $modelHtml.= '<div class="form-row"><div class="col-md-6 mb-2"><label><b>Code:</b> </label>
+            $modelHtml .= '<div class="form-row"><div class="col-md-6 mb-2"><label><b>Code:</b> </label>
 			<input type="text" value="' . $row->code . '" class="form-control-line"  readonly></div>
 			<div class="col-md-6 mb-2"><label><b> City:</b> </label>
 			<input type="text" class="form-control-line" value="' . $row->cityName . '"  readonly></div>
@@ -288,45 +307,49 @@ class Address extends CI_Controller {
             $text = $role . " " . $userName . ' viewed Address from ' . $ip;
             $log_text = array('code' => "demo", 'addID' => $addID, 'logText' => $text);
             $this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-            //Activity Track Ends
-            
+        //Activity Track Ends
+
         }
-        $modelHtml.= '</form>';
+        $modelHtml .= '</form>';
         echo $modelHtml;
     }
-    public function getAllData() {
+    public function getAllData()
+    {
         $place = $this->input->get('place');
         $dataPlace = $this->GlobalModel->similarResultFind('customaddressmaster', 'place', $place);
         $place = '';
         foreach ($dataPlace->result() as $pin) {
-            $place.= '<option value="' . $pin->place . '">';
+            $place .= '<option value="' . $pin->place . '">';
         }
         echo $place;
     }
-    public function getStateData() {
+    public function getStateData()
+    {
         $state = $this->input->get('state');
         $datastate = $this->GlobalModel->similarResultFindWithDistinct('customaddressmaster', 'state', $state);
         $state = '';
         foreach ($datastate->result() as $pin) {
-            $state.= '<option value="' . $pin->state . '">';
+            $state .= '<option value="' . $pin->state . '">';
         }
         echo $state;
     }
-    public function getDistData() {
+    public function getDistData()
+    {
         $district = $this->input->get('district');
         $datadistrict = $this->GlobalModel->similarResultFindWithDistinct('customaddressmaster', 'district', $district);
         $district1 = '';
         foreach ($datadistrict->result() as $pin) {
-            $district1.= '<option value="' . $pin->district . '">';
+            $district1 .= '<option value="' . $pin->district . '">';
         }
         echo $district1;
     }
-    public function getTalData() {
+    public function getTalData()
+    {
         $tal = $this->input->get('taluka');
         $dataTal = $this->GlobalModel->similarResultFindWithDistinct('customaddressmaster', 'taluka', $tal);
         $taluka1 = '';
         foreach ($dataTal->result() as $pin) {
-            $taluka1.= '<option value="' . $pin->taluka . '">';
+            $taluka1 .= '<option value="' . $pin->taluka . '">';
         }
         echo $taluka1;
     }

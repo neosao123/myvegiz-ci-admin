@@ -1944,12 +1944,18 @@ class Api extends REST_Controller
 			$response_all = json_decode($response, TRUE);
 			if (!empty($response_all['routes'])) {
 				foreach ($response_all['routes'] as $res1 => $val) {
+					$routeDistance = 0;
 					foreach ($val['legs'] as $keys => $value) {
-						$distance = round($value['distance']['value'] / 1000);
-						array_push($arrayDist, $distance);
+						$routeDistance += $value['distance']['value'];
 					}
+					array_push($arrayDist, ($routeDistance / 1000));
 				}
-				$mindistance = min($arrayDist);
+				$mindistance_raw = min($arrayDist);
+				if ($mindistance_raw > (floor($mindistance_raw) + 0.5)) {
+					$mindistance = ceil($mindistance_raw);
+				} else {
+					$mindistance = floor($mindistance_raw);
+				}
 				if($fixedDeliveryFlag==1){
 				    $shortestdistance=$mindistance;
 				    $charges=$deliveryCharge;

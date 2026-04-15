@@ -663,7 +663,7 @@
 				data: {
 					'cityCode': this_code
 				},
-				type: 'get',
+				type: 'POST',
 				success: function(response) {
 					if (response != undefined || response != "") {
 						$("#addressCode").empty();

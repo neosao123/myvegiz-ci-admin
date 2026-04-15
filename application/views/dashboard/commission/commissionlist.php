@@ -184,7 +184,7 @@
                         'toDate': p_toDate,
                         'orderType': 'food'
                     },
-                    type: "GET",
+                    type: "POST",
                     complete: function(json) {
                         //console.log(json);
                         $(".blue").click(function() {
@@ -196,7 +196,7 @@
                             $(".modal-body").empty();
                             $.ajax({
                                 url: base_path + "Commission/viewCurrentHistory",
-                                type: "GET",
+                                type: "POST",
                                 data: {
                                     code: code,
                                     fromDate: p_fromDate,
@@ -216,7 +216,7 @@
                             $("#historydiv").empty();
                             $.ajax({
                                 url: base_path + "Commission/showhistory",
-                                method: "GET",
+                                method: "POST",
                                 data: {
                                     code: code
                                 },
@@ -249,7 +249,7 @@
                         'toDate': p_toDate,
                         'orderType': 'vegetable'
                     },
-                    type: "GET",
+                    type: "POST",
 
                     complete: function(json) {
                         //console.log(json);
@@ -263,7 +263,7 @@
                             $(".modal-body").empty();
                             $.ajax({
                                 url: base_path + "Commission/viewCurrentHistory",
-                                type: "GET",
+                                type: "POST",
                                 data: {
                                     code: code,
                                     fromDate: fromDate,
@@ -283,7 +283,7 @@
                             $("#historydiv").empty();
                             $.ajax({
                                 url: base_path + "Commission/showhistory",
-                                method: "GET",
+                                method: "POST",
                                 data: {
                                     code: code
                                 },

@@ -47,9 +47,11 @@
 								<span> <label>Product Name :</label> </span>
 								<input type="text" class="form-control" list="productCodeList" id="productCode" name="productCode" placeholder="Enter Product Name Here ">
 								<datalist id="productCodeList">
-									<?php if($productmaster){foreach ($productmaster->result() as $product) {
-										echo '<option value="' . $product->code . '">' . $product->productName . '</option>';
-									} }?>
+									<?php if ($productmaster) {
+	foreach ($productmaster->result() as $product) {
+		echo '<option value="' . $product->code . '">' . $product->productName . '</option>';
+	}
+}?>
 							</div>
 						</div>
 
@@ -58,9 +60,11 @@
 								<span> <label>Category Name :</label> </span>
 								<select type="text" class="form-control" id="categoryCode" name="categoryCode">
 									<option value="">Select Option</option>
-									<?php if($categorymaster){ foreach ($categorymaster->result() as $cat) {
-										echo '<option value="' . $cat->categorySName . '">' . $cat->categoryName . '</option>';
-									} }?>
+									<?php if ($categorymaster) {
+	foreach ($categorymaster->result() as $cat) {
+		echo '<option value="' . $cat->categorySName . '">' . $cat->categoryName . '</option>';
+	}
+}?>
 								</select>
 							</div>
 						</div>
@@ -226,7 +230,7 @@
 						'storageCode': p_keyStorageCode,
 						'categoryCode': p_keyCategoryCode
 					},
-					type: "GET",
+					type: "POST",
 					//model views
 					"complete": function(json) {
 						//console.log(json);
@@ -234,7 +238,7 @@
 							var code = $(this).data('seq');
 							$.ajax({
 								url: base_path + "Product/view",
-								method: "GET",
+								method: "POST",
 								data: {
 									'code': code
 								},

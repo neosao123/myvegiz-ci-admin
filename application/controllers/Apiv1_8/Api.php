@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 require(APPPATH . '/libraries/REST_Controller.php');
 
 use Restserver\Libraries\REST_Controller;
@@ -14,18 +15,18 @@ class Api extends REST_Controller
 		$this->load->library('form_validation');
 		$this->load->model('GlobalModel');
 		$this->load->model('ApiModel');
-		$this->load->library('cashfree');//new version
-		$this->load->library('cashfreepayment');//old version 
+		$this->load->library('cashfree'); //new version
+		$this->load->library('cashfreepayment'); //old version 
 		$this->load->library('sendsms');
 		$this->load->library('notificationlibv_3');
 		$this->load->library('firestore');
 		$this->load->library('assignorder');
-		$this->load->library('encryption'); 
+		$this->load->library('encryption');
 	}
-	 
-	
 
-	public function getMainCategoryList_get() 
+
+
+	public function getMainCategoryList_get()
 	{
 		$columns = "maincategorymaster.*";
 		$cond = array('maincategorymaster' . ".isActive" => 1);
@@ -42,7 +43,8 @@ class Api extends REST_Controller
 			}
 			$response['mainCategoryList'] = $data;
 			return $this->response(array("status" => "200", "message" => 'Data Found', "result" => $response), 200);
-		} else {
+		}
+		else {
 			$data['mainCategoryList'] = array();
 			return $this->response(array("status" => "300", "message" => "Data not found.", 'result' => $data), 200);
 		}
@@ -55,7 +57,8 @@ class Api extends REST_Controller
 		if ($result) {
 			$data['cities'] = $result;
 			return $this->response(array("status" => "200", "result" => $data), 200);
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "Data not found."), 200);
 		}
 	}
@@ -70,16 +73,19 @@ class Api extends REST_Controller
 				$result = $this->sendsms->sendOTPMessage($otpNumber, $postData['contactNumber']);
 				$result['status'] = true;
 				if ($result['status'] == true) {
-					return $this->response(array("status" => "200", "message" => "OTP was sent successfully!", "result" => $otpNumber,"smsResponse"=>$result), 200);
-				} else {
-					//$data = new stdClass();
-					return $this->response(array("status" => "300", "message" => "Failed to send  OTP!","result" => "", "smsResponse"=>$result), 200);
+					return $this->response(array("status" => "200", "message" => "OTP was sent successfully!", "result" => $otpNumber, "smsResponse" => $result), 200);
 				}
-			} else {
+				else {
+					//$data = new stdClass();
+					return $this->response(array("status" => "300", "message" => "Failed to send  OTP!", "result" => "", "smsResponse" => $result), 200);
+				}
+			}
+			else {
 				$data = new stdClass();
 				return $this->response(array("status" => "300", "result" => $data, "message" => "Contact Number should be exactly 10 digit number only!"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * fields are mandatory!"), 200);
 		}
 	}
@@ -90,7 +96,7 @@ class Api extends REST_Controller
 		$encryption_key = "myvegizfooddeliv";
 		$iv_size = openssl_cipher_iv_length($cipher);
 		$iv = "myvegizfooddeliv";
-		$encrypted_data = base64_decode($encrypted_data);   
+		$encrypted_data = base64_decode($encrypted_data);
 		return openssl_decrypt($encrypted_data, $cipher, $encryption_key, 0, $iv);
 	}
 
@@ -111,7 +117,7 @@ class Api extends REST_Controller
 		$key = "encryptionhash";
 		$iv = "sample9863254111";
 		$decryptedText = openssl_decrypt(base64_decode($encryptedText), $encryptionMethod, $key, $options = OPENSSL_RAW_DATA, $iv);
-		return json_decode($decryptedText,true);
+		return json_decode($decryptedText, true);
 	}
 
 	public function sendOTP_post()
@@ -130,15 +136,18 @@ class Api extends REST_Controller
 				$result['status'] = true;
 				if ($result['status'] == true) {
 					return $this->response(array("status" => "200", "message" => "OTP was sent successfully!", "result" => $otpNumber), 200);
-				} else {
+				}
+				else {
 					$data = new stdClass();
 					return $this->response(array("status" => "300", "result" => $data, "message" => "Failed to send  OTP!"), 200);
 				}
-			} else {
+			}
+			else {
 				$data = new stdClass();
 				return $this->response(array("status" => "300", "result" => $data, "message" => "Contact Number should be exactly 10 digit number only!"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * fields are mandatory!"), 200);
 		}
 	}
@@ -157,19 +166,22 @@ class Api extends REST_Controller
 				if ($res != false) {
 					$usdata['userData'] = $res[0];
 					return $this->response(array("status" => "200", "message" => "OTP Verified and Logged in successfully", "accountExists" => 1, "result" => $usdata), 200);
-				} else {
+				}
+				else {
 					$usdata = new stdClass();
 					return $this->response(array("status" => "300", "message" => "OTP Verified but User does not exists", "accountExists" => 0), 200);
 				}
-			} else {
+			}
+			else {
 				$data = new stdClass();
 				return $this->response(array("status" => "300", "result" => $data, "message" => "Invalid data entered"), 200);
 			}
-		} else { 
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "Please enter OTP you have received to your contact number!"), 200);
 		}
 	}
-	
+
 	public function verifyRegisterOTP_post()
 	{
 		$postData = $this->post();
@@ -182,13 +194,15 @@ class Api extends REST_Controller
 			if ($res != false) {
 				$usdata['userData'] = $res[0];
 				return $this->response(array("status" => "200", "message" => "OTP Verified and Logged in successfully", "accountExists" => 1, "result" => $usdata), 200);
-			} else {
+			}
+			else {
 				$usdata = new stdClass();
 				return $this->response(array("status" => "300", "message" => "OTP Verified but User does not exists", "accountExists" => 0), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "Please enter OTP you have received to your contact number!"), 200);
-		} 
+		}
 	}
 
 
@@ -196,11 +210,11 @@ class Api extends REST_Controller
 	public function registration_post()
 	{
 		$postData = $this->post();
-		if (isset($postData["contactNumber"]) && $postData["contactNumber"] != '' && isset($postData["cityCode"]) && $postData["cityCode"]  != '' && isset($postData["name"]) && $postData["name"]  != '') {
+		if (isset($postData["contactNumber"]) && $postData["contactNumber"] != '' && isset($postData["cityCode"]) && $postData["cityCode"] != '' && isset($postData["name"]) && $postData["name"] != '') {
 			if (strlen($postData['contactNumber']) == 10) {
 				$checkIfCityValid = $this->GlobalModel->selectQuery("citymaster.code", "citymaster", array("citymaster.code" => $postData['cityCode']));
 				if ($checkIfCityValid != false && $checkIfCityValid->num_rows() > 0) {
-					$checkUserexists =  $this->GlobalModel->selectQuery("clientmaster.code", 'clientmaster', array("clientmaster.mobile" => $postData['contactNumber'], "clientmaster.isActive" => 1));
+					$checkUserexists = $this->GlobalModel->selectQuery("clientmaster.code", 'clientmaster', array("clientmaster.mobile" => $postData['contactNumber'], "clientmaster.isActive" => 1));
 					if ($checkUserexists != false && $checkUserexists->num_rows() > 0) {
 						$condition = array(
 							"clientmaster.code" => $checkUserexists->result_array()[0]['code']
@@ -209,7 +223,8 @@ class Api extends REST_Controller
 						$resultData = $this->ApiModel->read_user_information($condition);
 						$result['userData'] = $resultData[0];
 						$this->response(array("status" => "300", "message" => "User Already Exists", "result" => $result), 200);
-					} else {
+					}
+					else {
 						$insertArr = array(
 							"mobile" => $postData["contactNumber"],
 							'cityCode' => $postData['cityCode'],
@@ -233,20 +248,25 @@ class Api extends REST_Controller
 								$resultData = $this->ApiModel->read_user_information($condition);
 								$result['userData'] = $resultData[0];
 								return $this->response(array("status" => "200", "message" => "Registration Successful..", "result" => $result), 200);
-							} else {
+							}
+							else {
 								return $this->response(array("status" => "300", "message" => "Registration Successful.. Please Signin..", "result" => $result), 200);
 							}
-						} else {
+						}
+						else {
 							$this->response(array("status" => "300", "message" => " Opps...! Something went wrong please try again."), 200);
 						}
 					}
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Invalid City"), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Contact Number should be exactly 10 digit number only!"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	} //end registration  Process
@@ -275,10 +295,12 @@ class Api extends REST_Controller
 				}
 				$result['addressList'] = $addressList;
 				return $this->response(array("status" => "200", "message" => " Address List where Services Available", "result" => $result), 200);
-			} else {
+			}
+			else {
 				$this->response(array("status" => "300", "message" => " No data Found"), 400);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "  * are Required field(s)."), 400);
 		}
 	}
@@ -301,7 +323,8 @@ class Api extends REST_Controller
 			}
 			$data['homesliderImages'] = $imageArray;
 			return $this->response(array("status" => "200", "message" => 'Data Found', "result" => $data), 200);
-		} else {
+		}
+		else {
 
 			return $this->response(array("status" => "300", "message" => "Data not found.", "result" => $data), 200);
 		}
@@ -330,11 +353,13 @@ class Api extends REST_Controller
 				}
 				$data['sliderImages'] = $imageArray;
 				return $this->response(array("status" => "200", "message" => 'Data Found', "result" => $data), 200);
-			} else {
+			}
+			else {
 				$data['sliderImages'] = array();
 				return $this->response(array("status" => "300", "message" => "Data not found.", 'result' => $data), 200);
 			}
-		} else {
+		}
+		else {
 			$data['sliderImages'] = array();
 			return $this->response(array("status" => "400", "message" => "* fields are required"), 400);
 		}
@@ -345,7 +370,7 @@ class Api extends REST_Controller
 	public function categoryList_post()
 	{
 		$postData = $this->post();
-		if (isset($postData["offset"]) && $postData["offset"] != '' && isset($postData["mainCategoryCode"])  && $postData["mainCategoryCode"] != '') {
+		if (isset($postData["offset"]) && $postData["offset"] != '' && isset($postData["mainCategoryCode"]) && $postData["mainCategoryCode"] != '') {
 			$mainCategoryCode = $postData["mainCategoryCode"];
 			$category_offset = $postData["offset"];
 			$category_limit = 10;
@@ -358,10 +383,12 @@ class Api extends REST_Controller
 				}
 				$data['categories'] = $category_result;
 				return $this->response(array("status" => "200", "totalRecords" => $totalRecords, "result" => $data), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Required field(s)."), 400);
 		}
 	}
@@ -369,17 +396,17 @@ class Api extends REST_Controller
 
 	//category list by limit
 	public function categoryAndProduct_post()
-	{	
-		
+	{
+
 		$postData = $this->post();
 		if (isset($postData["offset"]) && $postData["offset"] != '' && isset($postData['cityCode']) && $postData['cityCode'] != "" && isset($postData['mainCategoryCode']) && $postData['mainCategoryCode'] != "") {
 			$mainCategoryCode = $postData["mainCategoryCode"];
 			$category_offset = $postData["offset"];
 			$cityCode = $postData['cityCode'];
 			$clientCode = isset($postData['clientCode']) ? $postData['clientCode'] : "";
-			
-			log_message("error","---API-CALLED----".$mainCategoryCode."----".$category_offset."----".$cityCode."----".$clientCode);
-			
+
+			log_message("error", "---API-CALLED----" . $mainCategoryCode . "----" . $category_offset . "----" . $cityCode . "----" . $clientCode);
+
 			$category_limit = "3";
 			$condition = array('isActive' => 1, 'mainCategoryCode' => $mainCategoryCode);
 			$totalRecords = sizeof($this->ApiModel->selectData('categorymaster', '', '', $condition)->result());
@@ -387,7 +414,7 @@ class Api extends REST_Controller
 			if ($category_result) {
 				$category_resulta = [];
 				$art = [];
-				for ($i = 0; $i < sizeof($category_result); $i++) {     
+				for ($i = 0; $i < sizeof($category_result); $i++) {
 
 					$category_resulta[$i]['id'] = $category_result[$i]['id'];
 					$category_resulta[$i]['code'] = $category_result[$i]['code'];
@@ -397,11 +424,11 @@ class Api extends REST_Controller
 					$category_resulta[$i]['categoryImage'] = base_url() . 'uploads/category/' . $category_result[$i]['code'] . '/' . $category_result[$i]['categoryImage'];
 
 					$orderColumns = array("productmaster.id,productmaster.code,productmaster.hsnCode,productmaster.taxPercent,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,productmaster.productRegularPrice,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingPrice as sellingPrice,productratelineentries.productStatus,productratelineentries.sellingUnit,productratelineentries.cityCode,productmaster.isActive,ifnull(productmaster.tagCode,'') as tagCode,ifnull(tagmaster.tagTitle,'') as tagTitle,ifnull(tagmaster.tagColor,'') as tagColor,productratelineentries.code as variantsCode,productratelineentries.quantity,subcategorymaster.id as subCategoryId");
-					$cond = array('productmaster' . ".productCategory" => $category_result[$i]['categorySName'], 'productmaster' . ".isActive" => 1, 'productratelineentries.cityCode' => $cityCode, "productratelineentries.isMainVariant" => 1,"productratelineentries.isActive" =>1,"productratelineentries.isDelete" =>0);
+					$cond = array('productmaster' . ".productCategory" => $category_result[$i]['categorySName'], 'productmaster' . ".isActive" => 1, 'productratelineentries.cityCode' => $cityCode, "productratelineentries.isMainVariant" => 1, "productratelineentries.isActive" => 1, "productratelineentries.isDelete" => 0);
 					//$orderBy = array('productmaster.productCategory' => 'DESC', 'productmaster.subCategoryCode' => 'DESC', 'productmaster.tagCode' => 'DESC', 'productmaster.id' => 'DESC');
-					$orderBy = array('productmaster.productCategory' => 'DESC','subcategorymaster.id' => 'ASC','productmaster.id' => 'DESC');
-					$join = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode','subcategorymaster'=>'subcategorymaster.code=productmaster.subCategoryCode');
-					$joinType = array('productratelineentries' => 'inner', 'tagmaster' => 'left','subcategorymaster'=>'left');
+					$orderBy = array('productmaster.productCategory' => 'DESC', 'subcategorymaster.id' => 'ASC', 'productmaster.id' => 'DESC');
+					$join = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode', 'subcategorymaster' => 'subcategorymaster.code=productmaster.subCategoryCode');
+					$joinType = array('productratelineentries' => 'inner', 'tagmaster' => 'left', 'subcategorymaster' => 'left');
 					$like = array();
 					$groupBy = array();
 					//$groupBy = ["productmaster.tagCode"];
@@ -417,7 +444,7 @@ class Api extends REST_Controller
 							$product_result[$j]['isInWishlist'] = false;
 
 							$productCode = $product_result[$j]['code'];
-                            $product_result[$j]['quantity'] = $product_result[$j]['quantity'];
+							$product_result[$j]['quantity'] = $product_result[$j]['quantity'];
 							//$product_result[$j]['quantity'] = number_format($product_result[$j]['quantity'], 0, '.', '');
 							if ($clientCode != "") {
 
@@ -454,14 +481,14 @@ class Api extends REST_Controller
 							//product rates 
 							$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
 							$tbl = 'productratelineentries';
-							$cndt = ['productratelineentries.productCode' => $productCode, 'cityCode' => $cityCode,'isDelete'=>0,'isActive'=>1];
+							$cndt = ['productratelineentries.productCode' => $productCode, 'cityCode' => $cityCode, 'isDelete' => 0, 'isActive' => 1];
 							$ordby = ['productratelineentries.productCode' => 'DESC'];
 							$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby);
 
 							if ($rate_result) {
 								$rates = [];
 								foreach ($rate_result->result_array() as $rs) {
-									$product =  $productCode . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
+									$product = $productCode . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
 									//$product =  $productCode . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . number_format($rs['quantity'],3, '.', '');
 									//echo $product;
 									$art[] = $product;
@@ -469,8 +496,8 @@ class Api extends REST_Controller
 									$isInCart1 = false;
 									$cartQuantity1 = 0;
 									$cartCode1 = "";
-									$sellingPrice_tax=0;
-									$regularPrice_tax=0;
+									$sellingPrice_tax = 0;
+									$regularPrice_tax = 0;
 									$discount = 0;
 									if ($clientCode != "") {
 										$tableName2 = "clientcarts";
@@ -527,29 +554,32 @@ class Api extends REST_Controller
 							}
 							$product_result[$j]['rate_variants'] = $rateArray;
 						}
-						
-						
-						
+
+
+
 						$reorderedData = $this->reorderData($product_result);
-  
-                       
+
+
 						$proData['products'] = $reorderedData;
-						$category_resulta[$i]['productList'] = $proData; 
+						$category_resulta[$i]['productList'] = $proData;
 					}
 				}
 				$data['categories'] = $category_resulta;
 				return $this->response(array("status" => "200", "sqr" => $art, "totalRecords" => $totalRecords, "result" => $data), 200);
-              	//return $this->response(array("status" => "200", "totalRecords" => $totalRecords, "result" => $data), 200);
-			} else {
+			//return $this->response(array("status" => "200", "totalRecords" => $totalRecords, "result" => $data), 200);
+			}
+			else {
 				$data['categories'] = array();
 				return $this->response(array("status" => "300", "message" => "Data not found."), 400);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "* fields are required"), 200);
 		}
 	}
-	
-	function customSortA($a, $b) {
+
+	function customSortA($a, $b)
+	{
 		$tagTitleA = !empty($a['tagTitle']);
 		$tagTitleB = !empty($b['tagTitle']);
 
@@ -561,7 +591,8 @@ class Api extends REST_Controller
 	}
 
 	// Reorder function
-	function reorderData($data) {
+	function reorderData($data)
+	{
 		$result = [];
 		$groupedData = [];
 
@@ -576,13 +607,13 @@ class Api extends REST_Controller
 		}
 
 		foreach ($groupedData as $subCategoryId => $products) {
-			usort($products, array($this,'customSortA'));
+			usort($products, array($this, 'customSortA'));
 			$result = array_merge($result, $products);
 		}
 
 		return $result;
 	}
-	
+
 	public function getPopularProductsList_post()
 	{
 		$postData = $this->post();
@@ -590,7 +621,7 @@ class Api extends REST_Controller
 			$clientCode = isset($postData['clientCode']) ? $postData['clientCode'] : "";
 			$mainCategoryCode = $postData['mainCategoryCode'];
 			$cityCode = $postData['cityCode'];
-			$condition1 = array("productmaster.isPopular" => 1, "productmaster.isActive" => 1, 'productratelineentries.cityCode' => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode,'productratelineentries.isDelete'=>0,'productratelineentries.isActive'=>1,'productratelineentries.isMainVariant'=>1);
+			$condition1 = array("productmaster.isPopular" => 1, "productmaster.isActive" => 1, 'productratelineentries.cityCode' => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode, 'productratelineentries.isDelete' => 0, 'productratelineentries.isActive' => 1, 'productratelineentries.isMainVariant' => 1);
 			$join1 = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode');
 			$joinType1 = array('productratelineentries' => 'inner');
 			$totalProducta = $this->GlobalModel->selectQuery("productmaster.*,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingPrice as sellingPrice,productratelineentries.productStatus,productratelineentries.sellingUnit,productratelineentries.cityCode,productratelineentries.quantity", 'productmaster', $condition1, array('productmaster.tagCode' => 'DESC', 'productmaster.id' => 'DESC'), $join1, $joinType1);
@@ -603,7 +634,7 @@ class Api extends REST_Controller
 					$temp = 0;
 					for ($i = 0; $i < $totalProduct; $i += 4) {
 						$orderColumns = array("productmaster.id,productmaster.code,productmaster.hsnCode,productmaster.taxPercent,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,productmaster.productRegularPrice,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingPrice as productSellingPrice,productratelineentries.productStatus,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.cityCode,productmaster.isActive,ifnull(productmaster.tagCode,'') as tagCode,ifnull(tagmaster.tagTitle,'') as tagTitle,ifnull(tagmaster.tagColor,'') as tagColor,productratelineentries.code as variantsCode");
-						$cond = array("productmaster.isPopular" => 1, "productmaster.isActive" => 1,'productratelineentries.cityCode' => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode, "productratelineentries.isMainVariant" => 1); //only kolhpaur data
+						$cond = array("productmaster.isPopular" => 1, "productmaster.isActive" => 1, 'productratelineentries.cityCode' => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode, "productratelineentries.isMainVariant" => 1); //only kolhpaur data
 						$orderBy = array('productmaster.productCategory' => 'DESC', 'productmaster.subCategoryCode' => 'DESC', 'productmaster.tagCode' => 'DESC', 'productmaster.id' => 'DESC');
 						$join = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode');
 						$joinType = array('productratelineentries' => 'inner', 'tagmaster' => 'left');
@@ -648,13 +679,13 @@ class Api extends REST_Controller
 								$limitProduct_result[$j]['sellingPrice'] = $sellingPrice_with_tax;
 
 								/*$discount='';
-								$taxCalulateRegular = round($limitProduct_result[$j]['regularPrice'] * ($limitProduct_result[$j]['taxPercent']/100),2);
-								$regularPrice_with_tax = number_format($limitProduct_result[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
-								$limitProduct_result[$j]['regularPrice'] = $regularPrice_with_tax;
-								if($limitProduct_result[$j]['regularPrice']!=0){
-									$discount = round(((($limitProduct_result[$j]['regularPrice'] - $limitProduct_result[$j]['sellingPrice']) / ($limitProduct_result[$j]['regularPrice'])) * 100)).' %';
-								}
-								$limitProduct_result[$j]['productDiscount'] = $discount;*/
+								 $taxCalulateRegular = round($limitProduct_result[$j]['regularPrice'] * ($limitProduct_result[$j]['taxPercent']/100),2);
+								 $regularPrice_with_tax = number_format($limitProduct_result[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
+								 $limitProduct_result[$j]['regularPrice'] = $regularPrice_with_tax;
+								 if($limitProduct_result[$j]['regularPrice']!=0){
+								 $discount = round(((($limitProduct_result[$j]['regularPrice'] - $limitProduct_result[$j]['sellingPrice']) / ($limitProduct_result[$j]['regularPrice'])) * 100)).' %';
+								 }
+								 $limitProduct_result[$j]['productDiscount'] = $discount;*/
 
 
 								$limitProduct_result[$j]['images'] = $imageArray;
@@ -663,14 +694,14 @@ class Api extends REST_Controller
 								//product rates 
 								$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
 								$tbl = 'productratelineentries';
-								$cndt = ['productratelineentries.productCode' => $limitProduct_result[$j]['code'], 'cityCode' => $cityCode,'isDelete'=>0,'isActive'=>1];
+								$cndt = ['productratelineentries.productCode' => $limitProduct_result[$j]['code'], 'cityCode' => $cityCode, 'isDelete' => 0, 'isActive' => 1];
 								$ordby = ['productratelineentries.code' => 'DESC'];
 								$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby);
 								if ($rate_result) {
 									$rates = [];
 									foreach ($rate_result->result_array() as $rs) {
 
-										$product =  $limitProduct_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
+										$product = $limitProduct_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
 										//in cart list 
 
 										$isInCart1 = false;
@@ -737,13 +768,16 @@ class Api extends REST_Controller
 					$response['list'] = $data;
 					//$data['products'] = $limitProduct_result;
 					return $this->response(array("status" => "200", "totalRecords" => $totalProduct, "result" => $response), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Required field(s)."), 200);
 		}
 	}
@@ -753,7 +787,7 @@ class Api extends REST_Controller
 	public function productByCategory_post()
 	{
 		$postData = $this->post();
-		if (isset($postData["categorySName"])  && $postData["categorySName"] != '' && isset($postData["offset"]) && $postData["offset"] != '' && isset($postData['cityCode']) && $postData["cityCode"] != "" && isset($postData['mainCategoryCode']) && $postData['mainCategoryCode'] != "") {
+		if (isset($postData["categorySName"]) && $postData["categorySName"] != '' && isset($postData["offset"]) && $postData["offset"] != '' && isset($postData['cityCode']) && $postData["cityCode"] != "" && isset($postData['mainCategoryCode']) && $postData['mainCategoryCode'] != "") {
 			$mainCategoryCode = $postData["mainCategoryCode"];
 			$categorySName = $postData["categorySName"];
 			$product_offset = $postData["offset"];
@@ -766,11 +800,11 @@ class Api extends REST_Controller
 
 			if ($totalProduct) {
 				$orderColumns = array("productmaster.id,productmaster.code,productmaster.hsnCode,productmaster.taxPercent,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,ifnull(productratelineentries.regularPrice,0) as productRegularPrice,productratelineentries.sellingPrice as productSellingPrice,productratelineentries.productStatus,productratelineentries.cityCode,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingUnit,productratelineentries.quantity,productmaster.isActive,ifnull(productmaster.tagCode,'') as tagCode,ifnull(tagmaster.tagTitle,'') as tagTitle,ifnull(tagmaster.tagColor,'') as tagColor,productratelineentries.code as variantsCode,productratelineentries.isMainVariant,ifnull(subcategorymaster.id,'0') as subCategoryId");
-				$cond = array('productmaster' . ".productCategory" => $categorySName, 'productmaster' . '.isActive' => 1, 'productratelineentries.cityCode' => $cityCode, 'productratelineentries.isMainVariant' => 1,'productmaster' . '.isDelete' => 0,'productratelineentries.isDelete'=>0,'productratelineentries.isActive'=>1);
-				$orderBy = array('productmaster.productCategory' => 'DESC', 'subcategorymaster.id' => 'ASC','productmaster.id' => 'DESC');
-				$join = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode','subcategorymaster'=>'subcategorymaster.code=productmaster.subCategoryCode');
-				$joinType = array('productratelineentries' => 'inner', 'tagmaster' => 'left','subcategorymaster'=>'left');
-				$groupBy=array();
+				$cond = array('productmaster' . ".productCategory" => $categorySName, 'productmaster' . '.isActive' => 1, 'productratelineentries.cityCode' => $cityCode, 'productratelineentries.isMainVariant' => 1, 'productmaster' . '.isDelete' => 0, 'productratelineentries.isDelete' => 0, 'productratelineentries.isActive' => 1);
+				$orderBy = array('productmaster.productCategory' => 'DESC', 'subcategorymaster.id' => 'ASC', 'productmaster.id' => 'DESC');
+				$join = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode', 'subcategorymaster' => 'subcategorymaster.code=productmaster.subCategoryCode');
+				$joinType = array('productratelineentries' => 'inner', 'tagmaster' => 'left', 'subcategorymaster' => 'left');
+				$groupBy = array();
 				//$groupBy = array("productmaster.tagCode");
 				$resultQuery = $this->GlobalModel->selectQuery($orderColumns, 'productmaster', $cond, $orderBy, $join, $joinType, array(), $product_limit, $product_offset);
 				if ($resultQuery) {
@@ -814,13 +848,13 @@ class Api extends REST_Controller
 						$limitProduct_result[$j]['sellingPrice'] = $sellingPrice_with_tax;
 
 						/*$discount='';
-							$taxCalulateRegular = round($limitProduct_result[$j]['regularPrice'] * ($limitProduct_result[$j]['taxPercent']/100),2);
-							$regularPrice_with_tax = number_format($limitProduct_result[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
-							$limitProduct_result[$j]['regularPrice'] = $regularPrice_with_tax;
-							if($limitProduct_result[$j]['regularPrice']!=0){
-								$discount = round(((($limitProduct_result[$j]['regularPrice'] - $limitProduct_result[$j]['sellingPrice']) / ($limitProduct_result[$j]['regularPrice'])) * 100)).' %';
-							}
-							$limitProduct_result[$j]['productDiscount'] = $discount;*/
+						 $taxCalulateRegular = round($limitProduct_result[$j]['regularPrice'] * ($limitProduct_result[$j]['taxPercent']/100),2);
+						 $regularPrice_with_tax = number_format($limitProduct_result[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
+						 $limitProduct_result[$j]['regularPrice'] = $regularPrice_with_tax;
+						 if($limitProduct_result[$j]['regularPrice']!=0){
+						 $discount = round(((($limitProduct_result[$j]['regularPrice'] - $limitProduct_result[$j]['sellingPrice']) / ($limitProduct_result[$j]['regularPrice'])) * 100)).' %';
+						 }
+						 $limitProduct_result[$j]['productDiscount'] = $discount;*/
 
 
 						$limitProduct_result[$j]['images'] = $imageArray;
@@ -828,14 +862,14 @@ class Api extends REST_Controller
 						//product rates 
 						$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
 						$tbl = 'productratelineentries';
-						$cndt = ['productratelineentries.productCode' => $limitProduct_result[$j]['code'], 'cityCode' => $cityCode,'isDelete'=>0,'isActive'=>1];
+						$cndt = ['productratelineentries.productCode' => $limitProduct_result[$j]['code'], 'cityCode' => $cityCode, 'isDelete' => 0, 'isActive' => 1];
 						$ordby = ['productratelineentries.productCode' => 'DESC'];
 						$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby);
 						if ($rate_result) {
 							$rates = [];
 							foreach ($rate_result->result_array() as $rs) {
 
-								$product =  $limitProduct_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' .$rs['quantity'];
+								$product = $limitProduct_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
 								//$product =  $limitProduct_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . number_format($rs['quantity'],3, '.', '');
 								//in cart list 
 
@@ -889,25 +923,28 @@ class Api extends REST_Controller
 									'isMainVariant' => $rs['isMainVariant'],
 									'isInCart' => $isInCart1,
 									'cartQuantity' => $cartQuantity1,
-									'cartCode' => $cartCode1  
+									'cartCode' => $cartCode1
 								];
 							}
 							$rateArray = $rates;
 						}
 						$limitProduct_result[$j]['rate_variants'] = $rateArray;
-					} 
+					}
 					$data['products'] = $this->reorderData($limitProduct_result);
 					return $this->response(array("status" => "200", "totalRecords" => $totalProduct, "result" => $data), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "* fields are required"), 400);
 		}
-	}  //Ends Product list by categorySName
+	} //Ends Product list by categorySName
 
 	// Get Product by productCode
 	public function productById_post()
@@ -921,8 +958,8 @@ class Api extends REST_Controller
 
 			$clientCode = isset($postData['clientCode']) ? $postData['clientCode'] : "";
 			$orderColumns = array("productmaster.id,productmaster.code,productmaster.hsnCode,productmaster.taxPercent,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,productmaster.productRegularPrice,productratelineentries.sellingPrice as productSellingPrice,productratelineentries.productStatus,productratelineentries.cityCode,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingUnit,productratelineentries.quantity,productmaster.isActive,ifnull(productmaster.tagCode,'') as tagCode,ifnull(tagmaster.tagTitle,'') as tagTitle,ifnull(tagmaster.tagColor,'') as tagColor,productratelineentries.code as variantsCode,productratelineentries.isMainVariant");
-			$cond = array('productmaster' . '.isActive' => 1,'productmaster' . ".code" => $productCode, 'productratelineentries.cityCode' => $cityCode, 'productmaster.mainCategoryCode' => $mainCategoryCode,"productratelineentries.isMainVariant" => 1,'productratelineentries.isDelete'=>0,'productratelineentries.isActive'=>1);
-			$orderBy = array('productmaster.productCategory' => 'DESC', 'productmaster.subCategoryCode' => 'DESC','productmaster.tagCode' => 'DESC', 'productmaster.id' => 'DESC');
+			$cond = array('productmaster' . '.isActive' => 1, 'productmaster' . ".code" => $productCode, 'productratelineentries.cityCode' => $cityCode, 'productmaster.mainCategoryCode' => $mainCategoryCode, "productratelineentries.isMainVariant" => 1, 'productratelineentries.isDelete' => 0, 'productratelineentries.isActive' => 1);
+			$orderBy = array('productmaster.productCategory' => 'DESC', 'productmaster.subCategoryCode' => 'DESC', 'productmaster.tagCode' => 'DESC', 'productmaster.id' => 'DESC');
 			$join = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode');
 			$joinType = array('productratelineentries' => 'inner', 'tagmaster' => 'left');
 			$product_result = $this->GlobalModel->selectQuery($orderColumns, 'productmaster', $cond, $orderBy, $join, $joinType);
@@ -964,13 +1001,13 @@ class Api extends REST_Controller
 					$product_result[$j]['sellingPrice'] = $sellingPrice_with_tax;
 
 					/*$discount='';
-					$taxCalulateRegular = round($product_result[$j]['regularPrice'] * ($product_result[$j]['taxPercent']/100),2);
-					$regularPrice_with_tax = number_format($product_result[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
-					$product_result[$j]['regularPrice'] = $regularPrice_with_tax;
-					if($product_result[$j]['regularPrice']!=0){
-						$discount = round(((($product_result[$j]['regularPrice'] - $product_result[$j]['sellingPrice']) / ($product_result[$j]['regularPrice'])) * 100)).' %';
-					}
-					$product_result[$j]['productDiscount'] = $discount;*/
+					 $taxCalulateRegular = round($product_result[$j]['regularPrice'] * ($product_result[$j]['taxPercent']/100),2);
+					 $regularPrice_with_tax = number_format($product_result[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
+					 $product_result[$j]['regularPrice'] = $regularPrice_with_tax;
+					 if($product_result[$j]['regularPrice']!=0){
+					 $discount = round(((($product_result[$j]['regularPrice'] - $product_result[$j]['sellingPrice']) / ($product_result[$j]['regularPrice'])) * 100)).' %';
+					 }
+					 $product_result[$j]['productDiscount'] = $discount;*/
 
 
 					$product_result[$j]['images'] = $imageArray;
@@ -978,7 +1015,7 @@ class Api extends REST_Controller
 					//product rates 
 					$clms = "productmaster.code as productCode,productmaster.productName,productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
 					$tbl = 'productratelineentries';
-					$cndt = ['productratelineentries.productCode' => $product_result[$j]['code'], 'cityCode' => $cityCode,'productratelineentries.isDelete'=>0,'productratelineentries.isActive'=>1];
+					$cndt = ['productratelineentries.productCode' => $product_result[$j]['code'], 'cityCode' => $cityCode, 'productratelineentries.isDelete' => 0, 'productratelineentries.isActive' => 1];
 					$ordby = ['productratelineentries.productCode' => 'DESC'];
 					$join3 = array('productmaster' => 'productmaster.code=productratelineentries.productCode');
 					$joinType3 = array('productmaster' => 'inner');
@@ -989,7 +1026,7 @@ class Api extends REST_Controller
 						$rates = [];
 						foreach ($rate_result->result_array() as $rs) {
 							//$product =  $product_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . number_format($rs['quantity'],3,'.','');
-							$product =  $product_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
+							$product = $product_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
 							//in cart list 
 
 							$isInCart1 = false;
@@ -1053,10 +1090,12 @@ class Api extends REST_Controller
 				}
 				$data['products'] = $product_result[0];
 				return $this->response(array("status" => "200", "result" => $data), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Data not found."), 400);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "Data not found."), 400);
 		}
 	} // Ends Get Product by productCode 
@@ -1074,13 +1113,16 @@ class Api extends REST_Controller
 				$wishlist_result = $this->ApiModel->selectData('clientwishlist', '', '', $condition2)->result_array();
 				if (sizeof($wishlist_result) > 0) {
 					return $this->response(array("status" => "200", "message" => 'item already exist in wishlist'), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => 'iteam not added to wishlist yet'), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => 'user not registerd'), 400);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Required field(s)."), 400);
 		}
 	}
@@ -1104,7 +1146,8 @@ class Api extends REST_Controller
 					$code = $clientWishList[0]['code'];
 					$this->GlobalModel->deleteForever($code, 'clientwishlist');
 					return $this->response(array("status" => "200", "message" => "Product removed from your wishlist successfully."), 200);
-				} else {
+				}
+				else {
 					$data = [
 						'productCode' => $productCode,
 						'clientCode' => $clientCode,
@@ -1117,14 +1160,17 @@ class Api extends REST_Controller
 
 					if ($code != 'false') {
 						return $this->response(array("status" => "200", "message" => "Product added to your wishlist successfully."), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => "Product not added. Please try again later."), 400);
 					}
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user before adding product to your wishlist."), 400);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "300", "message" => "Data not found."), 400);
 		}
 	} // Ends Add to Wish list by productId and userId
@@ -1140,21 +1186,21 @@ class Api extends REST_Controller
 			$cityCode = $postData['cityCode'];
 			$tableName = "clientwishlist";
 			$orderColumns = array("productmaster.*,ifnull(tagmaster.tagTitle,'') as tagTitle,ifnull(tagmaster.tagColor,'') as tagColor,clientwishlist.productCode, productratelineentries.productStatus, productratelineentries.sellingPrice as productSellingPrice,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.code as variantsCode,productratelineentries.isMainVariant");
-			$cond = array('clientwishlist' . ".clientCode" => $clientCode, 'productratelineentries.cityCode' => $cityCode, 'productmaster.mainCategoryCode' => $mainCategoryCode,"productratelineentries.isMainVariant" => 1);
+			$cond = array('clientwishlist' . ".clientCode" => $clientCode, 'productratelineentries.cityCode' => $cityCode, 'productmaster.mainCategoryCode' => $mainCategoryCode, "productratelineentries.isMainVariant" => 1);
 			$orderBy = array('clientwishlist' . ".id" => 'DESC');
 			$groupBy = array();
 			$join = array('productmaster' => 'clientwishlist' . '.productCode=' . 'productmaster' . '.code', 'productratelineentries' => 'productmaster' . '.code=' . 'productratelineentries' . '.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode');
 			$joinType = array('productmaster' => 'inner', 'productratelineentries' => 'inner', 'tagmaster' => 'left');
-			$clientWishList = $this->GlobalModel->selectQuery($orderColumns, $tableName, $cond, $orderBy, $join, $joinType,array(),'','',$groupBy);
+			$clientWishList = $this->GlobalModel->selectQuery($orderColumns, $tableName, $cond, $orderBy, $join, $joinType, array(), '', '', $groupBy);
 			//echo $this->db->last_query();
-			if ($clientWishList) {				
+			if ($clientWishList) {
 				$clientWishList = $clientWishList->result_array();
 				for ($j = 0; $j < sizeof($clientWishList); $j++) {
 					$clientWishList[$j]['isInCart'] = false;
 					$clientWishList[$j]['isInWishlist'] = false;
 					$clientWishList[$j]['cartQuantity'] = 0;
 					$clientWishList[$j]['cartCode'] = "";
-					
+
 					$productCode = $clientWishList[$j]['productCode'];
 					$condition2 = array('productCode' => $productCode);
 					$images_result = $this->ApiModel->selectData('productphotos', '', '', $condition2)->result_array();
@@ -1180,12 +1226,12 @@ class Api extends REST_Controller
 							$clientWishList[$j]['wishlistCode'] = $clientWish->result_array()[0]['code'];
 						}
 					}
-                    $rateArray=[];
-					
+					$rateArray = [];
+
 					//product rates 
 					$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
 					$tbl = 'productratelineentries';
-					$cndt = ['productratelineentries.productCode' => $clientWishList[$j]['code'], 'cityCode' => $cityCode,'productratelineentries.isDelete'=>0,'productratelineentries.isActive'=>1];
+					$cndt = ['productratelineentries.productCode' => $clientWishList[$j]['code'], 'cityCode' => $cityCode, 'productratelineentries.isDelete' => 0, 'productratelineentries.isActive' => 1];
 					$ordby = ['productratelineentries.code' => 'DESC'];
 					$join3 = array('productmaster' => 'productmaster.code=productratelineentries.productCode');
 					$joinType3 = array('productmaster' => 'inner');
@@ -1194,22 +1240,22 @@ class Api extends REST_Controller
 						$rates = [];
 						foreach ($rate_result->result_array() as $rs) {
 							//$product =  $clientWishList[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . number_format($rs['quantity'],3,'.','');
-							$product =  $clientWishList[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
+							$product = $clientWishList[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
 							$isInCart1 = false;
 							$cartQuantity1 = 0;
 							$cartCode1 = "";
-							if ($clientCode != "") {						
-					
+							if ($clientCode != "") {
+
 								$tableName2 = "clientcarts";
 								$orderColumns2 = array("clientcarts.*");
 								//$cond2 = array('clientcarts' . ".productCode" => $clientWishList[$j]['code'], 'clientcarts' . ".clientCode" => $clientCode);
-								
+
 								$cond2 = array('clientcarts' . ".productCode" => $clientWishList[$j]['code'], 'clientcarts' . ".clientCode" => $clientCode, 'clientcarts' . ".product" => $product);
 								$orderBy2 = array('clientcarts' . ".id" => 'DESC');
 								$join2 = array();
 								$joinType2 = array();
 								$clientcarts = $this->GlobalModel->selectQuery($orderColumns2, $tableName2, $cond2, $orderBy2, $join2, $joinType2);
-                                //echo $this->db->last_query();
+								//echo $this->db->last_query();
 								if ($clientcarts) {
 									$isInCart1 = true;
 									$cartQuantity1 = $clientcarts->result_array()[0]['quantity'];
@@ -1261,10 +1307,12 @@ class Api extends REST_Controller
 				$data['wishlist'] = $clientWishList;
 
 				return $this->response(array("status" => "200", "totalresult" => sizeof($clientWishList), "result" => $data), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "No Data found!"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	} // End WishList by ClientCode
@@ -1285,11 +1333,13 @@ class Api extends REST_Controller
 			if ($resultData) {
 				$result['userProfile'] = $resultData->result_array()[0];
 				return $this->response(array("status" => "200", "result" => $result), 200);
-			} else {
+			}
+			else {
 
 				return $this->response(array("status" => "300", "msg" => "No Data Found!"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "msg" => " * are required field(s)."), 400);
 		}
 	}
@@ -1304,7 +1354,8 @@ class Api extends REST_Controller
 			if (isset($postData["emailId"]) && $postData["emailId"] != "") {
 				if (filter_var($postData["emailId"], FILTER_VALIDATE_EMAIL)) {
 					$emailID = $postData["emailId"];
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Invalid Email ID"), 200);
 				}
 			}
@@ -1322,22 +1373,25 @@ class Api extends REST_Controller
 				$resultMaster = $this->GlobalModel->doEdit($dataMaster, 'clientmaster', $postData["clientCode"]);
 				if ($resultMaster != false) {
 					return $this->response(array("status" => "200", "message" => "Your profile has been updated successfully."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => " Failed to update your profile."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user."), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
-	}  // End update profile
+	} // End update profile
 
 	//updateuseraddress
 	public function updateProfileAddress_post()
 	{
 		$postData = $this->post();
-		if (isset($postData["clientCode"]) && $postData["clientCode"] != '' && isset($postData["city"]) && $postData["city"] != '' && isset($postData["state"]) && $postData["state"] != '' && isset($postData["area"]) && $postData["area"] != '' && isset($postData["local"]) && $postData["local"] != '' && isset($postData["flat"]) && $postData["flat"] != '' && isset($postData["pincode"]) && $postData["pincode"] != ''  && isset($postData["areaCode"]) && $postData["areaCode"] != '') {
+		if (isset($postData["clientCode"]) && $postData["clientCode"] != '' && isset($postData["city"]) && $postData["city"] != '' && isset($postData["state"]) && $postData["state"] != '' && isset($postData["area"]) && $postData["area"] != '' && isset($postData["local"]) && $postData["local"] != '' && isset($postData["flat"]) && $postData["flat"] != '' && isset($postData["pincode"]) && $postData["pincode"] != '' && isset($postData["areaCode"]) && $postData["areaCode"] != '') {
 			$dataProfile = [
 				"city" => $postData["city"],
 				"local" => $postData["local"],
@@ -1355,13 +1409,16 @@ class Api extends REST_Controller
 				$resultProfile = $this->GlobalModel->doEditWithField($dataProfile, 'clientprofile', 'clientCode', $postData["clientCode"]);
 				if ($resultProfile != false) {
 					return $this->response(array("status" => "200", "message" => "Your profile has been updated successfully."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => " Failed to update your profile."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user."), 400);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	} //end update user address
@@ -1371,7 +1428,7 @@ class Api extends REST_Controller
 	public function addToCart_post()
 	{
 		$postData = $this->post();
-		if (isset($postData["productCode"]) && $postData["productCode"] != '' &&  isset($postData["clientCode"]) && $postData["clientCode"] != '' && isset($postData["quantity"]) && $postData["quantity"] != '' && isset($postData["productName"]) && $postData['productName'] != "" && isset($postData["unit"]) && $postData['unit'] != "" && isset($postData["sellingQuantity"]) && $postData['sellingQuantity'] != "" && isset($postData["price"]) && $postData['price'] != "" && isset($postData["unitId"]) && $postData['unitId'] != "") {
+		if (isset($postData["productCode"]) && $postData["productCode"] != '' && isset($postData["clientCode"]) && $postData["clientCode"] != '' && isset($postData["quantity"]) && $postData["quantity"] != '' && isset($postData["productName"]) && $postData['productName'] != "" && isset($postData["unit"]) && $postData['unit'] != "" && isset($postData["sellingQuantity"]) && $postData['sellingQuantity'] != "" && isset($postData["price"]) && $postData['price'] != "" && isset($postData["unitId"]) && $postData['unitId'] != "") {
 			$productCode = $postData["productCode"];
 			$clientCode = $postData["clientCode"];
 			$quantity = $postData["quantity"];
@@ -1391,7 +1448,8 @@ class Api extends REST_Controller
 				//$clientCart = $this->GlobalModel->selectQuery("clientcarts.*", "clientcarts", $condition2,array(), array(), array(), array(), "", "", array(), "")->result_array();
 				if ($clientCart != FALSE && sizeof($clientCart) > 0) {
 					return $this->response(array("status" => "300", "message" => "Product already present in your cart."), 200);
-				} else {
+				}
+				else {
 					$data = [
 						'clientCode' => $clientCode,
 						'productCode' => $productCode,
@@ -1407,73 +1465,78 @@ class Api extends REST_Controller
 					$code = $this->GlobalModel->addNew($data, 'clientcarts', 'CART');
 					if ($code != 'false') {
 						return $this->response(array("status" => "200", "message" => "Product added to your cart successfully.", "cartCode" => $code), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => "Failed to add product to your cart . Please try again later."), 200);
 					}
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user before adding product to your cart."), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "* are required Fields"), 400);
 		}
-	}  //Ends Add to cart by productId and clientId
+	} //Ends Add to cart by productId and clientId
 
 	public function getGroceryProductCartCount_post()
 	{
 		$postData = $this->post();
-		
+
 		if (isset($postData["clientCode"]) && $postData["clientCode"] != '') {
 			/*$cartData = $this->GlobalModel->selectQuery("GROUP_CONCAT(CONCAT('''', productCode, '''' )) as cartproducts,ifnull(count(id),0) as productCount","clientcarts",array("clientcarts.clientCode"=>$postData['clientCode']));
-			if($cartData!=false && $cartData->num_rows()>0){
-				$cartproducts = $cartData->result_array()[0]['cartproducts'];
-				$productCount = $cartData->result_array()[0]['productCount'];
-				if($cartproducts!=''){
-					$checkProduct = $this->db->query("select code from productmaster where productmaster.code in (".$cartproducts.")");
-					if($checkProduct){
-						$count = count($checkProduct->result_array());
-						
-					}
-				}
-				$data['groceryCartCount'] = $count;
-				return $this->response(array("status" => "200", "message"=>"Grocery Product Cart Count", "result" => $data), 200); 
-			}else{
-				return $this->response(array("status" => "300", "message" => "No data found"), 200);
-			}*/
-			
-			$cityCode="";
-			
+			 if($cartData!=false && $cartData->num_rows()>0){
+			 $cartproducts = $cartData->result_array()[0]['cartproducts'];
+			 $productCount = $cartData->result_array()[0]['productCount'];
+			 if($cartproducts!=''){
+			 $checkProduct = $this->db->query("select code from productmaster where productmaster.code in (".$cartproducts.")");
+			 if($checkProduct){
+			 $count = count($checkProduct->result_array());
+			 
+			 }
+			 }
+			 $data['groceryCartCount'] = $count;
+			 return $this->response(array("status" => "200", "message"=>"Grocery Product Cart Count", "result" => $data), 200); 
+			 }else{
+			 return $this->response(array("status" => "300", "message" => "No data found"), 200);
+			 }*/
+
+			$cityCode = "";
+
 			$cityData = $this->GlobalModel->selectQuery("clientmaster.*", "clientmaster", array("clientmaster.code" => $postData['clientCode']));
-			if($cityData !=false && $cityData->num_rows()>0){
-				   foreach($cityData->result_array() as $items){
-					   $cityCode=$items["cityCode"];
-				   }
+			if ($cityData != false && $cityData->num_rows() > 0) {
+				foreach ($cityData->result_array() as $items) {
+					$cityCode = $items["cityCode"];
+				}
 			}
 			//echo $this->db->last_query();
 			$count = 0;
-		    $cartAmount = 0;  
+			$cartAmount = 0;
 			$cartData = $this->GlobalModel->selectQuery("clientcarts.*", "clientcarts", array("clientcarts.clientCode" => $postData['clientCode']));
 			if ($cartData != false && $cartData->num_rows() > 0) {
 				foreach ($cartData->result_array() as $item) {
-                    
+
 					$checkProduct = $this->db->query("select productmaster.code,productratelineentries.* from productmaster INNER JOIN `productratelineentries` ON `productmaster`.`code`=`productratelineentries`.`productCode` where productmaster.code = '" . $item['productCode'] . "' 
                                     AND cityCode = '" . $cityCode . "' AND `productratelineentries`.`quantity`=" . $item['rateQuantity']);
 					//echo $this->db->last_query();
 					if ($checkProduct != false && $checkProduct->num_rows() > 0) {
-						
+
 						$cartAmount = $cartAmount + ($item['price'] * $item['quantity']);
-					   $count++;
+						$count++;
 					}
 				}
 				$data['cartAmount'] = number_format($cartAmount, 2, '.', '');
 				$data['groceryCartCount'] = $count;
 				return $this->response(array("status" => "200", "message" => "Grocery Product Cart Count", "result" => $data), 200);
-			} else {
+			}
+			else {
 				$data['cartAmount'] = number_format($cartAmount, 2, '.', '');
 				$data['groceryCartCount'] = 0;
 				return $this->response(array("status" => "200", "message" => "No data found", "result" => $data), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "* are required fields"), 200);
 		}
 	}
@@ -1484,46 +1547,57 @@ class Api extends REST_Controller
 		$postData = $this->post();
 		if (isset($postData["clientCode"]) && $postData["clientCode"] != '') {
 			$clientCode = $postData["clientCode"];
-			$cityCode = '';
+			$clientData = $this->GlobalModel->selectQuery("clientmaster.cityCode", "clientmaster", array("clientmaster.isActive" => "1", "clientmaster.code" => $clientCode));
+			if ($clientData != false && $clientData->num_rows() > 0) {
+				$cityCode = $clientData->result_array()[0]['cityCode'];
+			}
+			$clientLatitude = '';
+			$clientLongitude = '';
 			$cartAmount = 0;
-			$productTax = 0;
-			$amountWithTax = 0;
+			$totalTax = 0;
+			$cartAmountWithTax = 0;
 			$rateArray = [];
 			$addressLatitudeData = $this->GlobalModel->selectQuery("clientprofile.latitude,clientprofile.longitude,clientprofile.cityCode", "clientprofile", array("clientprofile.isActive" => "1", "clientprofile.isSelected" => "1", "clientprofile.clientCode" => $clientCode));
 			if ($addressLatitudeData != false) {
 				$data = $addressLatitudeData->result_array()[0];
-				$cityCode = $data['cityCode'];
-                $clientLatitude = $data['latitude'];
-			    $clientLongitude = $data['longitude'];
-				if($clientLatitude=="" || $clientLongitude ==""){
-					$this->response(array("status" => "300", "message" => "something went wrong please check your location."), 200);
-				}
- 				
-			}			
-			if($cityCode==""){
-				$clientData = $this->GlobalModel->selectQuery("clientmaster.cityCode", "clientmaster", array("clientmaster.isActive" => "1","clientmaster.code" => $clientCode));
-				$getdata = $clientData->result_array()[0];
-				$cityCode = $getdata['cityCode'];
+				$clientLatitude = $data['latitude'];
+				$clientLongitude = $data['longitude'];
+				// if ($clientLatitude == "" || $clientLongitude == "") {
+				// 	$this->response(array("status" => "300", "message" => "something went wrong please check your location."), 200);
+				// }
+
 			}
-            
+
+			if ($clientLatitude == "" || $clientLongitude == "") {
+				// use city's lat long as default
+				if ($cityCode != '') {
+					$cityLoc = $this->GlobalModel->selectQuery("citymaster.latitude,citymaster.longitude", "citymaster", array("citymaster.code" => $cityCode, "citymaster.isActive" => 1));
+					if ($cityLoc != false && $cityLoc->num_rows() > 0) {
+						$cdata = $cityLoc->result_array()[0];
+						$clientLatitude = $cdata['latitude'];
+						$clientLongitude = $cdata['longitude'];
+					}
+				}
+			}
+
 			$deliverySlotsList = $this->db->query("select code,slotTitle,startTime,endTime,ifnull(deliveryCharge,0) as deliveryCharge from deliveryChargesSlots where isActive=1 and (code='DSLT_1' OR ((startTime > '" . date('H:i:s') . "') or ('" . date('H:i:s') . "' between startTime and endTime))) order by startTime");
 			$tableName = "clientcarts";
 			$orderColumns = array("productmaster.id,productmaster.hsnCode,productmaster.taxPercent,productmaster.code,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,productmaster.productRegularPrice,productratelineentries.sellingUnit,productratelineentries.productStatus,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.cityCode,productmaster.isActive,clientcarts.quantity,clientcarts.product,clientcarts.code as cartCode,productratelineentries.code as variantsCode");
-			$cond = array("clientcarts.clientCode" => $clientCode, "productratelineentries.cityCode" => $cityCode, "productmaster.isActive" => 1,"productratelineentries.isActive"=>1,"productratelineentries.isDelete"=>0); 
+			$cond = array("clientcarts.clientCode" => $clientCode, "productratelineentries.cityCode" => $cityCode, "productmaster.isActive" => 1, "productratelineentries.isActive" => 1, "productratelineentries.isDelete" => 0);
 			$orderBy = array('clientcarts' . ".id" => 'DESC');
 			$join = array('productmaster' => 'clientcarts.productCode=productmaster.code', "productratelineentries" => 'productmaster.code=productratelineentries.productCode AND clientcarts.rateQuantity=productratelineentries.quantity');
-			$joinType = array('productmaster' => 'inner', 'productratelineentries' => 'inner');
+			$joinType = array('productmaster' => 'inner', 'productratelineentries' => 'left');
 			$res = $this->GlobalModel->selectQuery($orderColumns, $tableName, $cond, $orderBy, $join, $joinType);
-		    //echo $this->db->last_query();
-		    $totalRec=0;
+			//echo $this->db->last_query();
+			$totalRec = 0;
 			if ($res) {
 				$clientCartList = $res->result_array();
 				for ($j = 0; $j < sizeof($clientCartList); $j++) {
 					$productCode = $clientCartList[$j]['code'];
 					$cartproduct = $clientCartList[$j]['product'];
 					$cartQty = $clientCartList[$j]['quantity'];
-                    $totalRec=$totalRec+1;
-					
+					$totalRec = $totalRec + 1;
+
 					$cartProductArray = explode("##", $cartproduct);
 
 					$condition2 = array('productCode' => $productCode);
@@ -1534,33 +1608,33 @@ class Api extends REST_Controller
 					$clientCartList[$j]['variantsCode'] = $cartProductArray[2];
 					$clientCartList[$j]['quantity'] = $cartProductArray[3];
 					$clientCartList[$j]['totalPrice'] = number_format($clientCartList[$j]['sellingPrice'] * $cartQty, 2);
-					
 
-				// 	$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
-				// 	$tbl = 'productratelineentries';
-				// 	$cndt = ['productratelineentries.productCode' => $productCode, "productratelineentries.code" => $cartProductArray[2]];
-				// 	$ordby = ['productratelineentries.code' => 'DESC'];
-				// 	$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby, [], [], [], 1);
 
-				// 	if ($rate_result) {
-				// 		$rates = [];
-				// 		foreach ($rate_result->result_array() as $rs) {
-				// 			$clientCartList[$j]["regularPrice"] = $rs['regularPrice'];
-				// 			$clientCartList[$j]["sellingPrice"] = $rs['sellingPrice'];
-				// 		}
-				// 	}
+					// 	$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
+					// 	$tbl = 'productratelineentries';
+					// 	$cndt = ['productratelineentries.productCode' => $productCode, "productratelineentries.code" => $cartProductArray[2]];
+					// 	$ordby = ['productratelineentries.code' => 'DESC'];
+					// 	$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby, [], [], [], 1);
+
+					// 	if ($rate_result) {
+					// 		$rates = [];
+					// 		foreach ($rate_result->result_array() as $rs) {
+					// 			$clientCartList[$j]["regularPrice"] = $rs['regularPrice'];
+					// 			$clientCartList[$j]["sellingPrice"] = $rs['sellingPrice'];
+					// 		}
+					// 	}
 
 					if ($clientCode != "") {
-				      $tableName2 = "clientcarts";
-				// 		$orderColumns2 = array("clientcarts.*");
-				// 		$cond2 = array('clientcarts' . ".productCode" => $productCode, 'clientcarts' . ".clientCode" => $clientCode);
-				// 		$orderBy2 = array('clientcarts' . ".id" => 'DESC');
-				// 		$clientcarts = $this->GlobalModel->selectQuery($orderColumns2, $tableName2, $cond2, $orderBy2);
-				// 		if ($clientcarts) {
-				// 			$clientCartList[$j]['isInCart'] = true;
-				// 		//	$clientCartList[$j]['cartQuantity'] = $clientcarts->result_array()[0]['quantity'];
-				// 		//	$clientCartList[$j]['cartCode'] = $clientcarts->result_array()[0]['code'];
-				// 		}
+						$tableName2 = "clientcarts";
+						// 		$orderColumns2 = array("clientcarts.*");
+						// 		$cond2 = array('clientcarts' . ".productCode" => $productCode, 'clientcarts' . ".clientCode" => $clientCode);
+						// 		$orderBy2 = array('clientcarts' . ".id" => 'DESC');
+						// 		$clientcarts = $this->GlobalModel->selectQuery($orderColumns2, $tableName2, $cond2, $orderBy2);
+						// 		if ($clientcarts) {
+						// 			$clientCartList[$j]['isInCart'] = true;
+						// 		//	$clientCartList[$j]['cartQuantity'] = $clientcarts->result_array()[0]['quantity'];
+						// 		//	$clientCartList[$j]['cartCode'] = $clientcarts->result_array()[0]['code'];
+						// 		}
 
 						$tableName1 = "clientwishlist";
 						$orderColumns1 = array("clientwishlist.*");
@@ -1581,71 +1655,43 @@ class Api extends REST_Controller
 						array_push($imageArray, base_url() . 'uploads/product/' . $productCode . '/' . $images_result[$img]['productPhoto']);
 					}
 					$clientCartList[$j]['images'] = $imageArray;
-					$productTax = ($clientCartList[$j]['sellingPrice'] * ($clientCartList[$j]['taxPercent'] / 100));
-					$amountWithTax = $productTax + $clientCartList[$j]['sellingPrice'];
 
-					$cartAmount = $cartAmount + ($amountWithTax * $cartQty);
-					unset($imageArray);
-
-					//product rates 
-				/*	$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
-					$tbl = 'productratelineentries';
-					$cndt = ['productratelineentries.productCode' => $productCode, "productratelineentries.code" => $cartProductArray[3]];
-					$ordby = ['productratelineentries.code' => 'DESC'];
-					$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby);
-					//$query[] = $this->db->last_query();
-					if ($rate_result) {
-						$rates = [];
-						foreach ($rate_result->result_array() as $rs) {
-							$product =  $clientCartList[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
-							//in cart list 
-							$isInCart1 = false;
-							$cartQuantity1 = 0;
-							$cartCode1 = "";
-							if ($clientCode != "") {
-								$tableName2 = "clientcarts";
-								$orderColumns2 = array("clientcarts.*");
-								$cond2 = array('clientcarts' . ".productCode" => $clientCartList[$j]['code'], 'clientcarts' . ".clientCode" => $clientCode, 'clientcarts' . ".product" => $product);
-								$orderBy2 = array('clientcarts' . ".id" => 'DESC');
-								$join2 = array();
-								$joinType2 = array();
-								$clientcarts = $this->GlobalModel->selectQuery($orderColumns2, $tableName2, $cond2, $orderBy2, $join2, $joinType2);
-
-								if ($clientcarts) {
-									$isInCart1 = true;
-									$cartQuantity1 = $clientcarts->result_array()[0]['quantity'];
-									$cartCode1 = $clientcarts->result_array()[0]['code'];
-								}
-							}
-
-							$taxCalulate = round($rs['sellingPrice'] * ($clientCartList[$j]['taxPercent'] / 100), 2);
-							$sellingPrice_tax = number_format($rs['sellingPrice'] + $taxCalulate, 2, '.', '');
-							$taxCalulateRegular = round($rs['regularPrice'] * ($clientCartList[$j]['taxPercent'] / 100), 2);
-							$regularPrice_tax = number_format($rs['regularPrice'] + $taxCalulateRegular, 2, '.', '');
-							$discount = '';
-							if ($rs['regularPrice'] != null) {
-								$discount = round((($regularPrice_tax - $sellingPrice_tax) / $regularPrice_tax) * 100, 2) . ' %';
-							}
-							$rates[] = [
-								'variantsCode' => $rs['code'],
-								'cityCode' => $rs['cityCode'],
-								'sellingUnit' => $rs['sellingUnit'],
-								'quantity' => number_format($rs['quantity'], 0, '.', ''),
-								'productStatus' => $rs['productStatus'],
-								'sellingPrice' => $sellingPrice_tax,
-								//'sellingActualPrice'=>$rs['sellingPrice'],
-								'regularPrice' => $regularPrice_tax,
-								//'regularActualPrice'=>$rs['regularPrice'],
-								'productDiscount' => $discount,
-								'isMainVariant' => $rs['isMainVariant'],
-								'isInCart' => $isInCart1,
-								'cartQuantity' => $cartQuantity1,
-								'cartCode' => $cartCode1
-							];
+					if ($clientCartList[$j]['sellingPrice'] == null || $clientCartList[$j]['sellingPrice'] == '') {
+						// fetch main variant
+						$mainCond = array('productmaster.code' => $productCode, 'productratelineentries.cityCode' => $cityCode, 'productratelineentries.isMainVariant' => 1, 'productratelineentries.isActive' => 1, 'productratelineentries.isDelete' => 0, 'productmaster.isActive' => 1);
+						$mainJoin = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode');
+						$mainJoinType = array('productratelineentries' => 'inner');
+						$mainColumns = array("productratelineentries.sellingUnit,productratelineentries.productStatus,ifnull(productratelineentries.regularPrice,0) as regularPrice,productratelineentries.sellingPrice,productratelineentries.quantity,productratelineentries.code as variantsCode");
+						$mainResult = $this->GlobalModel->selectQuery($mainColumns, 'productmaster', $mainCond, array(), $mainJoin, $mainJoinType);
+						if ($mainResult && $mainResult->num_rows() > 0) {
+							$mainData = $mainResult->result_array()[0];
+							$clientCartList[$j]['sellingUnit'] = $mainData['sellingUnit'];
+							$clientCartList[$j]['productStatus'] = $mainData['productStatus'];
+							$clientCartList[$j]['regularPrice'] = $mainData['regularPrice'];
+							$clientCartList[$j]['sellingPrice'] = $mainData['sellingPrice'];
+							$clientCartList[$j]['quantity'] = $mainData['quantity'];
+							$clientCartList[$j]['variantsCode'] = $mainData['variantsCode'];
 						}
-						$rateArray = $rates;
-					}*/
-				//	$clientCartList[$j]['rate_variants'] = [];
+					}
+
+					// Senior Implementation: Separate Base Price and Tax logic
+					$unitPrice = $clientCartList[$j]['sellingPrice'];
+					$taxPercent = $clientCartList[$j]['taxPercent'];
+
+					// Calculate tax for this item
+					$taxAmountPerUnit = round(($unitPrice * $taxPercent) / 100, 2);
+					$unitPriceWithTax = $unitPrice + $taxAmountPerUnit;
+
+					// Update individual item prices in the list to be tax-inclusive (matching listing pages)
+					$clientCartList[$j]['sellingPrice'] = number_format($unitPriceWithTax, 2, '.', '');
+					$clientCartList[$j]['totalPrice'] = number_format($unitPriceWithTax * $cartQty, 2, '.', '');
+
+					// Accumulate totals
+					$totalTax += ($taxAmountPerUnit * $cartQty);
+					$cartAmount += ($unitPrice * $cartQty); // Net amount (Base)
+					$cartAmountWithTax += ($unitPriceWithTax * $cartQty); // Gross amount
+
+					unset($imageArray);
 				}
 				$data['products'] = $clientCartList;
 				$deliveryListArray = [];
@@ -1660,14 +1706,16 @@ class Api extends REST_Controller
 					if ($cityCode != '') {
 
 						//	$getVegiStoreLocation = $this->GlobalModel->selectQuery("vegitablestorelocation.latitude,vegitablestorelocation.longitude", "vegitablestorelocation", array("vegitablestorelocation.cityCode" => $cityCode));
-						$getVegiStoreLocation = $this->GlobalModel->selectQuery("citymaster.latitude,citymaster.longitude", "citymaster", array("citymaster.code" => $cityCode));
+						$getVegiStoreLocation = $this->GlobalModel->selectQuery("citymaster.latitude,citymaster.longitude,citymaster.code", "citymaster", array("citymaster.code" => $cityCode, "citymaster.isActive" => 1));
+						$storeLat = "";
+						$storeLong = "";
 
-						if ($getVegiStoreLocation != false) {
+						if ($getVegiStoreLocation != false && $getVegiStoreLocation->num_rows() > 0) {
 							$resultData = $getVegiStoreLocation->result_array()[0];
-							$storeLatitude = $resultData['latitude'];
-							$storeLongitude = $resultData['longitude'];
-							if ($storeLatitude != "" && $storeLongitude != "") {
-								$result = $this->calculateDistanceDeliveryCharges($storeLatitude, $storeLongitude, $clientCode, $cartAmount);
+							if ($resultData['latitude'] != "" && $resultData['longitude'] != "") {
+								$storeLat = $resultData['latitude'];
+								$storeLong = $resultData['longitude'];
+								$result = $this->calculateDistanceDeliveryCharges($storeLat, $storeLong, $clientCode, $cartAmountWithTax, $clientLatitude, $clientLongitude, $cityCode);
 								//	print_r($result);
 								$deliveryCharge = $result['charges'];
 								$shortestDistance = $result['shortestdistance'];
@@ -1692,7 +1740,8 @@ class Api extends REST_Controller
 								$deliveryList['isSelected'] = 1;
 								if ($postData['deliverySlotCode'] == 'DSLT_1') {
 									$deliveryList['deliveryCharge'] = $deliveryCharge;
-								} else {
+								}
+								else {
 									$deliveryCharge = $dls['deliveryCharge'];
 								}
 							}
@@ -1701,19 +1750,25 @@ class Api extends REST_Controller
 					}
 				}
 				if (isset($postData['couponCode']) && $postData['couponCode'] != "") {
-					$amountDetails = $this->getCouponDetails($postData['couponCode'], $postData['clientCode'], $cartAmount);
-				} else {
-					$amountDetails = $this->getCouponDetails('', $postData['clientCode'], $cartAmount);
+					$amountDetails = $this->getCouponDetails($postData['couponCode'], $postData['clientCode'], $cartAmountWithTax);
+				}
+				else {
+					$amountDetails = $this->getCouponDetails('', $postData['clientCode'], $cartAmountWithTax);
 				}
 
 				$discount = $amountDetails['discountApplied'];
 				$subTotal = $cartAmount - $discount;
-				$gstPer = $gstAmount = 0;
+
+				// Final GST Logic: Use aggregated product-level tax, fallback to global only if none found
+				$gstAmount = round($totalTax, 2);
+				$gstPer = 0;
+
 				$getTaxDetails = $this->GlobalModel->selectQuery("settings.settingValue", "settings", array("settings.code" => 'SET_11'));
 				if ($getTaxDetails != false) {
 					$taxData = $getTaxDetails->result_array()[0];
 					$gstPer = $taxData['settingValue'];
-					if ($gstPer != "") {
+					// If no specific product taxes were found, apply the global percentage as a fallback
+					if ($gstAmount == 0 && $gstPer != "") {
 						$gstAmount = round(($subTotal * $gstPer) / 100, 2);
 					}
 				}
@@ -1726,15 +1781,17 @@ class Api extends REST_Controller
 				$data['slotList'] = $deliveryListArray;
 				//$deliveryCharge=0;
 				//$packagingCharges=0; 
-                $note = "<ol><li><b>&nbsp; Once you place an order, it cannot be cancelled.</b><br></li><li><b>&nbsp; If you receive spoiled vegetables after placing an order, they will be replaced.</b><br></li><li><b>&nbsp; If any product is missing from your order, the payment for that item will be refunded.</b><br></li></ol>";		
+				$note = "<ol><li><b>&nbsp; Once you place an order, it cannot be cancelled.</b><br></li><li><b>&nbsp; If you receive spoiled vegetables after placing an order, they will be replaced.</b><br></li><li><b>&nbsp; If any product is missing from your order, the payment for that item will be refunded.</b><br></li></ol>";
 				$finalOrderAmount = $subTotal + $gstAmount + $deliveryCharge + $packagingCharges;
 				//$finalOrderAmount=1;
-				
-				return $this->response(array("status" => "200", "totalRecords" => $totalRec, "itemTotal" => number_format($cartAmount, 2, '.', ''), "discount" => number_format($discount, 2, '.', ''), "subTotal" => number_format($subTotal, 2, '.', ''), "minimumOrder" => $minOrder, "shortestDistance" => $shortestDistance, "deliveryCharge" => number_format($deliveryCharge, 2, '.', ''), "gstPer" => number_format($gstPer, 2, '.', ''), "gstAmount" => number_format($gstAmount, 2, '.', ''), "packagingCharges" => $packagingCharges, "finalOrderAmount" => number_format($finalOrderAmount, 2, '.', ''), "result" => $data, "couponDetails" => $amountDetails,"note"=>$note), 200);
-			} else {
+
+				return $this->response(array("status" => "200", "totalRecords" => $totalRec, "itemTotal" => number_format($cartAmount, 2, '.', ''), "discount" => number_format($discount, 2, '.', ''), "subTotal" => number_format($subTotal, 2, '.', ''), "minimumOrder" => $minOrder, "shortestDistance" => $shortestDistance, "deliveryCharge" => number_format($deliveryCharge, 2, '.', ''), "gstPer" => number_format($gstPer, 2, '.', ''), "gstAmount" => number_format($gstAmount, 2, '.', ''), "packagingCharges" => $packagingCharges, "finalOrderAmount" => number_format($finalOrderAmount, 2, '.', ''), "result" => $data, "couponDetails" => $amountDetails, "note" => $note), 200);
+			}
+			else {
 				return $this->response(array("status" => "300", "totalRecords" => 0, "message" => "no records found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -1750,7 +1807,8 @@ class Api extends REST_Controller
 				$result = $this->GlobalModel->deleteForever($postData["cartCode"], 'clientcarts');
 				if ($result != 'false') {
 					return $this->response(array("status" => "deletetrue", "message" => "delete successfully"), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "deletefalse", "message" => "delete failed"), 200);
 				}
 			}
@@ -1760,10 +1818,12 @@ class Api extends REST_Controller
 			$result = $this->GlobalModel->doEdit($data, 'clientcarts', $postData["cartCode"]);
 			if ($result != 'false') {
 				return $this->response(array("status" => "200", "message" => "cart updated.", "cartCode" => $cartCode), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => " Failed to update."), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "300", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -1775,7 +1835,8 @@ class Api extends REST_Controller
 		$stateresult = $this->GlobalModel->selectDistinctData($columnName, 'addressmaster')->result();
 		if ($stateresult) {
 			return $this->response(array("status" => "200", "result" => $stateresult), 200);
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Data not found."), 400);
 		}
 	} // End statelist
@@ -1791,7 +1852,8 @@ class Api extends REST_Controller
 		if ($stateresult) {
 			$result["areaList"] = $stateresult;
 			return $this->response(array("status" => "200", "result" => $result), 200);
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Data not found."), 400);
 		}
 	}
@@ -1804,7 +1866,8 @@ class Api extends REST_Controller
 		if ($termsResult) {
 			$result['terms'] = $termsResult[0]['terms'];
 			return $this->response(array("status" => "200", "result" => $result), 200);
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Data not found."), 400);
 		}
 	} // End termslist
@@ -1816,7 +1879,8 @@ class Api extends REST_Controller
 		if ($faqResult) {
 			$result['faq'] = $faqResult[0]['description'];
 			return $this->response(array("status" => "200", "result" => $result), 200);
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Data not found."), 400);
 		}
 	} // End  FAQ
@@ -1825,31 +1889,33 @@ class Api extends REST_Controller
 	{
 		$postData = $this->post();
 		if (
-			isset($postData["clientCode"]) && $postData["clientCode"] != '' && isset($postData["paymentMode"]) && $postData["paymentMode"] != '' && isset($postData["areaCode"]) && $postData["areaCode"] != '' && isset($postData['cityCode']) && $postData['cityCode'] != ""
-			&& isset($postData['discount'])  && $postData['discount'] != "" && isset($postData['subTotal'])  && $postData['subTotal'] != "" && isset($postData['deliverySlotCode'])  && $postData['deliverySlotCode'] != "" && isset($postData['shippingCharges'])  && $postData['shippingCharges'] != ""
-			&& isset($postData['gstAmount'])  && $postData['gstAmount'] != "" && isset($postData['gstPer'])  && $postData['gstPer'] != "" && isset($postData['packagingCharges'])  && $postData['packagingCharges'] != ""
-		) 
-		{			
-			if(isset($postData['latitude']) && $postData['latitude'] != "" && isset($postData['longitude']) && $postData['longitude'] != ""){
-			
+		isset($postData["clientCode"]) && $postData["clientCode"] != '' && isset($postData["paymentMode"]) && $postData["paymentMode"] != '' && isset($postData["areaCode"]) && $postData["areaCode"] != '' && isset($postData['cityCode']) && $postData['cityCode'] != ""
+		&& isset($postData['discount']) && $postData['discount'] != "" && isset($postData['subTotal']) && $postData['subTotal'] != "" && isset($postData['deliverySlotCode']) && $postData['deliverySlotCode'] != "" && isset($postData['shippingCharges']) && $postData['shippingCharges'] != ""
+		&& isset($postData['gstAmount']) && $postData['gstAmount'] != "" && isset($postData['gstPer']) && $postData['gstPer'] != "" && isset($postData['packagingCharges']) && $postData['packagingCharges'] != ""
+		) {
+			if (isset($postData['latitude']) && $postData['latitude'] != "" && isset($postData['longitude']) && $postData['longitude'] != "") {
+
 				$clientCode = $postData["clientCode"];
 				$timeStamp = date("Y-m-d h:i:s");
 				$totalamount = 0;
 				if (isset($postData['couponCode'])) {
 					$couponCode = $postData["couponCode"];
-				} else {
+				}
+				else {
 					$couponCode = "";
 				}
 				$isOnlinePayment = false;
 				$paymentStatus = 'PNDG';
 				if ($postData['paymentMode'] == 'COD') {
 					$orderStatus = "PND";
-				} else {
+				}
+				else {
 					$isOnlinePayment = true;
 					$orderStatus = "PND";
 				}
 				$transactionId = "";
-				if (isset($postData['transactionId']) && $postData['transactionId'] != "") $transactionId = $postData['transactionId'];
+				if (isset($postData['transactionId']) && $postData['transactionId'] != "")
+					$transactionId = $postData['transactionId'];
 				$totalamount = ($postData['subTotal'] - $postData['discount']) + $postData['gstAmount'] + $postData['shippingCharges'] + $postData['packagingCharges'];
 				$vendorCode = "myvegiz";
 				$getClientDetails = $this->GlobalModel->selectQuery("clientmaster.name,clientmaster.emailId,clientmaster.mobile,clientmaster.code", "clientmaster", array("clientmaster.code" => $postData['clientCode']));
@@ -1859,7 +1925,7 @@ class Api extends REST_Controller
 					$email = $clientData['emailId'] ?? mailId;
 					$mobile = $clientData['mobile'];
 					$clientCode = $clientData['code'];
-					$orderId="ORDERVG".(int)(microtime(true) * 1000);
+					$orderId = "ORDERVG" . (int)(microtime(true) * 1000);
 					if ($name != "" && $mobile != "" && $clientCode != "") {
 						$tableName = "clientcarts";
 						$orderColumns = array("productmaster.id,productmaster.code,productmaster.taxPercent,productmaster.hsnCode,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,productmaster.productRegularPrice,productratelineentries.sellingPrice as productSellingPrice,productratelineentries.productStatus,productratelineentries.cityCode,productmaster.isActive,clientcarts.quantity,clientcarts.code as cartCode,clientcarts.product,clientcarts.price,clientcarts.sellingUnit,clientcarts.rateQuantity,productratelineentries.isMainVariant");
@@ -1869,16 +1935,16 @@ class Api extends REST_Controller
 						$joinType = array('productmaster' => 'inner', 'productratelineentries' => 'inner');
 						$clientCartList = $this->GlobalModel->selectQuery($orderColumns, $tableName, $cond, $orderBy, $join, $joinType);
 						if ($clientCartList != false) {
-							
-						$flat="";
-						$landmark="";					
-						$addressData = $this->GlobalModel->selectQuery("clientprofile.*", "clientprofile", array("clientprofile.isActive" => "1", "clientprofile.isSelected" => "1", "clientprofile.clientCode" => $clientCode));
-						if ($addressData != false) {
-							$addData = $addressData->result_array()[0];
-							$flat = $addData['flat'];
-							$landmark=$addData['landMark'];						
-						}			
-						$insertArr = array(
+
+							$flat = "";
+							$landmark = "";
+							$addressData = $this->GlobalModel->selectQuery("clientprofile.*", "clientprofile", array("clientprofile.isActive" => "1", "clientprofile.isSelected" => "1", "clientprofile.clientCode" => $clientCode));
+							if ($addressData != false) {
+								$addData = $addressData->result_array()[0];
+								$flat = $addData['flat'];
+								$landmark = $addData['landMark'];
+							}
+							$insertArr = array(
 								"clientCode" => $postData["clientCode"],
 								"cityCode" => $postData['cityCode'],
 								"paymentMode" => $postData["paymentMode"],
@@ -1889,26 +1955,29 @@ class Api extends REST_Controller
 								"gstPer" => $postData['gstPer'],
 								"gst" => $postData['gstAmount'],
 								"shippingCharges" => $postData["shippingCharges"],
-								"address" => $flat.",".$landmark.",".$postData["address"],
+								"address" => $flat . "," . $landmark . "," . $postData["address"],
 								"areaCode" => $postData["areaCode"],
 								"phone" => $postData["phone"],
 								"orderStatus" => $orderStatus,
 								"totalPrice" => $totalamount,
 								"deliverySlotCode" => $postData['deliverySlotCode'],
 								"packagingCharges" => $postData['packagingCharges'],
-								"orderId"=>$orderId,
+								"orderId" => $orderId,
 								//"isActive" => 1,
 								'editDate' => $timeStamp
 							);
-							if ($postData['paymentMode'] == 'COD'){
-								$insertArr["isActive"]=1;
-								$insertArr["isDelete"]=0;
-							}else{
-								$insertArr["isActive"]=0;
-								$insertArr["isDelete"]=1;
-							} 
-							if (isset($postData['latitude']) && $postData['latitude'] != "") $insertArr['latitude'] = $postData['latitude'];
-							if (isset($postData['longitude']) && $postData['longitude'] != "") $insertArr['longitude'] = $postData['longitude'];
+							if ($postData['paymentMode'] == 'COD') {
+								$insertArr["isActive"] = 1;
+								$insertArr["isDelete"] = 0;
+							}
+							else {
+								$insertArr["isActive"] = 0;
+								$insertArr["isDelete"] = 1;
+							}
+							if (isset($postData['latitude']) && $postData['latitude'] != "")
+								$insertArr['latitude'] = $postData['latitude'];
+							if (isset($postData['longitude']) && $postData['longitude'] != "")
+								$insertArr['longitude'] = $postData['longitude'];
 							//$orderCode = 'ORDER' . rand(99, 99999);
 							$orderCode = 'ORDERVG';
 							$insertResult = $this->GlobalModel->addWithoutYear($insertArr, 'ordermaster', $orderCode);
@@ -1921,23 +1990,24 @@ class Api extends REST_Controller
 								if ($isOnlinePayment) {
 									//$orderid = $insertResult;   
 									//$cashfreeResult = $this->cashfreepayment->payment($orderid, $totalamount, "INR", $clientCode, $email, $mobile, $name);
-									$cashfreeResult=$this->cashfree->create_order($orderId,  $totalamount, "INR", $clientCode, $email, $mobile, $name);
+									$cashfreeResult = $this->cashfree->create_order($orderId, $totalamount, "INR", $clientCode, $email, $mobile, $name);
 									log_message("error", " cashfree response => " . trim(stripslashes(json_encode($cashfreeResult))));
 									if (array_key_exists("message", $cashfreeResult)) {
 										return $this->response(array("status" => "300", "message" => "Payment for this order is not generated. Please try again", "submessage" => $cashfreeResult['message']), 200);
-									} else {
+									}
+									else {
 										log_message("error", " cashfree response => " . trim(stripslashes(json_encode($cashfreeResult))));
 										//$orderMasterArray['paymentLink'] = $cashfreeResult['payments']['url'];
 										$orderMasterArray['notify_url'] = $cashfreeResult['order_meta']['notify_url'];
 										$orderMasterArray['return_url'] = $cashfreeResult['order_meta']['return_url'];
 										//$orderMasterArray['secretKey'] = CASHFREE_CLIENT_SECRET; 
-	 
+
 										//$orderMasterArray['paymentOrderId'] = $cashfreeResult['order_id'];
 										$orderMasterArray['paymentOrderId'] = $cashfreeResult['cf_order_id'];
 										$orderMasterArray['paymentOrderToken'] = $cashfreeResult['payment_session_id'];
 										$orderMasterArray['finalAmount'] = $totalamount;
 										//$orderMasterArray['finalAmount'] = 1.00;
-										$ordData['paymentOrderId'] = $cashfreeResult['cf_order_id'];  
+										$ordData['paymentOrderId'] = $cashfreeResult['cf_order_id'];
 										$ordData['paymentOrderToken'] = $cashfreeResult['payment_session_id'];
 									}
 								}
@@ -1946,7 +2016,8 @@ class Api extends REST_Controller
 									if ((isset($postData['vendorOfferCode'])) && $postData['vendorOfferCode'] != "") {
 										if ((isset($postData['decidedExisitingLimit'])) && $postData['decidedExisitingLimit'] > 1) {
 											$this->use_User_Coupon("update", $postData['vendorOfferCode'], $couponCode, $clientCode, $postData['decidedExisitingLimit'], $vendorCode);
-										} else {
+										}
+										else {
 											$this->use_User_Coupon("add", $postData['vendorOfferCode'], $couponCode, $clientCode, $postData['decidedExisitingLimit'], $vendorCode);
 										}
 									}
@@ -1962,7 +2033,7 @@ class Api extends REST_Controller
 									$productUnitID = $split_product[2];
 									$productSellingQty = $split_product[3];
 									$qty = $clientCartList[$i]["quantity"];
-									$originalPrice=$clientCartList[$i]['price'];
+									$originalPrice = $clientCartList[$i]['price'];
 									//$originalPrice = $clientCartList[$i]["productSellingPrice"];
 									$taxPercent = $clientCartList[$i]["taxPercent"];
 									$taxAmount = round($originalPrice * ($taxPercent / 100), 2);
@@ -1995,21 +2066,22 @@ class Api extends REST_Controller
 								}
 								if ($isOnlinePayment) {
 									$msg = "Order (" . $insertResult . ") created successfully. Please continue to make the payment...";
-								} else {
+								}
+								else {
 
 									$curl = curl_init();
 
 									$url = 'https://notify.myvegiz.com/order/place?orderNo=' . $insertResult . '&orderDate=' . date('Y-m-d H:i:s') . '&orderStatus=PND&orderTotal=' . $totalamount . '&orderItems=1&restaurantCode=NA';
 
 									curl_setopt_array($curl, array(
-									CURLOPT_URL => $url,
-									CURLOPT_RETURNTRANSFER => true,
-									CURLOPT_ENCODING => '',
-									CURLOPT_MAXREDIRS => 10,
-									CURLOPT_TIMEOUT => 0,
-									CURLOPT_FOLLOWLOCATION => true,
-									CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-									CURLOPT_CUSTOMREQUEST => 'GET',
+										CURLOPT_URL => $url,
+										CURLOPT_RETURNTRANSFER => true,
+										CURLOPT_ENCODING => '',
+										CURLOPT_MAXREDIRS => 10,
+										CURLOPT_TIMEOUT => 0,
+										CURLOPT_FOLLOWLOCATION => true,
+										CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+										CURLOPT_CUSTOMREQUEST => 'GET',
 									));
 
 									$response = curl_exec($curl);
@@ -2017,7 +2089,7 @@ class Api extends REST_Controller
 									curl_close($curl);
 
 									$this->assignorder->allocate_delivery_boy_to_order($insertResult);
-									
+
 									$users = $this->db->query("SELECT websiteFirebaseToken FROM usermaster WHERE isActive=1 AND websiteFirebaseToken!=''");
 									if ($users->num_rows() > 0) {
 										$firebaseIds = [];
@@ -2045,27 +2117,33 @@ class Api extends REST_Controller
 											$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
 										}
 									}
-									
+
 									$msg = "Order (" . $insertResult . ") Placed Successfully";
 								}
 
 								return $this->response(array("status" => "200", "message" => $msg, "result" => $orderMasterArray), 200);
-							} else {
+							}
+							else {
 								$this->response(array("status" => "400", "message" => " Opps...! Something went wrong please try again."), 200);
 							}
-						} else {
+						}
+						else {
 							$this->response(array("status" => "400", "message" => 'cart is empty'), 200);
 						}
-					} else {
+					}
+					else {
 						$this->response(array("status" => "300", "message" => "Please complete your profile first"), 200);
 					}
-				} else {
+				}
+				else {
 					$this->response(array("status" => "300", "message" => "Invalid Client Code"), 200);
 				}
-			}else{
+			}
+			else {
 				$this->response(array("status" => "300", "message" => "something went wrong please check your location."), 200);
-		   }
-		} else {
+			}
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -2085,10 +2163,12 @@ class Api extends REST_Controller
 			$insert = $this->GlobalModel->addWithoutYear($data, 'couponusesdetail', 'CUDS');
 			if ($insert != 'false') {
 				return true;
-			} else {
+			}
+			else {
 				return false;
 			}
-		} else {
+		}
+		else {
 			$data['decidedExisitingLimit'] = $decidedExisitingLimit;
 			$data['editID'] = $clientCode;
 			$data['editIP'] = $_SERVER['REMOTE_ADDR'];
@@ -2103,7 +2183,8 @@ class Api extends REST_Controller
 			$this->db->update('couponusesdetail', $data);
 			if ($this->db->affected_rows() > 0) {
 				return true;
-			} else {
+			}
+			else {
 				return false;
 			}
 		}
@@ -2115,10 +2196,10 @@ class Api extends REST_Controller
 		$postData = $this->post();
 		if ($postData["clientCode"] != '') {
 
-			$clientCode = $postData["clientCode"];   
+			$clientCode = $postData["clientCode"];
 			$tableName = "ordermaster";
 			$orderColumns = array("ordermaster.code as orderCode,vegitablestorelocation.latitude as sourceLat,vegitablestorelocation.longitude as sourceLong,ordermaster.deliveryBoyCode as deliveryBoyCode,usermaster.name as dBoyName,usermaster.latitude as dBoyLat,usermaster.longitude as dBoyLong,ordermaster.shippingCharges as deliveryCharges,ordermaster.latitude as destLat,ordermaster.longitude as destLong,ordermaster.paymentmode,ordermaster.address,ordermaster.phone,ordermaster.totalPrice as orderTotalPrice,ordermaster.addDate as orderDate, orderstatusmaster.statusName as orderStatus, paymentstatusmaster.statusName as paymentStatus,ordermaster.cityCode,ordermaster.couponCode,ordermaster.discount,ordermaster.subTotal,ordermaster.gst,ifnull(ordermaster.gstPer,0) as gstPer,ifnull(ordermaster.packagingCharges,0) as packagingCharges");
-			$cond = array('ordermaster' . ".clientCode" => $clientCode, 'ordermaster.isActive' => 1,'ordermaster.isDelete' => 0);
+			$cond = array('ordermaster' . ".clientCode" => $clientCode, 'ordermaster.isActive' => 1, 'ordermaster.isDelete' => 0);
 			$orderBy = array('ordermaster' . ".id" => 'DESC');
 			$join = array('vegitablestorelocation' => 'ordermaster' . '.cityCode=' . 'vegitablestorelocation' . '.cityCode', 'usermaster' => 'ordermaster' . '.deliveryBoyCode=' . 'usermaster' . '.code', 'orderstatusmaster' => 'ordermaster' . '.orderStatus=' . 'orderstatusmaster' . '.statusSName', 'paymentstatusmaster' => 'ordermaster' . '.paymentStatus=' . 'paymentstatusmaster' . '.statusSName');
 			$joinType = array('vegitablestorelocation' => 'left', 'usermaster' => 'left', 'orderstatusmaster' => 'inner', 'paymentstatusmaster' => 'inner');
@@ -2158,7 +2239,7 @@ class Api extends REST_Controller
 								$rates = [];
 								foreach ($rate_result->result_array() as $rs) {
 
-									$product =  $orderProductList[$j]['pcode'] . '##' .  $orderProductList[$j]['productName'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
+									$product = $orderProductList[$j]['pcode'] . '##' . $orderProductList[$j]['productName'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
 									//in cart list 
 
 									$isInCart1 = false;
@@ -2217,10 +2298,12 @@ class Api extends REST_Controller
 				}
 				$finalResult['orders'] = $clientOrderList;
 				return $this->response(array("status" => "200", "totalOrders" => $totalOrders, "result" => $finalResult), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "400", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -2243,10 +2326,12 @@ class Api extends REST_Controller
 					$result = $this->GlobalModel->doEdit($dataDevice, 'clientdevicedetails', $deviceCode);
 					if ($result != false) {
 						return $this->response(array("status" => "200", "message" => "Firebase Id Update Successfully"), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => " Failed to update Firebase Id."), 200);
 					}
-				} else {
+				}
+				else {
 					$dataDevice['os_version'] = $postData['os_version'];
 					$dataDevice['app_version'] = $postData['app_version'];
 					$dataDevice['mobile_model'] = $postData['mobile_model'];
@@ -2257,14 +2342,17 @@ class Api extends REST_Controller
 					$result = $this->GlobalModel->addNew($dataDevice, 'clientdevicedetails', 'CDD');
 					if ($result) {
 						return $this->response(array("status" => "200", "message" => "Firebase Id Update Successfully"), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => " Failed to update Firebase Id."), 200);
 					}
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => " Failed to find device details!"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -2285,7 +2373,7 @@ class Api extends REST_Controller
 
 			if ($totalProduct) {
 				$orderColumns = array("productmaster.id,productmaster.code,productmaster.hsnCode,productmaster.taxPercent,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,productmaster.productRegularPrice,productratelineentries.sellingPrice as productSellingPrice,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,ifnull(productratelineentries.regularPrice,0) as regularPrice,productmaster.isActive,ifnull(productmaster.tagCode,'') as tagCode,ifnull(tagmaster.tagTitle,'') as tagTitle,ifnull(tagmaster.tagColor,'') as tagColor,productratelineentries.code as variantsCode");
-				$cond = array('productmaster' . '.isActive' => 1, "productratelineentries.cityCode" => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode,"productratelineentries.isActive" =>1,"productratelineentries.isDelete" =>0,"productratelineentries.isMainVariant" =>1);
+				$cond = array('productmaster' . '.isActive' => 1, "productratelineentries.cityCode" => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode, "productratelineentries.isActive" => 1, "productratelineentries.isDelete" => 0, "productratelineentries.isMainVariant" => 1);
 				$orderBy = array('productmaster.tagCode' => 'DESC', 'productmaster.id' => 'ASC');
 				$join = array("productratelineentries" => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode');
 				$joinType = array('productratelineentries' => 'inner', 'tagmaster' => 'left');
@@ -2332,15 +2420,15 @@ class Api extends REST_Controller
 						//product rates 
 						$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.regularPrice,productratelineentries.productStatus,productratelineentries.regularPrice";
 						$tbl = 'productratelineentries';
-						$cndt = ['productratelineentries.productCode' => $limitProduct_result[$j]['code'],'cityCode' => $postData['cityCode'],'isDelete'=>0,'isActive'=>1];
+						$cndt = ['productratelineentries.productCode' => $limitProduct_result[$j]['code'], 'cityCode' => $postData['cityCode'], 'isDelete' => 0, 'isActive' => 1];
 						$ordby = ['productratelineentries.code' => 'DESC'];
 						$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby);
 						if ($rate_result) {
 							$rates = [];
 							foreach ($rate_result->result_array() as $rs) {
 								//$product =  $limitProduct_result[$j]['code'] . '##' .  $limitProduct_result[$j]['productName'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
-								$product =  $limitProduct_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
-								
+								$product = $limitProduct_result[$j]['code'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
+
 								//in cart list 
 								$isInCart1 = false;
 								$cartQuantity1 = 0;
@@ -2353,7 +2441,7 @@ class Api extends REST_Controller
 									$join2 = array();
 									$joinType2 = array();
 									$clientcarts = $this->GlobalModel->selectQuery($orderColumns2, $tableName2, $cond2, $orderBy2, $join2, $joinType2);
-                                     
+
 									if ($clientcarts) {
 										$isInCart1 = true;
 										$cartQuantity1 = $clientcarts->result_array()[0]['quantity'];
@@ -2399,20 +2487,23 @@ class Api extends REST_Controller
 					$data['products'] = $limitProduct_result;
 
 					return $this->response(array("status" => "200", "totalRecords" => $totalProduct, "result" => $data), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Required field(s)."), 400);
 		}
 	}
 	//Ends Product list by keyword
 
 	//Start cancel order
-	public function cancelOrder_post() 
+	public function cancelOrder_post()
 	{
 		$postData = $this->post();
 		if (isset($postData["clientCode"]) && $postData["clientCode"] != '' && isset($postData["orderCode"]) && $postData["orderCode"] != '' && isset($postData["orderType"]) && $postData["orderType"] != '') {
@@ -2453,13 +2544,16 @@ class Api extends REST_Controller
 						}
 
 						return $this->response(array("status" => "200", "message" => "Order Cancelled Successfully"), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "400", "message" => "Failed to cancel the order! Please Try Again."), 200);
 					}
-				} else {
-				    return $this->response(array("status" => "400", "message" => "Unable to find or match the order"), 200);
 				}
-			} else {
+				else {
+					return $this->response(array("status" => "400", "message" => "Unable to find or match the order"), 200);
+				}
+			}
+			else {
 				$Result2 = $this->GlobalModel->selectDataByIdWithEmpty($code, 'vendorordermaster');
 
 				if ($Result2) {
@@ -2473,7 +2567,8 @@ class Api extends REST_Controller
 					$restoFlag = 0;
 					if ($orderStatus == 'PLC' || $orderStatus == 'PND') {
 						$DBFlag = 1;
-					} else {
+					}
+					else {
 						$restoFlag = 1;
 						$DBFlag = 1;
 					}
@@ -2540,7 +2635,7 @@ class Api extends REST_Controller
 					$notification['random_id'] = $random;
 					$notification['type'] = 'order';
 					$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
-                     
+
 					$data = array('orderStatus' => "CAN", "editDate" => $nowdate, "deliveryBoyCode" => "", 'editID' => $userCode);
 					$passresult = $this->GlobalModel->doEditWithField($data, 'vendorordermaster', 'code', $code);
 					if ($passresult == 'true') {
@@ -2574,14 +2669,17 @@ class Api extends REST_Controller
 						$delbActiveOrder = $this->GlobalModel->doEditWithField($dataUpCnt, 'deliveryBoyActiveOrder', 'deliveryBoyCode', $dbCode);
 
 						return $this->response(array("status" => "200", "message" => "Order Cancelled Successfully"), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => "Failed to cancel the order! Please Try Again."), 200);
 					}
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Unsuccessfull Order Cancel Please Try Again."), 200);
 				}
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "msg" => " * are required field(s)."), 400);
 		}
 	}
@@ -2614,10 +2712,12 @@ class Api extends REST_Controller
 				}
 				$data['categories'] = $category_result;
 				return $this->response(array("status" => "200", "totalRecords" => $totalRecords, "result" => $data), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Required field(s)."), 400);
 		}
 	}
@@ -2664,17 +2764,21 @@ class Api extends REST_Controller
 							}
 							$data['address'] = array('cityCode' => $cityCode, 'cityName' => $cityName, 'areaCode' => $areaCode, 'place' => $place, 'isService' => $isService);
 							return $this->response(array("status" => "200", "message" => "Address Updated Successfully.", "result" => $data), 200);
-						} else {
+						}
+						else {
 							return $this->response(array("status" => "300", "message" => "Area is not serviceable."), 200);
 						}
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => "Area is not serviceable."), 200);
 					}
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "No Data Found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -2715,16 +2819,20 @@ class Api extends REST_Controller
 					if ($Result) {
 						$data['addressdata'] = $Result->result_array();
 						return $this->response(array("status" => "200", "message" => "Location Updated Successfully.", "result" => $data), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => "No data Found."), 200);
 					}
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Something Went Wrong."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	} //end address line client
@@ -2754,22 +2862,22 @@ class Api extends REST_Controller
 							$place = $ResultArea->result_array()[0]['place'];
 						}
 						$data = array(
-							'city' => $cityName??"",
-							'area' => $place??"",
+							'city' => $cityName ?? "",
+							'area' => $place ?? "",
 							'id' => $row->id,
-							'address' => $row->address??"",
+							'address' => $row->address ?? "",
 							'latitude' => $row->latitude,
 							'longitude' => $row->longitude,
 							'cityCode' => $row->cityCode,
 							'areaCode' => $row->areaCode,
 							'addressType' => $row->addressType == null ? "home" : $row->addressType,
-							'flat' => $row->flat??"",
-							'directionToReach'=>$row->directionToReach??"",
-							'landMark' => $row->landMark??"",
+							'flat' => $row->flat ?? "",
+							'directionToReach' => $row->directionToReach ?? "",
+							'landMark' => $row->landMark ?? "",
 							'isSelected' => $row->isSelected,
-							'state'=>$row->state??"",
-							'pincode'=>$row->pincode??"",
-							'country'=>'India',
+							'state' => $row->state ?? "",
+							'pincode' => $row->pincode ?? "",
+							'country' => 'India',
 						);
 						array_push($addressList, $data);
 					}
@@ -2777,10 +2885,12 @@ class Api extends REST_Controller
 				$result['addresses'] = $addressList;
 				// $data['addresses']=$Result->result_array(); 
 				return $this->response(array("status" => "200", "message" => "Addresses List.", "result" => $result), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "No data Found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -2789,7 +2899,7 @@ class Api extends REST_Controller
 	{
 		$postData = $this->post();
 		// if ($postData["clientCode"] != '' && $postData["city"] != '' && $postData["state"] != '' && $postData["area"] != '' && $postData["local"] != '' && $postData["flat"] != '' && $postData["pincode"] !=''  && $postData["areaCode"] !='')
-		if ($postData["clientCode"] != '' && $postData["address"] != '' && $postData["latitude"] != '' && $postData["longitude"] != '' && $postData["addressType"] != '' && $postData["flat"] != '' && $postData["directionToReach"] != '' && $postData["areaCode"] != '' && $postData["cityCode"] != '') {
+		if ($postData["clientCode"] != '' && $postData["address"] != '' && $postData["latitude"] != '' && $postData["longitude"] != '' && $postData["addressType"] != '' && $postData["flat"] != '' && $postData["areaCode"] != '' && $postData["cityCode"] != '') {
 			$clientCode = $postData["clientCode"];
 			$Result = $this->GlobalModel->selectQuery('clientmaster.*', 'clientmaster', array('clientmaster.code' => $clientCode));
 
@@ -2810,7 +2920,7 @@ class Api extends REST_Controller
 					"landMark" => $postData["landMark"],
 					"areaCode" => $postData["areaCode"],
 					"cityCode" => $postData["cityCode"],
-					"directionToReach"=>$postData["directionToReach"],
+					"directionToReach" => $postData["directionToReach"],
 					"isSelected" => 1,
 					"isActive" => 1,
 				];
@@ -2820,16 +2930,20 @@ class Api extends REST_Controller
 					if ($Result) {
 						$data['addressdata'] = $Result->result_array();
 						return $this->response(array("status" => "200", "message" => "Location added Successfully.", "result" => $data), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => "No data Found."), 200);
 					}
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Something Went Wrong."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -2846,26 +2960,29 @@ class Api extends REST_Controller
 					"clientCode" => $postData["clientCode"],
 					"address" => $postData["address"],
 					"latitude" => $postData["latitude"],
-					"longitude" => $postData["longitude"], 
+					"longitude" => $postData["longitude"],
 					"flat" => $postData["flat"],
 					"addressType" => $postData["addressType"],
 					"landMark" => $postData["landMark"],
 					"areaCode" => $postData["areaCode"],
 					"cityCode" => $postData["cityCode"],
-					"directionToReach"=>$postData["directionToReach"],
+					"directionToReach" => $postData["directionToReach"],
 				];
 
 				$updateResult = $this->GlobalModel->doEditWithField($dataProfile, 'clientprofile', 'id', $id);
-                //echo $this->db->last_query();
-				if ($updateResult) { 
+				//echo $this->db->last_query();
+				if ($updateResult) {
 					return $this->response(array("status" => "200", "message" => "Address Updated Successfully."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Something Went Wrong."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	} //end address line client
@@ -2881,13 +2998,16 @@ class Api extends REST_Controller
 				$deleteResult = $this->GlobalModel->deleteWithField('id', $id, 'clientprofile');
 				if ($deleteResult != 'false') {
 					return $this->response(array("status" => "200", "message" => "Address Deleted Successfully."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Something Went Wrong."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "User not registered. Please register user."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	} //end address line client
@@ -2907,10 +3027,12 @@ class Api extends REST_Controller
 			$result = $this->GlobalModel->doEditWithField($data1, 'clientprofile', 'id', $postData['addressId']);
 			if ($result == 'true') {
 				return $this->response(array("status" => "200", "message" => "Address is set to default successfully"), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Failed to set as default address"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => '* fields are required'), 200);
 		}
 	}
@@ -2925,13 +3047,16 @@ class Api extends REST_Controller
 				$userData = $Result->result_array()[0]['isActive'];
 				if ($userData == 1) {
 					return $this->response(array("status" => "200", "message" => "Active User"), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "You are inactive please contact admin."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Someting went wrong try again..."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
 	} //end address line client
@@ -2943,7 +3068,8 @@ class Api extends REST_Controller
 		if ($Result) {
 			$responseRsult["appAlert"] = $Result->result_array();
 			return $this->response(array("status" => "200", "message" => "Alert Message", "result" => $responseRsult), 200);
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "300", "message" => "Alert not available"), 200);
 		}
 	} //end alert
@@ -2990,7 +3116,8 @@ class Api extends REST_Controller
 				$couponCode = $r['coupanCode'];
 				if ($r['offerType'] == 'flat') {
 					$discount = $r['flatAmount'];
-				} else {
+				}
+				else {
 					$discount = $r['discount'];
 				}
 				$capLimit = $r['capLimit'];
@@ -3023,20 +3150,25 @@ class Api extends REST_Controller
 						if ($userLimit < $perUserLimit) {
 							$nextLimit = $userLimit + 1;
 							return $this->response(array("status" => "200", "nextLimit" => $nextLimit, "message" => $couponCode . " and save every time you order", "result" => $data), 200);
-						} else {
+						}
+						else {
 							return $this->response(array("status" => "300", "message" => "Coupon Already Used"), 200);
 						}
-					} else {
+					}
+					else {
 						//not single use return coupon
 						return $this->response(array("status" => "200", "nextLimit" => 1, "message" => $couponCode . " and save every time you order", "result" => $data), 200);
 					}
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Amount should be greater than " . $minimumAmount), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Invalid Coupon Code."), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "msg" => " * are required field(s)."), 400);
 		}
 	}
@@ -3049,89 +3181,116 @@ class Api extends REST_Controller
 			$foodContact = $settingResult->result_array()[5]['settingValue'];
 			$vegeeContact = $settingResult->result_array()[6]['settingValue'];
 			return $this->response(array("status" => "200", "message" => "For Support", "foodContact" => $foodContact, "vegeeContact" => $vegeeContact), 200);
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "200", "message" => "For Support", "foodContact" => "9373747055", "vegeeContact" => "9373747055"), 200);
 		}
 	}
 	// End
 
-	public function calculateDistanceDeliveryCharges($storeLatitude, $storeLongitude, $clientCode, $cartAmount)
+	public function calculateDistanceDeliveryCharges($storeLatitude, $storeLongitude, $clientCode, $cartAmount, $custLat = "", $custLong = "", $city = "")
 	{
 		$shortestdistance = 0;
 		$charges = 0;
-		$cityCode = "";
-		$clientLatitude = $clientLongitude = '';
-		$addressLatitudeData = $this->GlobalModel->selectQuery("clientprofile.latitude,clientprofile.longitude,clientprofile.cityCode", "clientprofile", array("clientprofile.isActive" => "1", "clientprofile.isSelected" => "1", "clientprofile.clientCode" => $clientCode));
-		if ($addressLatitudeData != false) {
-			$data = $addressLatitudeData->result_array()[0];
-			$clientLatitude = $data['latitude'];
-			$clientLongitude = $data['longitude'];
-			$cityCode = $data['cityCode'];
+		$cityCode = $city;
+		$clientLatitude = $custLat;
+		$clientLongitude = $custLong;
+
+		// If city or customer coordinates were not passed, try to fetch them once
+		if ($cityCode == "" || $clientLatitude == "" || $clientLongitude == "") {
+			$addressData = $this->GlobalModel->selectQuery("clientprofile.latitude,clientprofile.longitude,clientprofile.cityCode", "clientprofile", array("clientprofile.isActive" => "1", "clientprofile.isSelected" => "1", "clientprofile.clientCode" => $clientCode));
+			if ($addressData != false && $addressData->num_rows() > 0) {
+				$adData = $addressData->result_array()[0];
+				$clientLatitude = ($clientLatitude == "") ? $adData['latitude'] : $clientLatitude;
+				$clientLongitude = ($clientLongitude == "") ? $adData['longitude'] : $clientLongitude;
+				$cityCode = ($cityCode == "") ? $adData['cityCode'] : $cityCode;
+			}
 		}
 
-		//	echo $storeLatitude ."  ".$storeLongitude." Customer -> ".$clientLatitude." ".$clientLongitude;
-		// 		$client = $this->GlobalModel->selectQuery("clientmaster.cityCode", "clientmaster", array("clientmaster.code" => $clientCode));
-		// 		if ($client) $cityCode = $client->result()[0]->cityCode;
-		$deliveryCharge = $perKmCharges = $minimumKmForFixedCharges = $minimumChargesForFixedKm  = 0;
-		$deliveryChargeCurrency = 'INR';
-		$chargesResult = $this->GlobalModel->selectQuery('deliverycomissionandcharges.*', 'deliverycomissionandcharges', array('deliverycomissionandcharges.cityCode' => $cityCode, 'deliverycomissionandcharges.forWhichService' => 'customer_vegee_grocery'));
-		$fixedDeliveryFlag = 0;
-		if ($chargesResult) {
-			$charge = $chargesResult->result()[0];
+		// Fetch delivery settings for the city (Latest active setting)
+		$deliveryCharge = $perKmCharges = $minimumKmForFixedCharges = $minimumChargesForFixedKm = 0;
+		$cond = array('deliverycomissionandcharges.cityCode' => $cityCode, 'deliverycomissionandcharges.forWhichService' => 'customer_vegee_grocery', 'deliverycomissionandcharges.isActive' => 1);
+		$chargesResult = $this->GlobalModel->selectQuery('deliverycomissionandcharges.*', 'deliverycomissionandcharges', $cond, array('id' => 'DESC'));
 
+		$fixedDeliveryFlag = 0;
+		if ($chargesResult != false && $chargesResult->num_rows() > 0) {
+			$charge = $chargesResult->result()[0];
 			if ($charge->isFixedChargesFlag == 1) {
-				if ($cartAmount > $charge->minOrderAmountForFixedCharge || $cartAmount == 0) {
+				// Purely fixed charge based on order value
+				if ($cartAmount >= $charge->minOrderAmountForFixedCharge || $cartAmount == 0) {
 					$deliveryCharge = 0;
-				} else {
+				}
+				else {
 					$deliveryCharge = $charge->fixedChargesOrCommission;
 				}
 				$fixedDeliveryFlag = 1;
-			} else {
-				$minimumKmForFixedCharges  = $charge->minimumKmForFixedCharges;
+			}
+			else {
+				// Base Fee + Distance surcharge logic
+				$minimumKmForFixedCharges = $charge->minimumKmForFixedCharges;
 				$minimumChargesForFixedKm = $charge->minimumChargesForFixedKm;
 				$perKmCharges = $charge->perKmCharges;
 			}
 		}
 
-		if ($clientLatitude != "" && $clientLongitude != "") {
-			$arrayDist = array();
-			$url = "https://maps.googleapis.com/maps/api/directions/json?destination=$storeLatitude,$storeLongitude&mode=driving&origin=$clientLatitude,$clientLongitude&key=" . PLACE_API_KEY;
+		// Calculate Distance using Google Distance Matrix API (More efficient for distances)
+		if ($clientLatitude != "" && $clientLongitude != "" && $storeLatitude != "" && $storeLongitude != "") {
+			$url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=$storeLatitude,$storeLongitude&destinations=$clientLatitude,$clientLongitude&mode=driving&key=" . PLACE_API_KEY;
+
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_PROXYPORT, 3128);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 			$response = curl_exec($ch);
 			curl_close($ch);
+
 			$response_all = json_decode($response, TRUE);
-			if (!empty($response_all['routes'])) {
-				foreach ($response_all['routes'] as $res1 => $val) {
-					foreach ($val['legs'] as $keys => $value) {
-						$distance = round($value['distance']['value'] / 1000);
-						array_push($arrayDist, $distance);
+
+			if (isset($response_all['status']) && $response_all['status'] == 'OK' && !empty($response_all['rows'][0]['elements'][0]['distance'])) {
+				$element = $response_all['rows'][0]['elements'][0];
+				if ($element['status'] == 'OK') {
+					$distance_raw = $element['distance']['value'] / 1000;
+					if ($distance_raw > (floor($distance_raw) + 0.5)) {
+						$distance = ceil($distance_raw);
+					} else {
+						$distance = floor($distance_raw);
+					}
+					$shortestdistance = $distance;
+
+					if ($fixedDeliveryFlag == 1) {
+						$charges = $deliveryCharge;
+					}
+					else {
+						if ($distance > $minimumKmForFixedCharges) {
+							// Example: Base charge for first 3km, then $perKm for each extra KM
+							$extraKm = ($distance - $minimumKmForFixedCharges);
+							$charges = $minimumChargesForFixedKm + ($extraKm * $perKmCharges);
+						}
+						else {
+							// Within base distance limit
+							$charges = $minimumChargesForFixedKm;
+						}
 					}
 				}
-				$mindistance = min($arrayDist);
-				if ($fixedDeliveryFlag == 1) {
-					$shortestdistance = $mindistance;
-					$charges = $deliveryCharge;
-				} else {
-					if ($mindistance > $minimumKmForFixedCharges) {
-						$finalDistance = $mindistance - $minimumKmForFixedCharges;
-						$shortestdistance = $mindistance;
-						$shippingCharges1 = $minimumChargesForFixedKm;
-						$shippingCharges1 = $shippingCharges1 + ($finalDistance * $perKmCharges);
-						$charges = $shippingCharges1;
-					} else {
-						$shortestdistance = $mindistance;
-						$charges = $minimumChargesForFixedKm;
-					}
+				else {
+					log_message('error', "Distance Matrix Matrix Status: " . $element['status']);
+					$charges = $minimumChargesForFixedKm;
 				}
 			}
+			else {
+				log_message('error', "Distance Matrix API Error for client $clientCode: " . ($response_all['status'] ?? 'Empty'));
+				$charges = $minimumChargesForFixedKm;
+			}
 		}
+		else {
+			// One or more coordinates were empty string or zero
+			log_message('debug', "Missing coordinates: Store($storeLatitude,$storeLongitude) Client($clientLatitude,$clientLongitude)");
+			$charges = $minimumChargesForFixedKm;
+		}
+
 		$result['shortestdistance'] = $shortestdistance . ' Kms';
-		$result['charges'] = $charges;
+		$result['charges'] = round($charges, 2);
 		return $result;
 	}
 
@@ -3147,25 +3306,28 @@ class Api extends REST_Controller
 			if ($Result != false) {
 				$r = $Result->result_array()[0];
 				$ar['OfferCode'] = $r['code'];
-				$ar['minimumAmount'] =  $r['minimumAmount'];
+				$ar['minimumAmount'] = $r['minimumAmount'];
 				$ar['offerType'] = $r['offerType'];
 				$ar['couponCode'] = $r['coupanCode'];
 				if ($r['offerType'] == 'flat') {
 					$ar['discount'] = $r['flatAmount'];
-				} else {
+				}
+				else {
 					$ar['discount'] = $r['discount'];
 				}
 				$ar['capLimit'] = $r['capLimit'];
 				$ar['termsAndConditions'] = $r['termsAndConditions'];
 				$ar['perUserLimit'] = $r['perUserLimit'];
-			} else {
+			}
+			else {
 				$ar = array();
 				$returnArr['nextLimit'] = "";
 				$returnArr['message'] = "Invalid Coupon Code";
 				$returnArr['submessage'] = "";
 			}
-		} else {
-			$ar =  new StdClass;
+		}
+		else {
+			$ar = new StdClass;
 		}
 
 		$saved_rs = 0;
@@ -3178,7 +3340,8 @@ class Api extends REST_Controller
 				$clientUseCouponResult = $this->GlobalModel->selectQuery('couponusesdetail.*', 'couponusesdetail', $condition1);
 				if ($r['offerType'] == 'flat') {
 					$saved_rs = $r['flatAmount'];
-				} else {
+				}
+				else {
 					$saved_rs = round(($cartAmount * $r['discount']) / 100, 2);
 					if ($saved_rs > $r['capLimit']) {
 						$saved_rs = round($r['capLimit']);
@@ -3194,23 +3357,27 @@ class Api extends REST_Controller
 						$returnArr['nextLimit'] = $nextLimit;
 						$returnArr['message'] = $ar['couponCode'] . " coupon applied..";
 						$returnArr['submessage'] = "You saved ₹ " . $saved_rs;
-					} else {
+					}
+					else {
 						$returnArr['nextLimit'] = "";
 						$returnArr['message'] = "Coupon Already Used";
 						$returnArr['submessage'] = "";
 					}
-				} else {
+				}
+				else {
 					$nextLimit = 1;
 					$returnArr['nextLimit'] = $nextLimit;
 					$returnArr['message'] = $ar['couponCode'] . " coupon applied..";
 					$returnArr['submessage'] = "You saved ₹ " . $saved_rs;
 				}
-			} else {
+			}
+			else {
 				$returnArr['nextLimit'] = "";
 				$returnArr['message'] = "Amount should be greater than or equal to minimum amount";
 				$returnArr['submessage'] = "";
 			}
-		} else {
+		}
+		else {
 			$returnArr['nextLimit'] = "";
 			$returnArr['message'] = "";
 			$returnArr['submessage'] = "";
@@ -3236,93 +3403,97 @@ class Api extends REST_Controller
 				$payment = $result->result_array()[0];
 				//due to failure of payment gatewat 
 				//if ($payment['paymentOrderId'] == $postData['paymentOrderId']) {  
-					if ($payment['paymentStatus'] == "PID") {
-						$message = "Payment successfull";
-						return $this->response(array("status" => 200, "message" => $message, "paymentId" => $postData['paymentOrderId'], "payment_status" => "SUCCESS"), 200);
-					}					
-					$cashFreeResult = $this->cashfreepayment->getOrderStatus($postData['orderCode']);
-					log_message("error", " payments response => " . trim(stripslashes(json_encode($cashFreeResult))));
-					if (array_key_exists("payments", $cashFreeResult) && !empty($cashFreeResult["payments"])) {
-						$payments = $cashFreeResult['payments'];
-						$payments = $payments[0];
-						$txtStatus = $payments['payment_status'];
-						if ($payments['is_captured'] == true  && $txtStatus = "SUCCESS") {
-							$this->db->query("delete from clientcarts where clientCode='" . $postData['clientCode'] . "'");
-							$data['orderStatus'] = 'PND';
-							$data['paymentStatus'] = "PID"; 
-							$data['isActive'] = 1;
-							
-							//customer notification
-							//$dataNoti = array('title' => 'Payment Successful', 'message' => $postData['orderCode'] . ' Order placed successfully.', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
-							//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
-							
-							$users = $this->db->query("SELECT websiteFirebaseToken FROM usermaster WHERE isActive=1 AND websiteFirebaseToken!=''");
-							if ($users->num_rows() > 0) {
-								$firebaseIds = [];
-								foreach ($users->result() as $user) {
-									$firebaseIds[] = $user->websiteFirebaseToken;
-								}
-								if (sizeof($firebaseIds) > 0) {
-									$random = rand(0, 999);
-									$datamsg = array("title" => 'Order ' . $postData['orderCode'], "message" => ' New Vegetable/Grocery order has been placed ', "order_id" => $postData['orderCode'], "random_id" => $random);
+				if ($payment['paymentStatus'] == "PID") {
+					$message = "Payment successfull";
+					return $this->response(array("status" => 200, "message" => $message, "paymentId" => $postData['paymentOrderId'], "payment_status" => "SUCCESS"), 200);
+				}
+				$cashFreeResult = $this->cashfreepayment->getOrderStatus($postData['orderCode']);
+				log_message("error", " payments response => " . trim(stripslashes(json_encode($cashFreeResult))));
+				if (array_key_exists("payments", $cashFreeResult) && !empty($cashFreeResult["payments"])) {
+					$payments = $cashFreeResult['payments'];
+					$payments = $payments[0];
+					$txtStatus = $payments['payment_status'];
+					if ($payments['is_captured'] == true && $txtStatus = "SUCCESS") {
+						$this->db->query("delete from clientcarts where clientCode='" . $postData['clientCode'] . "'");
+						$data['orderStatus'] = 'PND';
+						$data['paymentStatus'] = "PID";
+						$data['isActive'] = 1;
 
-									$dataArr = array();
-									$dataArr['device_id'] = $firebaseIds;
-									$dataArr['message'] = $datamsg['title']; //Message which you want to send
-									$dataArr['title'] = $datamsg['title'];
-									$dataArr['order_id'] = $datamsg['order_id'];
-									$dataArr['random_id'] = $datamsg['random_id'];
-									$dataArr['type'] = 'order';
+						//customer notification
+						//$dataNoti = array('title' => 'Payment Successful', 'message' => $postData['orderCode'] . ' Order placed successfully.', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
+						//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
 
-									$notification['device_id'] = $firebaseIds;
-									$notification['message'] = $datamsg['message']; //Message which you want to send
-									$notification['title'] = $datamsg['title'];
-									$notification['order_id'] = $datamsg['order_id'];
-									$notification['random_id'] = $datamsg['random_id'];
-									$notification['type'] = 'order';
-									$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
-								}
+						$users = $this->db->query("SELECT websiteFirebaseToken FROM usermaster WHERE isActive=1 AND websiteFirebaseToken!=''");
+						if ($users->num_rows() > 0) {
+							$firebaseIds = [];
+							foreach ($users->result() as $user) {
+								$firebaseIds[] = $user->websiteFirebaseToken;
 							}
-							
-							$errorCode = '200';
-							$message = "Payment successfull";
-						} else {
-							$data['orderStatus'] = 'CAN';
-							$data['paymentStatus'] = "RJCT";
-							$dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
-							$message = "Your payment has been marked as failed. Cannot place your order";
-							$errorCode = '300';
+							if (sizeof($firebaseIds) > 0) {
+								$random = rand(0, 999);
+								$datamsg = array("title" => 'Order ' . $postData['orderCode'], "message" => ' New Vegetable/Grocery order has been placed ', "order_id" => $postData['orderCode'], "random_id" => $random);
+
+								$dataArr = array();
+								$dataArr['device_id'] = $firebaseIds;
+								$dataArr['message'] = $datamsg['title']; //Message which you want to send
+								$dataArr['title'] = $datamsg['title'];
+								$dataArr['order_id'] = $datamsg['order_id'];
+								$dataArr['random_id'] = $datamsg['random_id'];
+								$dataArr['type'] = 'order';
+
+								$notification['device_id'] = $firebaseIds;
+								$notification['message'] = $datamsg['message']; //Message which you want to send
+								$notification['title'] = $datamsg['title'];
+								$notification['order_id'] = $datamsg['order_id'];
+								$notification['random_id'] = $datamsg['random_id'];
+								$notification['type'] = 'order';
+								$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
+							}
 						}
-						$this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
-						if ($payments['is_captured'] == true  && $txtStatus = "SUCCESS") {
-							$this->assignorder->allocate_delivery_boy_to_order($postData['orderCode']);
-						}
-						//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
-						return $this->response(array("status" => $errorCode, "message" => $message, "paymentId" => $postData['paymentOrderId'], "payment_status" => $payments['payment_status']), 200);
-					} else if (array_key_exists('exception', $cashFreeResult)) {
-						$data['orderStatus'] = 'CAN';
-						$data['paymentStatus'] = "RJCT";
-						$dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
-						$result1 = $this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
-						//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
-						return $this->response(array("status" => "300", "message" => "b Your payment has been marked as failed. Cannot place your order due to " . $cashFreeResult['exception'], "paymentId" => $postData['paymentOrderId'], "payment_status" => "FAILED"), 200);
-					} else {
-						$data['orderStatus'] = 'CAN';
-						$data['paymentStatus'] = "RJCT";
-						$dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
-						$result1 = $this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
-						//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
-						return $this->response(array("status" => "300", "message" => "c Your payment has been marked as failed. Cannot place your order", "paymentId" => $postData['paymentOrderId'], "payment_status" => "FAILED"), 200);
+
+						$errorCode = '200';
+						$message = "Payment successfull";
 					}
-				/*} else {
-					$data['orderStatus'] = 'CAN';
-					$data['paymentStatus'] = "FAIL";
-					$result = $this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
-					$dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
+					else {
+						$data['orderStatus'] = 'CAN';
+						$data['paymentStatus'] = "RJCT";
+						$dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
+						$message = "Your payment has been marked as failed. Cannot place your order";
+						$errorCode = '300';
+					}
+					$this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
+					if ($payments['is_captured'] == true && $txtStatus = "SUCCESS") {
+						$this->assignorder->allocate_delivery_boy_to_order($postData['orderCode']);
+					}
 					//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
-					return $this->response(array("status" => "300",  "message" => "a Your payment has been marked as failed. Cannot place your order. Please tray again after some time", "paymentId" => $postData['paymentOrderId'], "payment_status" => "FAILED"), 200);
-				}*/
-			} else {
+					return $this->response(array("status" => $errorCode, "message" => $message, "paymentId" => $postData['paymentOrderId'], "payment_status" => $payments['payment_status']), 200);
+				}
+				else if (array_key_exists('exception', $cashFreeResult)) {
+					$data['orderStatus'] = 'CAN';
+					$data['paymentStatus'] = "RJCT";
+					$dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
+					$result1 = $this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
+					//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
+					return $this->response(array("status" => "300", "message" => "b Your payment has been marked as failed. Cannot place your order due to " . $cashFreeResult['exception'], "paymentId" => $postData['paymentOrderId'], "payment_status" => "FAILED"), 200);
+				}
+				else {
+					$data['orderStatus'] = 'CAN';
+					$data['paymentStatus'] = "RJCT";
+					$dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
+					$result1 = $this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
+					//$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
+					return $this->response(array("status" => "300", "message" => "c Your payment has been marked as failed. Cannot place your order", "paymentId" => $postData['paymentOrderId'], "payment_status" => "FAILED"), 200);
+				}
+			/*} else {
+			 $data['orderStatus'] = 'CAN';
+			 $data['paymentStatus'] = "FAIL";
+			 $result = $this->GlobalModel->doEdit($data, 'ordermaster', $postData['orderCode']);
+			 $dataNoti = array('title' => 'Payment Failed', 'message' => $postData['orderCode'] . ' Order Cancelled', 'unique_id' => $postData['orderCode'], 'random_id' => $random, 'type' => 'VendorOrder');
+			 //$this->sendCustomerNotification($postData['clientCode'], $dataNoti);
+			 return $this->response(array("status" => "300",  "message" => "a Your payment has been marked as failed. Cannot place your order. Please tray again after some time", "paymentId" => $postData['paymentOrderId'], "payment_status" => "FAILED"), 200);
+			 }*/
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Unable to process payment"), 200);
 			}
 		}
@@ -3335,7 +3506,8 @@ class Api extends REST_Controller
 		if (isset($postData["clientCode"]) && $postData["clientCode"] != '') {
 			$this->db->query("DELETE FROM clientcarts where clientCode='" . $postData['clientCode'] . "'");
 			return $this->response(array("status" => "200", "message" => "Cart items removed successfully"), 200);
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "* are required fields"), 200);
 		}
 	}
@@ -3347,7 +3519,7 @@ class Api extends REST_Controller
 			$clientCode = isset($postData['clientCode']) ? $postData['clientCode'] : "";
 			$mainCategoryCode = $postData['mainCategoryCode'];
 			$orderColumns = array("productmaster.id,productmaster.code,productmaster.taxPercent,productmaster.hsnCode,productmaster.productName,productmaster.productDescription,productmaster.minimumSellingQuantity,productmaster.productUom,productmaster.productRegularPrice,productratelineentries.sellingPrice as productSellingPrice,productratelineentries.productStatus,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,ifnull(productratelineentries.regularPrice,0) as regularPrice,productmaster.isActive,ifnull(productmaster.tagCode,'') as tagCode,ifnull(tagmaster.tagTitle,'') as tagTitle,ifnull(tagmaster.tagColor,'') as tagColor,count(orderlineentries.id) as productCount,productratelineentries.code as variantsCode,productratelineentries.isMainVariant");
-			$condition1 = array("ordermaster.orderStatus" => 'DEL', "productmaster.isActive" => 1, 'productratelineentries.cityCode' => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode,"productratelineentries.isActive" =>1,"productratelineentries.isDelete" =>0);
+			$condition1 = array("ordermaster.orderStatus" => 'DEL', "productmaster.isActive" => 1, 'productratelineentries.cityCode' => $postData['cityCode'], 'productmaster.mainCategoryCode' => $mainCategoryCode, "productratelineentries.isActive" => 1, "productratelineentries.isDelete" => 0);
 			$orderBy = array('count(orderlineentries.id)' => 'DESC', 'productmaster.productCategory' => 'DESC', 'productmaster.subCategoryCode' => 'DESC', 'productmaster.tagCode' => 'DESC', 'productmaster.id' => 'DESC');
 			$join1 = array('productratelineentries' => 'productmaster.code=productratelineentries.productCode', 'tagmaster' => 'tagmaster.code=productmaster.tagCode', 'orderlineentries' => 'orderlineentries.productCode=productratelineentries.productCode', 'ordermaster' => 'ordermaster.code=orderlineentries.orderCode');
 			$joinType1 = array('productratelineentries' => 'inner', 'tagmaster' => 'inner', 'orderlineentries' => 'inner', 'ordermaster' => 'inner');
@@ -3401,31 +3573,31 @@ class Api extends REST_Controller
 
 
 					/*$taxCalulate = round($totalArr['productSellingPrice'] * ($totalArr['taxPercent']/100),2);
-					
-					$sellingPrice_with_tax = number_format($totalArr['productSellingPrice'] + $taxCalulate,2,'.','');
-					$totalArr['sellingPrice'] = $sellingPrice_with_tax;
-		
-					$discount='';
-					$taxCalulateRegular = round($totalArr[$j]['regularPrice'] * ($totalArr[$j]['taxPercent']/100),2);
-					$regularPrice_with_tax = number_format($totalArr[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
-					$totalArr[$j]['regularPrice'] = $regularPrice_with_tax;
-					if($totalArr[$j]['regularPrice']!=0){
-						$discount = round(((($totalArr[$j]['regularPrice'] - $totalArr[$j]['sellingPrice']) / ($totalArr[$j]['regularPrice'])) * 100)).' %';
-					}
-					$totalArr[$j]['productDiscount'] = $discount;*/
+					 
+					 $sellingPrice_with_tax = number_format($totalArr['productSellingPrice'] + $taxCalulate,2,'.','');
+					 $totalArr['sellingPrice'] = $sellingPrice_with_tax;
+					 
+					 $discount='';
+					 $taxCalulateRegular = round($totalArr[$j]['regularPrice'] * ($totalArr[$j]['taxPercent']/100),2);
+					 $regularPrice_with_tax = number_format($totalArr[$j]['regularPrice'] + $taxCalulateRegular,2,'.','');
+					 $totalArr[$j]['regularPrice'] = $regularPrice_with_tax;
+					 if($totalArr[$j]['regularPrice']!=0){
+					 $discount = round(((($totalArr[$j]['regularPrice'] - $totalArr[$j]['sellingPrice']) / ($totalArr[$j]['regularPrice'])) * 100)).' %';
+					 }
+					 $totalArr[$j]['productDiscount'] = $discount;*/
 
 
 					//product rates 
 					$clms = "productratelineentries.code,productratelineentries.cityCode,productratelineentries.sellingUnit,productratelineentries.quantity,productratelineentries.sellingPrice,productratelineentries.productStatus,productratelineentries.regularPrice,productratelineentries.isMainVariant";
 					$tbl = 'productratelineentries';
-					$cndt = ['productratelineentries.productCode' => $totalArr['code'],'isDelete'=>0,'isActive'=>1];
+					$cndt = ['productratelineentries.productCode' => $totalArr['code'], 'isDelete' => 0, 'isActive' => 1];
 					$ordby = ['productratelineentries.code' => 'DESC'];
 					$rate_result = $this->GlobalModel->selectQuery($clms, $tbl, $cndt, $ordby);
 					if ($rate_result) {
 						$rates = [];
 						foreach ($rate_result->result_array() as $rs) {
 
-							$product =  $totalArr['code'] . '##' .  $totalArr['productName'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
+							$product = $totalArr['code'] . '##' . $totalArr['productName'] . '##' . $rs['sellingUnit'] . '##' . $rs['code'] . '##' . $rs['quantity'];
 							//in cart list 
 
 							$isInCart1 = false;
@@ -3479,10 +3651,12 @@ class Api extends REST_Controller
 				}
 				$response = $data;
 				return $this->response(array("status" => "200", "totalRecords" => $totalProduct, "result" => $response), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "Required field(s)."), 200);
 		}
 	}
@@ -3492,7 +3666,7 @@ class Api extends REST_Controller
 		$postData = $this->post();
 		if (isset($postData["clientCode"]) && $postData["clientCode"] != '') {
 			$orderBy = array("vendorordermaster.id" => "ASC");
-			$extraCondition =  " (vendorordermaster.orderStatus NOT IN ('CAN','RJT','DEL')) and (deliveryBoyCode!='' or deliveryBoyCode IS NOT NULL) AND (trackingPort!='' or trackingPort IS NOT NULL)";
+			$extraCondition = " (vendorordermaster.orderStatus NOT IN ('CAN','RJT','DEL')) and (deliveryBoyCode!='' or deliveryBoyCode IS NOT NULL) AND (trackingPort!='' or trackingPort IS NOT NULL)";
 			$Records = $this->GlobalModel->selectQuery('vendorordermaster.code,vendorordermaster.deliveryBoyCode,vendorordermaster.trackingPort', 'vendorordermaster', array('vendorordermaster.isActive' => 1), $orderBy, array(), array(), array(), '', '', array(), $extraCondition);
 			$ar = [];
 			if ($Records) {
@@ -3520,10 +3694,12 @@ class Api extends REST_Controller
 					$array[] = $res;
 				}
 				return $this->response(array("status" => "200", "message" => "Data found.", "result" => $array), 200);
-			} else {
-				return $this->response(array("status" => "300", "message" => "No data found",), 200);
 			}
-		} else {
+			else {
+				return $this->response(array("status" => "300", "message" => "No data found", ), 200);
+			}
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 200);
 		}
 	}
@@ -3535,29 +3711,29 @@ class Api extends REST_Controller
 			$orders = [];
 			$sel = "vendorordermaster.code,vendorordermaster.latitude as destinationLat,vendorordermaster.longitude as destinationLng,vendor.latitude as sourceLat,vendorordermaster.code,vendorordermaster.latitude as destinationLat,vendorordermaster.longitude as destinationLng,vendor.latitude as sourceLat,vendor.longitude as sourceLng,vendorordermaster.deliveryBoyCode,usermaster.username as dBoyName,usermaster.latitude as dBoyLat,usermaster.longitude as dBoyLong,vendorordermaster.orderStatus";
 			$tbl = 'vendorordermaster';
-			$cond = ["vendorordermaster.clientCode" => $post['clientCode'],'vendorordermaster.isActive'=>1,'vendorordermaster.isDelete'=>0,'DATE(vendorordermaster.addDate)' => date('Y-m-d') ];
+			$cond = ["vendorordermaster.clientCode" => $post['clientCode'], 'vendorordermaster.isActive' => 1, 'vendorordermaster.isDelete' => 0, 'DATE(vendorordermaster.addDate)' => date('Y-m-d')];
 			$ord = ["vendorordermaster.id" => "DESC"];
 			$join = ['vendor' => 'vendor.code=vendorordermaster.vendorCode', 'usermaster' => 'vendorordermaster' . '.deliveryBoyCode=' . 'usermaster' . '.code'];
 			$jType = ['vendor' => 'inner', 'usermaster' => 'left'];
-			$groupBy = $like = []; 
+			$groupBy = $like = [];
 			$limit = $offset = "";
 			$extraCondition = " ((vendorordermaster.orderStatus IN ( 'PRE', 'RFP', 'PUP' )) or (vendorordermaster.reachStatus IN ('RCH') AND vendorordermaster.orderStatus  NOT IN ('DEL')))";
-			$foodOrders =  $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
+			$foodOrders = $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
 			if ($foodOrders) {
 				$foodOrders = $foodOrders->result();
 				foreach ($foodOrders as $f) {
 					$ary = [
-						"ordeCode"	=>	$f->code,
-						"orderType"	=> 	"food",
-						"srcLat"	=>	$f->sourceLat,
-						"srcLng"	=> 	$f->sourceLng,
-						"desLat"	=>	$f->destinationLat,
-						"deslng"	=> 	$f->destinationLng,
+						"ordeCode" => $f->code,
+						"orderType" => "food",
+						"srcLat" => $f->sourceLat,
+						"srcLng" => $f->sourceLng,
+						"desLat" => $f->destinationLat,
+						"deslng" => $f->destinationLng,
 						"deliveryBoyCode" => $f->deliveryBoyCode,
 						"dBoyName" => $f->dBoyName,
 						"dBoyLat" => $f->dBoyLat,
 						"dBoyLong" => $f->dBoyLong,
-                      	"orderStatus" => $f->orderStatus
+						"orderStatus" => $f->orderStatus
 					];
 					array_push($orders, $ary);
 				}
@@ -3567,7 +3743,7 @@ class Api extends REST_Controller
 			$srcLng = "74.244865";
 			$sel = "ordermaster.deliveryBoyCode as deliveryBoyCode,usermaster.username as dBoyName,usermaster.latitude as dBoyLat,usermaster.longitude as dBoyLong,ordermaster.code,ordermaster.cityCode,ordermaster.latitude as destinationLat,ordermaster.longitude as destinationLng,citymaster.latitude as srcLat,citymaster.longitude as srcLng,ordermaster.orderStatus";
 			$tbl = 'ordermaster';
-			$cond = ["ordermaster.clientCode" => $post['clientCode'],'ordermaster.isActive'=>1,'ordermaster.isDelete'=>0,'DATE(ordermaster.addDate)' => date('Y-m-d')];
+			$cond = ["ordermaster.clientCode" => $post['clientCode'], 'ordermaster.isActive' => 1, 'ordermaster.isDelete' => 0, 'DATE(ordermaster.addDate)' => date('Y-m-d')];
 			$ord = ["ordermaster.id" => "DESC"];
 			$join = ['citymaster' => 'citymaster.code=ordermaster.cityCode', 'usermaster' => 'ordermaster' . '.deliveryBoyCode=' . 'usermaster' . '.code'];
 			$jType = ['citymaster' => 'inner', 'usermaster' => 'left'];
@@ -3575,24 +3751,24 @@ class Api extends REST_Controller
 			$limit = $offset = "";
 			//$extraCondition = " ((ordermaster.orderStatus IN ( 'PRE', 'RFP', 'PUP' )) or (ordermaster.reachStatus = 'RCH' AND ordermaster.orderStatus != 'DEL'))";
 			$extraCondition = " ((ordermaster.orderStatus IN ('PLC','PRE', 'RFP', 'PUP' )) or (ordermaster.reachStatus IN ('RCH') AND ordermaster.orderStatus  NOT IN ('DEL')))";
-			$veggrcOrders =  $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
-			$q = $this->db->last_query(); 
+			$veggrcOrders = $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
+			$q = $this->db->last_query();
 			//print_r($q);
 			if ($veggrcOrders) {
 				$veggrcOrders = $veggrcOrders->result();
 				foreach ($veggrcOrders as $v) {
 					$ary = [
-						"ordeCode"	=>	$v->code,
-						"orderType"	=> 	"vegetable",
-						"srcLat"	=>	$v->srcLat ?? $srcLat,
-						"srcLng"	=> 	$v->srcLng ?? $srcLng,
-						"desLat"	=>	$v->destinationLat,
-						"deslng"	=> 	$v->destinationLng,
+						"ordeCode" => $v->code,
+						"orderType" => "vegetable",
+						"srcLat" => $v->srcLat ?? $srcLat,
+						"srcLng" => $v->srcLng ?? $srcLng,
+						"desLat" => $v->destinationLat,
+						"deslng" => $v->destinationLng,
 						"deliveryBoyCode" => $v->deliveryBoyCode,
 						"dBoyName" => $v->dBoyName,
 						"dBoyLat" => $v->dBoyLat,
 						"dBoyLong" => $v->dBoyLong,
-                      	"orderStatus" => $v->orderStatus
+						"orderStatus" => $v->orderStatus
 					];
 					array_push($orders, $ary);
 				}
@@ -3649,22 +3825,23 @@ class Api extends REST_Controller
 				$limit = 1;
 				$offset = "";
 				$extraCondition = "";
-				$foodOrders =  $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
+				$foodOrders = $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
 				if ($foodOrders) {
 					$f = $foodOrders->result()[0];
 					$data['orderData'] = [
-						"ordeCode"		=>	$f->code,
-						"orderType"		=> 	"food",
-						"srcLat"		=>	$f->sourceLat,
-						"srcLng"		=> 	$f->sourceLng,
-						"desLat"		=>	$f->destinationLat,
-						"deslng"		=> 	$f->destinationLng,
-						"trackingData"	=> 	$track
+						"ordeCode" => $f->code,
+						"orderType" => "food",
+						"srcLat" => $f->sourceLat,
+						"srcLng" => $f->sourceLng,
+						"desLat" => $f->destinationLat,
+						"deslng" => $f->destinationLng,
+						"trackingData" => $track
 					];
 					return $this->response(array("status" => "200", "message" => "Data found.", "result" => $data), 200);
 				}
 				return $this->response(array("status" => "300", "message" => "Either order has been delivered or no order found"), 200);
-			} else {
+			}
+			else {
 				$srcLat = "16.691307";
 				$srcLng = "74.244865";
 
@@ -3678,23 +3855,24 @@ class Api extends REST_Controller
 				$limit = 1;
 				$offset = "";
 				$extraCondition = "";
-				$veggrcOrders =  $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
+				$veggrcOrders = $this->GlobalModel->selectQuery($sel, $tbl, $cond, $ord, $join, $jType, $like, $limit, $offset, $groupBy, $extraCondition);
 				if ($veggrcOrders) {
 					$v = $veggrcOrders->result()[0];
 					$data['orderData'] = [
-						"ordeCode"		=>	$v->code,
-						"orderType"		=> 	"vegetable",
-						"srcLat"		=>	$v->srcLat ?? $srcLat,
-						"srcLng"		=> 	$v->srcLng ?? $srcLng,
-						"desLat"		=>	$v->destinationLat,
-						"deslng"		=> 	$v->destinationLng,
-						"trackingData"	=> 	$track
+						"ordeCode" => $v->code,
+						"orderType" => "vegetable",
+						"srcLat" => $v->srcLat ?? $srcLat,
+						"srcLng" => $v->srcLng ?? $srcLng,
+						"desLat" => $v->destinationLat,
+						"deslng" => $v->destinationLng,
+						"trackingData" => $track
 					];
 					return $this->response(array("status" => "200", "message" => "Data found.", "result" => $data), 200);
 				}
 				return $this->response(array("status" => "300", "message" => "Either order has been delivered or no order found"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 200);
 		}
 	}
@@ -3707,8 +3885,9 @@ class Api extends REST_Controller
 		$extraCondition = '';
 		if ($status == "CAN") {
 			$condition = array("bookorderstatuslineentries.orderCode" => $orderCode);
-			$extraCondition =  " (bookorderstatuslineentries.statusLine IN ('CAN','RJT'))";
-		} else {
+			$extraCondition = " (bookorderstatuslineentries.statusLine IN ('CAN','RJT'))";
+		}
+		else {
 			$condition = array("bookorderstatuslineentries.statusLine" => $status, "bookorderstatuslineentries.orderCode" => $orderCode);
 		}
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $table, $condition, $orderBy, array(), array(), array(), '', '', array(), $extraCondition);
@@ -3724,7 +3903,8 @@ class Api extends REST_Controller
 				$ar['statusDateTime'] = date('D, d M Y h:i A', strtotime($s['statusTime']));
 				break;
 			}
-		} else {
+		}
+		else {
 			$ar['status'] = $status;
 			$ar['statusTitle'] = $fullStatus;
 			$ar['statusDescription'] = "";
@@ -3746,7 +3926,7 @@ class Api extends REST_Controller
 			if ($Result) {
 				$data = array(
 					'isActive' => 0,
-					'isDelete' => 1, 
+					'isDelete' => 1,
 					'deleteDate' => date('Y-m-d H:i:s')
 				);
 
@@ -3755,15 +3935,18 @@ class Api extends REST_Controller
 					return $this->response(array("status" => "200", "message" => "User deleted successfully."), 200);
 				}
 				return $this->response(array("status" => "300", "msg" => "Something went to wrong."), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "msg" => "No Data found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "Required fields not found."), 400);
-		}             
+		}
 	}
-	
-	public function deleteUser_post(){
+
+	public function deleteUser_post()
+	{
 		$getData = $this->post();
 		if (isset($getData['clientCode']) && $getData['clientCode'] != "") {
 			$condition = array('clientmaster.code' => $getData['clientCode'], 'clientmaster.isActive' => 1, "clientmaster.isDelete" => 0);
@@ -3773,7 +3956,7 @@ class Api extends REST_Controller
 			if ($Result) {
 				$data = array(
 					'isActive' => 0,
-					'isDelete' => 1, 
+					'isDelete' => 1,
 					'deleteDate' => date('Y-m-d H:i:s')
 				);
 
@@ -3782,66 +3965,71 @@ class Api extends REST_Controller
 					return $this->response(array("status" => "200", "message" => "User deleted successfully."), 200);
 				}
 				return $this->response(array("status" => "300", "msg" => "Something went to wrong."), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "msg" => "No Data found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "Required fields not found."), 400);
-		}            
+		}
 	}
-	
-	public function getLatestVersion_get(){
-		 $data = [];
 
-        $settingIOS = $this->db->select('*')
-                               ->where('code', 'SET_15')
-                               ->get('settings')
-                               ->row();
+	public function getLatestVersion_get()
+	{
+		$data = [];
 
-        $settingAndroid = $this->db->select('*')
-                                   ->where('code', 'SET_14')
-                                   ->get('settings')
-                                   ->row();
+		$settingIOS = $this->db->select('*')
+			->where('code', 'SET_15')
+			->get('settings')
+			->row();
 
-        if (!empty($settingAndroid)) {
-            $data["android"] = [
-                "settingCode" => $settingAndroid->code,
-                "settingName" => $settingAndroid->settingName,
-                "settingValue" => $settingAndroid->settingValue,
-                "isUpdateCompulsory" => $settingAndroid->isUpdateCompulsory
-            ];
-        }
+		$settingAndroid = $this->db->select('*')
+			->where('code', 'SET_14')
+			->get('settings')
+			->row();
 
-        if (!empty($settingIOS)) {
-            $data["ios"] = [
-                "settingCode" => $settingIOS->code,
-                "settingName" => $settingIOS->settingName,
-                "settingValue" => $settingIOS->settingValue,
-                "isUpdateCompulsory" => $settingIOS->isUpdateCompulsory
-            ];
-        }
-     
-	     return $this->response(array("status" => "200", "message" => "Data found", "result" => $data), 200);
+		if (!empty($settingAndroid)) {
+			$data["android"] = [
+				"settingCode" => $settingAndroid->code,
+				"settingName" => $settingAndroid->settingName,
+				"settingValue" => $settingAndroid->settingValue,
+				"isUpdateCompulsory" => $settingAndroid->isUpdateCompulsory
+			];
+		}
+
+		if (!empty($settingIOS)) {
+			$data["ios"] = [
+				"settingCode" => $settingIOS->code,
+				"settingName" => $settingIOS->settingName,
+				"settingValue" => $settingIOS->settingValue,
+				"isUpdateCompulsory" => $settingIOS->isUpdateCompulsory
+			];
+		}
+
+		return $this->response(array("status" => "200", "message" => "Data found", "result" => $data), 200);
 	}
-	
-	
-	public function setVersion_post(){
+
+
+	public function setVersion_post()
+	{
 		$postData = $this->post();
 		if (isset($postData['settingCode']) && $postData['settingCode'] != "" && isset($postData['settingValue']) && $postData['settingValue'] != "" && isset($postData['isUpdateCompulsory']) && $postData['isUpdateCompulsory'] != "") {
-			
+
 			$data = [
 				"settingValue" => $postData['settingValue'],
 				"isUpdateCompulsory" => $postData['isUpdateCompulsory']
 			];
-			
+
 			$result = $this->db->where("code", $postData['settingCode'])
-                           ->update("settings", $data);
+				->update("settings", $data);
 			if ($result == true) {
 				return $this->response(array("status" => "200", "message" => "Version updated successfully."), 200);
 			}
 			return $this->response(array("status" => "300", "msg" => "Something went to wrong."), 200);
-		}else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "Required fields not found."), 400);
-		}  
+		}
 	}
 }

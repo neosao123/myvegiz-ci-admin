@@ -30,7 +30,7 @@ class Menucategory extends CI_Controller
 	{
 		// $this->load->view('dashboard/header');
 		$this->load->view('dashboard/menucategory/add');
-		// $this->load->view('dashboard/footer');	
+	// $this->load->view('dashboard/footer');	
 	}
 
 	public function edit()
@@ -39,31 +39,32 @@ class Menucategory extends CI_Controller
 		$data['query'] = $this->GlobalModel->selectDataById($code, 'menucategory');
 		// $this->load->view('dashboard/header');
 		$this->load->view('dashboard/menucategory/edit', $data);
-		// $this->load->view('dashboard/footer');
+	// $this->load->view('dashboard/footer');
 	}
 
 	public function getMenuCategoryList()
 	{
 		$tableName = "menucategory";
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$orderColumns = array("menucategory.*");
 		$condition = array();
 		$orderBy = array('menucategory' . '.id' => 'DESC');
 		$joinType = array();
 		$join = array();
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " (menucategory.isDelete=0 OR menucategory.isDelete IS NULL)";
 		$like = array("menucategory.menuCategoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = (intval($offset) > 0 ? intval($offset) : 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$code = $row->code;
 				if ($row->isActive == 1) {
 					$status = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$status = "<span class='label label-sm label-warning'>Inactive</span>";
 				}
 
@@ -89,20 +90,21 @@ class Menucategory extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
-				"recordsTotal"    =>      $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
-		} else {
+		}
+		else {
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
-				"recordsTotal"    =>     $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $this->input->get("draw") ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
 		}
@@ -142,12 +144,13 @@ class Menucategory extends CI_Controller
 			$data = array('error_message' => 'Duplicate Menu Category Name');
 			$response['status'] = 'error';
 			$response['message'] = 'Duplicate Menu Category Name';
-		} else {
+		}
+		else {
 			$data = array(
 				'menuCategoryName' => $menuCategoryName,
 				'addID' => $addID,
 				'addIP' => $ip,
-				'priority'=>$priority,
+				'priority' => $priority,
 				'isActive' => trim($this->input->post("isActive")),
 			);
 			$code = $this->GlobalModel->addWithoutYear($data, 'menucategory', 'MNCAT');
@@ -155,7 +158,8 @@ class Menucategory extends CI_Controller
 				$response['status'] = 'true';
 				$response['message'] = "Menu Category Successfully Added.";
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-			} else {
+			}
+			else {
 				$response['status'] = 'false';
 				$response['message'] = "Failed To Add Menu Category";
 			}
@@ -165,13 +169,14 @@ class Menucategory extends CI_Controller
 
 	public function update()
 	{
-		$code =  $this->input->post('code');
+		$code = $this->input->post('code');
 		$menuCategoryName = trim($this->input->post("menuCategoryName"));
 		$priority = trim($this->input->post("priority"));
 		$isActive = trim($this->input->post("isActive"));
-		if($isActive!=1){
+		if ($isActive != 1) {
 			$isActive = 0;
-		} else {
+		}
+		else {
 			$isActive = 1;
 		}
 		//Activity Track Starts
@@ -205,20 +210,22 @@ class Menucategory extends CI_Controller
 			$data = array('error_message' => 'Duplicate Menu Category Name');
 			$response['status'] = 'error';
 			$response['message'] = 'Duplicate Menu Category Name';
-		} else {
+		}
+		else {
 			$data = array(
 				'menuCategoryName' => $menuCategoryName,
-				'priority'=> $priority,
+				'priority' => $priority,
 				'editID' => $addID,
 				'editIP' => $ip,
 				'isActive' => $isActive
 			);
 			$result = $this->GlobalModel->doEdit($data, 'menucategory', $code);
-			if ($result != 'false') { 
+			if ($result != 'false') {
 				$response['status'] = 'true';
 				$response['message'] = "Menu Category Successfully Updated.";
 				$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-			} else {
+			}
+			else {
 				$response['status'] = 'false';
 				$response['message'] = "No change In Menu Category";
 			}
@@ -244,7 +251,7 @@ class Menucategory extends CI_Controller
 		}
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$dataQ = $this->GlobalModel->selectDataByField('code', $code, 'menucategory');
-		$categoryName = ''; 
+		$categoryName = '';
 		foreach ($dataQ->result() as $row) {
 			$categoryName = $row->menuCategoryName;
 		}
@@ -254,7 +261,7 @@ class Menucategory extends CI_Controller
 			'addID' => $addID,
 			'logText' => $text
 		);
-		$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT'); 
+		$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
 		$data = array(
 			'deleteID' => $addID,
 			'deleteIP' => $ip

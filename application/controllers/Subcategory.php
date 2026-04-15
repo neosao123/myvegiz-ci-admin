@@ -13,8 +13,8 @@ class Subcategory extends CI_Controller
 		$this->load->model('GlobalModel');
 		$this->load->model('GlobalModel1');
 		$this->session_key = $this->session->userdata('key' . SESS_KEY);
-		if(!isset($this->session->userdata['logged_in' . $this->session_key]['code'])){
-			redirect('Admin/login','refresh');
+		if (!isset($this->session->userdata['logged_in' . $this->session_key]['code'])) {
+			redirect('Admin/login', 'refresh');
 		}
 	}
 
@@ -32,7 +32,7 @@ class Subcategory extends CI_Controller
 		$cond = array('categorymaster' . '.isDelete' => 0, 'categorymaster' . '.isActive' => 1, 'categorymaster.mainCategoryCode' => 'MCAT_1');
 		$data['category'] = $this->GlobalModel->selectQuery($orderColumns, $table_name, $cond);
 		$this->load->view('dashboard/header');
-		$this->load->view('dashboard/subcategory/add',$data);
+		$this->load->view('dashboard/subcategory/add', $data);
 		$this->load->view('dashboard/footer');
 	}
 
@@ -48,29 +48,30 @@ class Subcategory extends CI_Controller
 		$this->load->view('dashboard/subcategory/edit', $data);
 		$this->load->view('dashboard/footer');
 	}
-		public function getsubcategoryList()
+	public function getsubcategoryList()
 	{
 		$tableName = "subcategorymaster";
-		$search = $this->input->GET("search")['value'];
+		$search = ($this->input->post("search") ?? $this->input->get("search"))['value'];
 		$orderColumns = array("subcategorymaster.*,categorymaster.categoryName");
 		$condition = array('categorymaster.mainCategoryCode' => 'MCAT_1');
 		$orderBy = array('subcategorymaster' . '.id' => 'DESC');
 		$joinType = array('categorymaster' => 'inner');
 		$join = array('categorymaster' => 'categorymaster.code=subcategorymaster.categoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " subcategorymaster.isDelete=0 OR subcategorymaster.isDelete IS NULL";
-		$like = array("subcategorymaster.subcategoryName" => $search . "~both","categorymaster.categoryName" => $search . "~both");
+		$like = array("subcategorymaster.subcategoryName" => $search . "~both", "categorymaster.categoryName" => $search . "~both");
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
-		$srno = $_GET['start'] + 1;
+		$srno = (int)($this->input->post('start') ?? $_GET['start'] ?? 0) + 1;
 		if ($Records) {
 			foreach ($Records->result() as $row) {
 				$code = $row->code;
 
 				if ($row->isActive == 1) {
 					$status = "<span class='label label-sm label-success'>Active</span>";
-				} else {
+				}
+				else {
 					$status = "<span class='label label-sm label-warning'>Inactive</span>";
 				}
 
@@ -97,20 +98,21 @@ class Subcategory extends CI_Controller
 			}
 			$dataCount = sizeof($this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, array(), '', '', '', $extraCondition)->result());
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
-				"recordsTotal"    =>      $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
-		} else {
+		}
+		else {
 			$dataCount = 0;
 			$data = array();
 			$output = array(
-				"draw"			  =>     intval($_GET["draw"]),
-				"recordsTotal"    =>     $dataCount,
-				"recordsFiltered" =>     $dataCount,
-				"data"            =>     $data
+				"draw" => intval($this->input->post("draw") ?? $_GET["draw"] ?? 0),
+				"recordsTotal" => $dataCount,
+				"recordsFiltered" => $dataCount,
+				"data" => $data
 			);
 			echo json_encode($output);
 		}
@@ -126,8 +128,8 @@ class Subcategory extends CI_Controller
 		$userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
 		$userName = $this->session->userdata['logged_in' . $this->session_key]['username'];
 		$role = "";
-		$isActive=0;
-		if(trim($this->input->post("isActive"))!=''){
+		$isActive = 0;
+		if (trim($this->input->post("isActive")) != '') {
 			$isActive = trim($this->input->post("isActive"));
 		}
 		switch ($userRole) {
@@ -145,10 +147,10 @@ class Subcategory extends CI_Controller
 			'addID' => $addID,
 			'logText' => $text
 		);
-		$result = $this->db->query("SELECT * FROM subcategorymaster WHERE LOWER(subcategoryName)='".$subcategoryName."' AND categoryCode='".$categoryCode."' and (`isDelete` IS NULL OR `isDelete`='0')");
+		$result = $this->db->query("SELECT * FROM subcategorymaster WHERE LOWER(subcategoryName)='" . $subcategoryName . "' AND categoryCode='" . $categoryCode . "' and (`isDelete` IS NULL OR `isDelete`='0')");
 		if ($result->num_rows() > 0) {
 			$data['error_message'] = 'Duplicate subcategory name';
-			
+
 			$table_name = 'categorymaster';
 			$orderColumns = array("categorymaster.*");
 			$cond = array('categorymaster' . '.isDelete' => 0, 'categorymaster' . '.isActive' => 1, 'categorymaster.mainCategoryCode' => 'MCAT_1');
@@ -156,7 +158,8 @@ class Subcategory extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/subcategory/add', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$this->form_validation->set_rules('categoryCode', 'Category Name', 'required');
 			$this->form_validation->set_rules('subcategoryName', 'subcategory Name', 'required');
 			if ($this->form_validation->run() == FALSE) {
@@ -168,7 +171,8 @@ class Subcategory extends CI_Controller
 				$this->load->view('dashboard/header');
 				$this->load->view('dashboard/subcategory/add', $data);
 				$this->load->view('dashboard/footer');
-			} else {
+			}
+			else {
 				$data = array(
 					'categoryCode' => $categoryCode,
 					'subcategoryName' => $subcategoryName,
@@ -182,7 +186,8 @@ class Subcategory extends CI_Controller
 					$response['status'] = true;
 					$response['message'] = "Subcategory Added Successfully";
 					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "Failed To Add Subcategory";
 				}
@@ -196,13 +201,13 @@ class Subcategory extends CI_Controller
 	{
 		$subcategoryName = trim($this->input->post("subcategoryName"));
 		$categoryCode = trim($this->input->post("categoryCode"));
-		$code =  $this->input->post('code');
+		$code = $this->input->post('code');
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
 		$userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
 		$userName = $this->session->userdata['logged_in' . $this->session_key]['username'];
 		$role = "";
-		$isActive=0;
-		if(trim($this->input->post("isActive"))!=''){
+		$isActive = 0;
+		if (trim($this->input->post("isActive")) != '') {
 			$isActive = trim($this->input->post("isActive"));
 		}
 		switch ($userRole) {
@@ -221,7 +226,7 @@ class Subcategory extends CI_Controller
 			'addID' => $addID,
 			'logText' => $text
 		);
-		$result = $this->db->query("SELECT * FROM subcategorymaster WHERE LOWER(subcategoryName)='".$subcategoryName."' AND categoryCode='".$categoryCode."' AND code!= '" . $code . "' and (`isDelete` IS NULL OR `isDelete`='0')");
+		$result = $this->db->query("SELECT * FROM subcategorymaster WHERE LOWER(subcategoryName)='" . $subcategoryName . "' AND categoryCode='" . $categoryCode . "' AND code!= '" . $code . "' and (`isDelete` IS NULL OR `isDelete`='0')");
 		if ($result->num_rows() > 0) {
 			$data = array('error_message' => 'Duplicate Subcategory');
 			$table_name = 'categorymaster';
@@ -232,7 +237,8 @@ class Subcategory extends CI_Controller
 			$this->load->view('dashboard/header');
 			$this->load->view('dashboard/subcategory/edit', $data);
 			$this->load->view('dashboard/footer');
-		} else {
+		}
+		else {
 			$this->form_validation->set_rules('subcategoryName', 'subcategory Name', 'required');
 			$this->form_validation->set_rules('categoryCode', 'Category Name', 'required');
 			if ($this->form_validation->run() == FALSE) {
@@ -245,7 +251,8 @@ class Subcategory extends CI_Controller
 				$this->load->view('dashboard/header');
 				$this->load->view('dashboard/subcategory/edit', $data);
 				$this->load->view('dashboard/footer');
-			} else {
+			}
+			else {
 				$data = array(
 					'categoryCode' => $categoryCode,
 					'subcategoryName' => $subcategoryName,
@@ -258,7 +265,8 @@ class Subcategory extends CI_Controller
 					$response['status'] = true;
 					$response['message'] = "Subcategory Successfully Updated.";
 					$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-				} else {
+				}
+				else {
 					$response['status'] = false;
 					$response['message'] = "No change In Subcategory";
 				}
@@ -306,7 +314,7 @@ class Subcategory extends CI_Controller
 	}
 	public function view()
 	{
-		$code = $this->input->get('code');
+		$code = $this->input->post('code') ?? $this->input->get('code');
 		//Activity Track Starts
 		$addID = $this->session->userdata['logged_in' . $this->session_key]['code'];
 		$userRole = $this->session->userdata['logged_in' . $this->session_key]['role'];
@@ -324,13 +332,13 @@ class Subcategory extends CI_Controller
 		//Activity Track Ends
 		$tableName = "subcategorymaster";
 		$orderColumns = array("subcategorymaster.*,categorymaster.categoryName");
-		$condition = array('subcategorymaster.code'=>$code, 'categorymaster.mainCategoryCode' => 'MCAT_1');
+		$condition = array('subcategorymaster.code' => $code, 'categorymaster.mainCategoryCode' => 'MCAT_1');
 		$orderBy = array('subcategorymaster' . '.id' => 'DESC');
 		$joinType = array('categorymaster' => 'inner');
 		$join = array('categorymaster' => 'categorymaster.code=subcategorymaster.categoryCode');
 		$groupByColumn = array();
-		$limit = $this->input->GET("length");
-		$offset = $this->input->GET("start");
+		$limit = $this->input->post("length") ?? $this->input->get("length");
+		$offset = $this->input->post("start") ?? $this->input->get("start");
 		$extraCondition = " subcategorymaster.isDelete=0 OR subcategorymaster.isDelete IS NULL";
 		$like = array();
 		$Records = $this->GlobalModel->selectQuery($orderColumns, $tableName, $condition, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
@@ -339,7 +347,8 @@ class Subcategory extends CI_Controller
 		foreach ($Records->result() as $row) {
 			if ($row->isActive == "1") {
 				$activeStatus = '<span class="label label-sm label-success">Active</span>';
-			} else {
+			}
+			else {
 				$activeStatus = '<span class="label label-sm label-warning">Inactive</span>';
 			}
 			$modelHtml .= '<div class="form-row">
@@ -361,7 +370,7 @@ class Subcategory extends CI_Controller
 				'logText' => $text
 			);
 			$this->GlobalModel->activityAdd($log_text, 'activitymaster', 'ACT');
-			//Activity Track Ends
+		//Activity Track Ends
 		}
 		$modelHtml .= '</form>';
 		echo $modelHtml;

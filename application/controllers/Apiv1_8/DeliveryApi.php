@@ -84,7 +84,8 @@ class DeliveryApi extends REST_Controller
 
 			$result["dashboard"] = $response;
 			$this->response(array("status" => "200", "result" => $result), 200);
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -102,7 +103,8 @@ class DeliveryApi extends REST_Controller
 
 			if (is_numeric($postData['userName'])) {
 				$loginData["mobile"] = $postData['userName'];
-			} else {
+			}
+			else {
 				$loginData["username"] = $postData['userName'];
 			}
 
@@ -110,7 +112,8 @@ class DeliveryApi extends REST_Controller
 
 				if (is_numeric($postData['userName'])) {
 					$data["mobile"] = $postData['userName'];
-				} else {
+				}
+				else {
 					$data["username"] = $postData['userName'];
 				}
 
@@ -125,22 +128,23 @@ class DeliveryApi extends REST_Controller
 						$res = $this->GlobalModel->selectQuery('deliveryBoyActiveOrder.loginStatus', 'deliveryBoyActiveOrder', array('deliveryBoyActiveOrder.deliveryBoyCode' => $userCode));
 						$loginStatus = $res->result_array()[0]['loginStatus'];
 					}
-				} else {
+				}
+				else {
 					$dataDbActive['deliveryBoyCode'] = $userCode;
 					$dataDbActive['orderCount'] = 0;
 					$dataDbActive['loginStatus'] = 1;
 					$dataDbActive['isActive'] = 1;
 					$resultDbActive = $this->GlobalModel->addWithoutYear($dataDbActive, 'deliveryBoyActiveOrder', 'DBA');
 				}
-				$cityName="";
-				$condition='`code`="'.$resultData[0]->cityCode.'"';
-                $this->db->select('cityName');
+				$cityName = "";
+				$condition = '`code`="' . $resultData[0]->cityCode . '"';
+				$this->db->select('cityName');
 				$this->db->from('citymaster');
 				$this->db->where($condition);
 				$this->db->limit(1);
 				$getCityData = $this->db->get();
-				if($getCityData->num_rows()>0){
-					foreach($getCityData->result_array() as $item){
+				if ($getCityData->num_rows() > 0) {
+					foreach ($getCityData->result_array() as $item) {
 						$cityName = $item["cityName"];
 					}
 				}
@@ -148,7 +152,7 @@ class DeliveryApi extends REST_Controller
 					'code' => $resultData[0]->code,
 					'name' => $resultData[0]->name,
 					'cityCode' => $resultData[0]->cityCode,
-					'cityName' => $cityName,					
+					'cityName' => $cityName,
 					'userName' => $resultData[0]->username,
 					'role' => $resultData[0]->role,
 					'userEmail' => $resultData[0]->userEmail,
@@ -159,20 +163,22 @@ class DeliveryApi extends REST_Controller
 					'loginStatus' => $loginStatus
 				);
 				$result['userData'] = $resultArray;
-				
-				$firestore=[
-				              "bearing"=>"0.0",
-				              "id"=>$resultData[0]->code,
-							  "latitude"=>"",
-							  "longitude"=>"",    
-						  ];
-			    //add deliveryboy to firebase			   
-			    $this->firestore->add_deliveryboy($firestore,"PATCH");				  
+
+				$firestore = [
+					"bearing" => "0.0",
+					"id" => $resultData[0]->code,
+					"latitude" => "",
+					"longitude" => "",
+				];
+				//add deliveryboy to firebase			   
+				$this->firestore->add_deliveryboy($firestore, "PATCH");
 				return $this->response(array("status" => "200", "message" => "Login Successfully...", "result" => $result), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "incorrect username or Password"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	} //end login  Process
@@ -184,20 +190,20 @@ class DeliveryApi extends REST_Controller
 		if (isset($postData["code"]) && $postData["code"] != '') {
 			$resultData = $this->ApiModel->read_Delivery_information(array("code" => $postData['code']));
 			if ($resultData != false) {
-				
-				$cityName="";
-				$condition='`code`="'.$resultData[0]->cityCode.'"';
-                $this->db->select('cityName');
+
+				$cityName = "";
+				$condition = '`code`="' . $resultData[0]->cityCode . '"';
+				$this->db->select('cityName');
 				$this->db->from('citymaster');
 				$this->db->where($condition);
 				$this->db->limit(1);
 				$getCityData = $this->db->get();
-				if($getCityData->num_rows()>0){
-					foreach($getCityData->result_array() as $item){
-						$cityName=$item["cityName"];
+				if ($getCityData->num_rows() > 0) {
+					foreach ($getCityData->result_array() as $item) {
+						$cityName = $item["cityName"];
 					}
 				}
-				
+
 				$userCode = $resultData[0]->code;
 				$loginStatus = 0;
 				$res = $this->GlobalModel->selectQuery('deliveryBoyActiveOrder.loginStatus', 'deliveryBoyActiveOrder', array('deliveryBoyActiveOrder.deliveryBoyCode' => $userCode));
@@ -207,7 +213,7 @@ class DeliveryApi extends REST_Controller
 				$resultArray = array(
 					'code' => $resultData[0]->code,
 					'name' => $resultData[0]->name,
-					'cityName'=>$cityName,
+					'cityName' => $cityName,
 					'userName' => $resultData[0]->username,
 					'role' => $resultData[0]->role,
 					'userEmail' => $resultData[0]->userEmail,
@@ -218,10 +224,12 @@ class DeliveryApi extends REST_Controller
 				);
 				$result['userData'] = $resultArray;
 				return $this->response(array("status" => "200", "result" => $result), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "No data Found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	} //end login  Process
@@ -232,21 +240,22 @@ class DeliveryApi extends REST_Controller
 		$postData = $this->post();
 		if ($postData['code'] != "" && $postData['status'] != "") {
 			if ($postData['status'] == 1) {
-				 $loginStatus=0;
+				$loginStatus = 0;
 				$dataupdate['loginStatus'] = 1;
-			} else {
+			}
+			else {
 				$dataupdate['loginStatus'] = 0;
-				$loginStatus=false;
+				$loginStatus = false;
 				$this->db->select('deliveryBoyActiveOrder.code');
 				$this->db->from('deliveryBoyActiveOrder');
 				$this->db->where('deliveryBoyActiveOrder.deliveryBoyCode', $postData['code']);
 				$this->db->where('deliveryBoyActiveOrder.orderCount', 1);
 				$this->db->where('deliveryBoyActiveOrder.orderCode IS NOT NULL');
 				$query = $this->db->get();
-				$getOrder = $query->row();				
-				if(!empty($getOrder)){
+				$getOrder = $query->row();
+				if (!empty($getOrder)) {
 					$dataupdate['loginStatus'] = 1;
-					$loginStatus=true;
+					$loginStatus = true;
 				}
 			}
 			$userCode = $postData['code'];
@@ -254,14 +263,16 @@ class DeliveryApi extends REST_Controller
 			$dataupdate['editIP'] = $_SERVER['REMOTE_ADDR'];
 			$res = $this->GlobalModel->doEditWithField($dataupdate, 'deliveryBoyActiveOrder', 'deliveryBoyCode', $userCode);
 			if ($res != 'false') {
-				if($loginStatus==true){
+				if ($loginStatus == true) {
 					return $this->response(array("status" => "200", "message" => "You have an order. You are not allowed to go offline."), 200);
 				}
 				return $this->response(array("status" => "200", "message" => "Status updated successfully"), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => " Failed to update status."), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -282,23 +293,27 @@ class DeliveryApi extends REST_Controller
 				if (isset($postData["name"]) && $postData["name"] != "") {
 					$data['name'] = $postData["name"];
 				}
-				$condition2 = array('userEmail' =>$postData["email"], 'code!=' => $postData["code"]);
-		        $result2 = $this->GlobalModel->checkDuplicateRecordNew($condition2, 'usermaster');
-				
-				$condition1 = array('mobile' =>$postData["mobile"], 'code!=' => $postData["code"]);
-		        $result1 = $this->GlobalModel->checkDuplicateRecordNew($condition1, 'usermaster');
-				if($result2==1){    
+				$condition2 = array('userEmail' => $postData["email"], 'code!=' => $postData["code"]);
+				$result2 = $this->GlobalModel->checkDuplicateRecordNew($condition2, 'usermaster');
+
+				$condition1 = array('mobile' => $postData["mobile"], 'code!=' => $postData["code"]);
+				$result1 = $this->GlobalModel->checkDuplicateRecordNew($condition1, 'usermaster');
+				if ($result2 == 1) {
 					return $this->response(array("status" => "300", "message" => "Email already exist."), 200);
-				}else if($result1==1){
+				}
+				else if ($result1 == 1) {
 					return $this->response(array("status" => "300", "message" => "Mobile number already exist."), 200);
-				}else{				
+				}
+				else {
 					$resultMaster = $this->GlobalModel->doEdit($data, 'usermaster', $postData["code"]);
 					return $this->response(array("status" => "200", "message" => "Your profile has been updated successfully."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Failed to update profile"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "300", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -329,7 +344,8 @@ class DeliveryApi extends REST_Controller
 			);
 			$filedoc = $this->GlobalModel->doEdit($subData, 'usermaster', $postData["code"]);
 			$this->response(array("status" => "200", "message" => "Profile photo uploaded successfully."), 200);
-		} else {
+		}
+		else {
 			$this->response(array("status" => "300", "message" => " * are required field(s)."), 400);
 		}
 	}
@@ -350,23 +366,26 @@ class DeliveryApi extends REST_Controller
 				$passresult = $this->GlobalModel->doEdit($passData, 'usermaster', $postData["code"]);
 				if ($passresult != false) {
 					return $this->response(array("status" => "200", "message" => "Your password has been updated successfully."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => " Failed to update your password."), 200);
 				}
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "You entered wrong current password."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
-	}  // End update password
+	} // End update password
 
 	public function getOrdersByStatus_post()
 	{
 		$postData = $this->post();
 		log_message("error", "getOrdersByStatus=>" . json_encode($postData));
 		if (isset($postData['code']) && $postData['code'] != '' && isset($postData['orderStatus']) && $postData['orderStatus'] != "") {
-			$clientOrderLista  = array();
+			$clientOrderLista = array();
 			$orderStatus = $postData['orderStatus'];
 			$orderColumns = array("'vegetable' as orderType,ordermaster.code as orderCode, 0 as tax,0 as totalPackagingCharges, ordermaster.discount,0 as subTotal,ordermaster.shippingCharges as deliveryCharges,ordermaster.paymentmode,ordermaster.address,ordermaster.phone,ordermaster.totalPrice as orderTotalPrice,ordermaster.addDate as orderDate, ordermaster.latitude,ordermaster.longitude, orderstatusmaster.statusName as orderStatus, paymentstatusmaster.statusName as paymentStatus,clientmaster.code as clientCode,clientmaster.name");
 			$join = array('clientmaster' => 'clientmaster.code = ordermaster.clientCode', 'orderstatusmaster' => 'ordermaster' . '.orderStatus=' . 'orderstatusmaster' . '.statusSName', 'paymentstatusmaster' => 'ordermaster' . '.paymentStatus=' . 'paymentstatusmaster' . '.statusSName');
@@ -411,7 +430,7 @@ class DeliveryApi extends REST_Controller
 						break;
 				}
 			}
-			$resultQuery = $this->GlobalModel->selectQuery($orderColumns, 'ordermaster', $cond, $orderBy, $join, $joinType, $like, $limit, $offset,	$groupByColumn, $extraCondition);
+			$resultQuery = $this->GlobalModel->selectQuery($orderColumns, 'ordermaster', $cond, $orderBy, $join, $joinType, $like, $limit, $offset, $groupByColumn, $extraCondition);
 			$r[] = $this->db->last_query();
 			if ($resultQuery) {
 				$clientOrderList = $resultQuery->result_array();
@@ -457,7 +476,7 @@ class DeliveryApi extends REST_Controller
 			$joinType = array('clientmaster' => 'left', 'vendororderstatusmaster' => 'inner', 'paymentstatusmaster' => 'inner');
 			$cond = array("vendorordermaster.deliveryBoyCode" => $postData['code'], "vendorordermaster.isActive" => 1);
 			$orderBy = array('vendorordermaster' . ".id" => 'DESC');
-			$like = array();  
+			$like = array();
 			$limit = "";
 			$offset = "";
 			$groupByColumn = array();
@@ -547,7 +566,7 @@ class DeliveryApi extends REST_Controller
 						$orderProductList = $orderProductRes->result_array();
 						for ($j = 0; $j < sizeof($orderProductList); $j++) {
 							$itemAr['vendorItemCode'] = $orderProductList[$j]["vendorItemCode"];
-							$itemAr['itemName'] =  $orderProductList[$j]["itemName"];
+							$itemAr['itemName'] = $orderProductList[$j]["itemName"];
 							$itemAr['addons'] = $orderProductList[$j]["addons"];
 							$itemAr['addonsCode'] = $orderProductList[$j]["addonsCode"];
 							$itemAr['quantity'] = $orderProductList[$j]["quantity"];
@@ -557,11 +576,13 @@ class DeliveryApi extends REST_Controller
 								$path = 'partner/uploads/' . $orderProductList[$j]["vendorCode"] . '/vendoritem/' . $orderProductList[$j]["itemPhoto"];
 								if (file_exists($path)) {
 									$itemAr['itemImage'] = base_url($path);
-								} else {
+								}
+								else {
 									$itemAr['itemImage'] = 'noimage';
 								}
-							} else {
-								$itemAr['itemImage'] = 'noimage'; 
+							}
+							else {
+								$itemAr['itemImage'] = 'noimage';
 							}
 							$resultArr = [];
 							if ($orderProductList[$j]['addonsCode'] != '' && $orderProductList[$j]['addonsCode'] != NULL) {
@@ -590,16 +611,18 @@ class DeliveryApi extends REST_Controller
 					}
 					$clientOrderLista[] = $order;
 				}
-				//$data[] = $clientOrderList; 
+			//$data[] = $clientOrderList; 
 			}
 			//print_r($data);
 			if (!empty($clientOrderLista)) {
 				$finalResult['orders'] = $clientOrderLista;
 				$this->response(array("status" => "200", "message" => " Order details", "result" => $finalResult), 200);
-			} else {
+			}
+			else {
 				$this->response(array("status" => "300", "message" => "No Data Found", 'r' => $r), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -623,12 +646,13 @@ class DeliveryApi extends REST_Controller
 		if (isset($postData['code']) && $postData['code'] != "" && isset($postData['orderStatus']) && $postData['orderStatus'] != "" && isset($postData['orderCode']) && $postData['orderCode'] != "") {
 			$orderStatus = $postData['orderStatus'];
 			$orderCode = $postData['orderCode'];
-			$code =	$addID =  $postData['code'];
+			$code = $addID = $postData['code'];
 			$trackingPort = '';
 			if ($orderStatus == "PLC") {
 				$ordData['orderStatus'] = 'PLC';
 				$reason = "Deliveryboy accepted order";
-			} else if ($orderStatus == "REL") {
+			}
+			else if ($orderStatus == "REL") {
 				if (isset($postData['reason'])) {
 					if ($postData['reason'] != "") {
 
@@ -658,7 +682,8 @@ class DeliveryApi extends REST_Controller
 							$orderData['deliveryBoyCode'] = null;
 							$orderData['orderStatus'] = 'PND';
 							$delbActiveOrder = $this->GlobalModel->doEditWithField($orderData, 'vendorordermaster', 'code', $orderCode);
-						} else {
+						}
+						else {
 							$VegGroOrder = $this->GlobalModel->selectQuery("ordermaster.code", "ordermaster", array("ordermaster.code" => $orderCode));
 							if ($VegGroOrder) {
 								$orderData['deliveryBoyCode'] = null;
@@ -666,20 +691,25 @@ class DeliveryApi extends REST_Controller
 								$delbActiveOrder = $this->GlobalModel->doEditWithField($orderData, 'ordermaster', 'code', $orderCode);
 							}
 						}
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "400", "message" => "PLease provide a valid reason to release this order."), 400);
 					}
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "400", "message" => "PLease provide a valid reason to release this order."), 400);
 				}
-			} else if ($orderStatus == "PUP") {
+			}
+			else if ($orderStatus == "PUP") {
 				$ordData['orderStatus'] = 'PUP';
 				$reason = "Order has been picked-up";
-			} else if ($orderStatus == 'RCH') {
+			}
+			else if ($orderStatus == 'RCH') {
 				//$ordData['orderStatus'] = 'RCH';
 				$ordData['reachStatus'] = 'RCH';
 				$reason = "Delivery person reached near the restaurant";
-			} else if ($orderStatus == "DEL") {
+			}
+			else if ($orderStatus == "DEL") {
 				$ordData['orderStatus'] = 'DEL';
 				//$ordData['trackingPort'] = NULL;
 				$FoodOrder = $this->GlobalModel->selectQuery("vendorordermaster.code", "vendorordermaster", array("vendorordermaster.code" => $orderCode));
@@ -690,7 +720,8 @@ class DeliveryApi extends REST_Controller
 					$cond = array("vendorordermaster.code" => $orderCode);
 					$tableName = 'vendorordermaster';
 					$isRes = 1;
-				} else {
+				}
+				else {
 					$orderColumns = array("clientmaster.name,ordermaster.*");
 					$join = array('clientmaster' => 'clientmaster.code = ordermaster.clientCode');
 					$joinType = array('clientmaster' => 'inner');
@@ -714,7 +745,8 @@ class DeliveryApi extends REST_Controller
 				$restDelv['editIP'] = $ip;
 				$restDelv['orderCount'] = 0;
 				$delbActiveOrder = $this->GlobalModel->doEditWithField($restDelv, 'deliveryBoyActiveOrder', 'deliveryBoyCode', $postData['code']);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "400", "message" => "Invalid Order Status"), 400);
 			}
 			#replace $ template in title 
@@ -741,7 +773,8 @@ class DeliveryApi extends REST_Controller
 							$longitude = $postData['longitude'];
 							$this->GlobalModel->doEdit(['delvLat' => $latidude, "delvLng" => $longitude], 'ordermaster', $orderCode);
 						}
-					} else {
+					}
+					else {
 						if (isset($postData['latitude']) && $postData['latitude'] != "" && isset($postData['longitude']) && $postData['longitude'] != "") {
 							$latidude = $postData['latitude'];
 							$longitude = $postData['longitude'];
@@ -764,7 +797,13 @@ class DeliveryApi extends REST_Controller
 					$delvLng = $res->result_array()[0]['delvLng'];
 
 					$cityCode = $res->result_array()[0]['cityCode'];
-                   
+
+					log_message('error', "ORDER_DEBUG: orderCode=$orderCode, cityCode=$cityCode, grandTotal=$grandTotal");
+					$allCharges = $this->db->get_where('deliverycomissionandcharges', ['cityCode' => $cityCode])->result_array();
+					foreach ($allCharges as $ch) {
+						log_message('error', "CHARGE_DEBUG: city=$cityCode, code=" . $ch['code'] . ", service=" . $ch['forWhichService'] . ", active=" . $ch['isActive']);
+					}
+
 					$orderUpdate = $this->GlobalModel->doEdit($ordData, 'ordermaster', $orderCode);
 					if ($orderUpdate == 'true') {
 						//update the status at firebase
@@ -779,95 +818,113 @@ class DeliveryApi extends REST_Controller
 								$DeviceIdsArr[] = $key->firebaseId;
 							}
 						}
+						// Calculate and save delivery boy commission for DEL status (independent of notifications)
+						if ($orderStatus == "DEL") {
+							$dBoyCommission = 0;
+							$lat2 = 16.691307;
+							$lon2 = 74.244865;
+
+							$city = $this->db->select("latitude,longitude")->from("citymaster")->where("code", $cityCode)->get()->row_array();
+							if (!empty($city)) {
+								$lat2 = $city['latitude'];
+								$lon2 = $city['longitude'];
+								if ($delvLat == null or $delvLng == null) {
+									$delvLat = $lat2;
+									$delvLng = $lon2;
+								}
+							}
+							$delv_city_pick_kms = $this->distanceInKms($delvLat, $delvLng, $lat1, $lon1);
+							$city_pick_cust_kms = $this->distanceInKms($lat1, $lon1, $lat2, $lon2);
+							$distanceinKms = $delv_city_pick_kms + $city_pick_cust_kms;
+							$dBoyCommission = $this->calculate_deliveryboy_commission("deliveryboyr_commission_vegee", $distanceinKms, $cityCode);
+							/*$extraWhere = " code in ('SET_9','SET_10','SET_11')";
+							 $settingResult = $this->GlobalModel->selectQuery('settings.*', 'settings', [], ["id" => "ASC"], [], [], [], "", "", [], $extraWhere);
+							 if ($settingResult) {
+							 $baseKms = $baseCommission = $perKmCharge = 0;
+							 foreach ($settingResult->result() as $set) {
+							 if ($set->code == "SET_9") $baseKms = $set->settingValue;
+							 if ($set->code == "SET_10") $baseCommission = $set->settingValue;
+							 if ($set->code == "SET_11") $perKmCharge = $set->settingValue;
+							 }
+							 if ($distanceinKms > $baseKms) {
+							 $extraKms = $distanceinKms - $baseKms;
+							 $extracharges = number_format($extraKms * $perKmCharge, 2, '.', '');
+							 $commission = number_format($baseCommission + $extracharges, 2, '.', '');
+							 } else {
+							 $commission = number_format($baseCommission, 2, '.', '');
+							 }*/
+
+
+							log_message("error", "Commission Earned by Delivery Executive $code Comission $dBoyCommission for Vege-Groc Order " . $orderCode);
+							$dbcAdd['commissionAmount'] = $dBoyCommission;
+							$dbcAdd['orderAmount'] = $grandTotal;
+							$dbcAdd['commissionType'] = 'regular';
+							$dbcAdd['orderCode'] = $orderCode;
+							$dbcAdd['deliveryBoyCode'] = $code;
+							$dbcAdd['orderType'] = 'vegetable';
+							$dbcAdd['isActive'] = 1;
+							$dbcAdd['isPaid'] = 0;
+							$delboyCommission = $this->GlobalModel->addNew($dbcAdd, 'deliveryboyearncommission', 'DBEC');
+
+						}
+
+						// Send notifications if client has registered devices
 						if (!empty($DeviceIdsArr)) {
 							if ($orderStatus == "PLC") {
 								$title = "New Order";
 								$message = "Your order has been placed for order no. " . $orderCode;
 								$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
-							} else if ($orderStatus == "PUP") {
+							}
+							else if ($orderStatus == "PUP") {
 								$title = "Order - " . $orderCode;
 								$message = "The order has been picked up by successfully!";
 								$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
-							} else if ($orderStatus == "RCH") {
+							}
+							else if ($orderStatus == "RCH") {
 								$title = "Order - " . $orderCode;
 								$message = "Order has been reached nearby your location";
 								$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
-							} else if ($orderStatus == "DEL") {
-                                $dBoyCommission = 0;
-								$lat2 = 16.691307;
-								$lon2 = 74.244865;
-
-								$city = $this->db->select("latitude,longitude")->from("citymaster")->where("code", $cityCode)->get()->row_array();
-								if (!empty($city)) {
-									$lat2 = $city['latitude'];
-									$lon2 = $city['longitude'];
-									if($delvLat==null or $delvLng==null){
-										$delvLat=$lat2;
-										$delvLng=$lon2;
-								    }
-								}
-								$delv_city_pick_kms = $this->distanceInKms($delvLat, $delvLng, $lat1, $lon1);
-								$city_pick_cust_kms = $this->distanceInKms($lat1, $lon1, $lat2, $lon2);
-								$distanceinKms = $delv_city_pick_kms + $city_pick_cust_kms;
-                                $dBoyCommission=$this->calculate_deliveryboy_commission("deliveryboy_commission_vegee",$distanceinKms,$cityCode);
-								/*$extraWhere = " code in ('SET_9','SET_10','SET_11')";
-								$settingResult = $this->GlobalModel->selectQuery('settings.*', 'settings', [], ["id" => "ASC"], [], [], [], "", "", [], $extraWhere);
-								if ($settingResult) {
-									$baseKms = $baseCommission = $perKmCharge = 0;
-									foreach ($settingResult->result() as $set) {
-										if ($set->code == "SET_9") $baseKms = $set->settingValue;
-										if ($set->code == "SET_10") $baseCommission = $set->settingValue;
-										if ($set->code == "SET_11") $perKmCharge = $set->settingValue;
-									}
-
-									if ($distanceinKms > $baseKms) {
-										$extraKms = $distanceinKms - $baseKms;
-										$extracharges = number_format($extraKms * $perKmCharge, 2, '.', '');
-										$commission = number_format($baseCommission + $extracharges, 2, '.', '');
-									} else {
-										$commission = number_format($baseCommission, 2, '.', '');
-									}*/
-                                   
-							
-									log_message("error", "Commission Earned by Delivery Executive $code Comission $dBoyCommission for Vege-Groc Order " . $orderCode);
-									$dbcAdd['commissionAmount'] = $dBoyCommission;
-									$dbcAdd['orderAmount'] = $grandTotal;
-									$dbcAdd['commissionType'] = 'regular';
-									$dbcAdd['orderCode'] = $orderCode;
-									$dbcAdd['deliveryBoyCode'] = $code;
-									$dbcAdd['orderType'] = 'vegetable';
-									$dbcAdd['isActive'] = 1;
-									$dbcAdd['isPaid']=0;
-									$delboyCommission = $this->GlobalModel->addNew($dbcAdd, 'deliveryboyearncommission', 'DBEC');
-								  
-								//}
-
+							}
+							else if ($orderStatus == "DEL") {
 								$title = "Order - " . $orderCode;
 								$message = "The order has been delivered successfully!";
 								$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
-							} else {
-								// no more notifications
+							}
+							else {
+							// no more notifications
 							}
 						}
 					}
-				} else {
+				}
+				else {
 					$cond2['vendorordermaster.code'] = $postData['orderCode'];
 					$res = $this->GlobalModel->selectQuery("vendorordermaster.*", "vendorordermaster", $cond2);
 					if ($res) {
 						if ($trackingPort != '' && $trackingPort != NULL) {
 							$this->db->query("update activeports set isConnected=0 where port='" . $trackingPort . "'");
 						}
-						$vendorCode  = $res->result_array()[0]['vendorCode'];
-						$clientCode  = $res->result_array()[0]['clientCode'];
-						$deliveryBoyCode  = $res->result_array()[0]['deliveryBoyCode'];
-						$grandTotal  = $res->result_array()[0]['grandTotal'];
-						$shippingCharges  = $res->result_array()[0]['shippingCharges']; 
+						$vendorCode = $res->result_array()[0]['vendorCode'];
+						$clientCode = $res->result_array()[0]['clientCode'];
+						$deliveryBoyCode = $res->result_array()[0]['deliveryBoyCode'];
+						$grandTotal = $res->result_array()[0]['grandTotal'];
+						$shippingCharges = $res->result_array()[0]['shippingCharges'];
 
 						$lat1 = $res->result_array()[0]['latitude'];
 						$lon1 = $res->result_array()[0]['longitude'];
 
 						$delvLat = $res->result_array()[0]['delvLat'];
 						$delvLng = $res->result_array()[0]['delvLng'];
+
+						log_message('error', "FOOD_ORDER_DEBUG: orderCode=" . $postData['orderCode'] . ", vendorCode=$vendorCode, grandTotal=$grandTotal");
+						$vendorInfo = $this->db->select('cityCode')->from('vendor')->where('code', $vendorCode)->get()->row_array();
+						if ($vendorInfo) {
+							$vCityCode = $vendorInfo['cityCode'];
+							log_message('error', "V_CITY_DEBUG: city=$vCityCode");
+							$allCharges = $this->db->get_where('deliverycomissionandcharges', ['cityCode' => $vCityCode])->result_array();
+							foreach ($allCharges as $ch) {
+								log_message('error', "V_CHARGE_DEBUG: city=$vCityCode, code=" . $ch['code'] . ", service=" . $ch['forWhichService'] . ", active=" . $ch['isActive']);
+							}
+						}
 
 						$dataUpCnt['orderCode'] = $postData['orderCode'];
 						$dataUpCnt['orderType'] = 'food';
@@ -885,46 +942,45 @@ class DeliveryApi extends REST_Controller
 							if (!empty($vendor)) {
 								$lat2 = $vendor['latitude'];
 								$lon2 = $vendor['longitude'];
-								$cityCode = $vendor['cityCode'];  
-                                if($delvLat==null or $delvLng==null){
-										$delvLat=$lat2;
-										$delvLng=$lon2;
-								}								
+								$cityCode = $vendor['cityCode'];
+								if ($delvLat == null or $delvLng == null) {
+									$delvLat = $lat2;
+									$delvLng = $lon2;
+								}
 							}
 
 							$delv_city_pick_kms = $this->distanceInKms($delvLat, $delvLng, $lat1, $lon1);
 							$city_pick_cust_kms = $this->distanceInKms($lat1, $lon1, $lat2, $lon2);
 							$distanceinKms = $delv_city_pick_kms + $city_pick_cust_kms;
-                            $dBoyCommission=$this->calculate_deliveryboy_commission("deliveryboy_commission_food",$distanceinKms,$cityCode);
+							$dBoyCommission = $this->calculate_deliveryboy_commission("deliveryboyr_commission_food", $distanceinKms, $cityCode);
 							/*$extraWhere = " code in ('SET_9','SET_10','SET_11')";
-							$settingResult = $this->GlobalModel->selectQuery('settings.*', 'settings', [], ["id" => "ASC"], [], [], [], "", "", [], $extraWhere);
-							if ($settingResult) {
-								$baseKms = $baseCommission = $perKmCharge = 0;
-								foreach ($settingResult->result() as $set) {
-									if ($set->code == "SET_9") $baseKms = $set->settingValue;
-									if ($set->code == "SET_10") $baseCommission = $set->settingValue;
-									if ($set->code == "SET_11") $perKmCharge = $set->settingValue;
-								}
+							 $settingResult = $this->GlobalModel->selectQuery('settings.*', 'settings', [], ["id" => "ASC"], [], [], [], "", "", [], $extraWhere);
+							 if ($settingResult) {
+							 $baseKms = $baseCommission = $perKmCharge = 0;
+							 foreach ($settingResult->result() as $set) {
+							 if ($set->code == "SET_9") $baseKms = $set->settingValue;
+							 if ($set->code == "SET_10") $baseCommission = $set->settingValue;
+							 if ($set->code == "SET_11") $perKmCharge = $set->settingValue;
+							 }
+							 if ($distanceinKms > $baseKms) {
+							 $extraKms = $distanceinKms - $baseKms;
+							 $extracharges = number_format($extraKms * $perKmCharge, 2, '.', '');
+							 $commission = number_format($baseCommission + $extracharges, 2, '.', '');
+							 } else {
+							 $commission = number_format($baseCommission, 2, '.', '');
+							 }*/
 
-								if ($distanceinKms > $baseKms) {
-									$extraKms = $distanceinKms - $baseKms;
-									$extracharges = number_format($extraKms * $perKmCharge, 2, '.', '');
-									$commission = number_format($baseCommission + $extracharges, 2, '.', '');
-								} else {
-									$commission = number_format($baseCommission, 2, '.', '');
-								}*/
+							log_message("error", "Commission Earned by Delivery Executive $code Comission $dBoyCommission for Food Order " . $orderCode);
 
-								log_message("error", "Commission Earned by Delivery Executive $code Comission $dBoyCommission for Food Order " . $orderCode);
-
-								$dbcAdd['commissionAmount'] = $dBoyCommission;
-								$dbcAdd['orderAmount'] = $grandTotal;
-								$dbcAdd['commissionType'] = 'regular';
-								$dbcAdd['orderCode'] = $orderCode;
-								$dbcAdd['deliveryBoyCode'] = $code;
-								$dbcAdd['orderType'] = 'food';
-								$dbcAdd['isActive'] = 1;
-								$dbcAdd['isPaid']=0;
-								$delboyCommission = $this->GlobalModel->addNew($dbcAdd, 'deliveryboyearncommission', 'DBEC');
+							$dbcAdd['commissionAmount'] = $dBoyCommission;
+							$dbcAdd['orderAmount'] = $grandTotal;
+							$dbcAdd['commissionType'] = 'regular';
+							$dbcAdd['orderCode'] = $orderCode;
+							$dbcAdd['deliveryBoyCode'] = $code;
+							$dbcAdd['orderType'] = 'food';
+							$dbcAdd['isActive'] = 1;
+							$dbcAdd['isPaid'] = 0;
+							$delboyCommission = $this->GlobalModel->addNew($dbcAdd, 'deliveryboyearncommission', 'DBEC');
 							//}
 
 
@@ -932,11 +988,11 @@ class DeliveryApi extends REST_Controller
 							$vendorComissionPercentage = 0;
 							$subtotal = ($grandTotal - $shippingCharges);
 							$vendorComissionResult = $this->GlobalModel->selectQuery("vendorconfiguration.defaultVendorCommission", "vendorconfiguration");
-							if($vendorComissionResult){
+							if ($vendorComissionResult) {
 								$vendorComissionPercentage = $vendorComissionResult->result_array()[0]["defaultVendorCommission"];
-								$vendorAmount=0;
+								$vendorAmount = 0;
 								$vcomission = round($subtotal * ($vendorComissionPercentage / 100));
-							    $vendorAmount=($subtotal-$vcomission);
+								$vendorAmount = ($subtotal - $vcomission);
 								$vcData['comissionAmount'] = $vcomission;
 								$vcData['deliveryBoyCode'] = $vendorCode;
 								$vcData['orderCode'] = $orderCode;
@@ -945,39 +1001,38 @@ class DeliveryApi extends REST_Controller
 								$vcData['vendorAmount'] = $vendorAmount;
 								$vcData['grandTotal'] = $grandTotal;
 								$vcData['isActive'] = 1;
-								$vcData['isPaid']=0;
-							    $vcData['commissionType'] = 'regular';
+								$vcData['isPaid'] = 0;
+								$vcData['commissionType'] = 'regular';
 								$delboyCommission = $this->GlobalModel->addNew($vcData, 'vendorordercommission', 'VNDC');
 							}
-							
-							/*$checkSlabs = $this->db->query("select ifnull(commissionRate,0) as commissionRate from vendorcommissionslabs where " . $subtotal . " between amountFrom and amountTo order by id desc limit 1");
 
-							if ($checkSlabs) {
-								if ($checkSlabs->num_rows() > 0) {
-									$vendorComissionPercentage = $checkSlabs->result_array()[0]['commissionRate'];
-								}
-							}
-							if ($vendorComissionPercentage == 0 || $vendorComissionPercentage == '' || $vendorComissionPercentage == NULL) {
-								$vendorComissionResult = $this->GlobalModel->selectQuery("vendorconfiguration.defaultVendorCommission", "vendorconfiguration");
-								$vendorComission = 0;
-								if ($vendorComissionResult) {
-									$vendorComissionPercentage = $vendorComissionResult->result_array()[0]["defaultVendorCommission"];
-								}
-							}
-							$vendorAmount = 0;
-							$vcomission = round($subtotal * ($vendorComissionPercentage / 100));
-							$vendorAmount = ($subtotal - $vcomission);
-							$vcData['comissionAmount'] = $vcomission;
-							$vcData['deliveryBoyCode'] = $vendorCode;
-							$vcData['orderCode'] = $orderCode;
-							$vcData['comissionPercentage'] = $vendorComissionPercentage;
-							$vcData['subTotal'] = $subtotal;
-							$vcData['vendorAmount'] = $vendorAmount;
-							$vcData['grandTotal'] = $grandTotal;
-							$vcData['isActive'] = 1;
-							$vcData['isPaid']=0;
-							$vcData['commissionType'] = 'regular';
-							$delboyCommission = $this->GlobalModel->addNew($vcData, 'vendorordercommission', 'VNDC');*/
+						/*$checkSlabs = $this->db->query("select ifnull(commissionRate,0) as commissionRate from vendorcommissionslabs where " . $subtotal . " between amountFrom and amountTo order by id desc limit 1");
+						 if ($checkSlabs) {
+						 if ($checkSlabs->num_rows() > 0) {
+						 $vendorComissionPercentage = $checkSlabs->result_array()[0]['commissionRate'];
+						 }
+						 }
+						 if ($vendorComissionPercentage == 0 || $vendorComissionPercentage == '' || $vendorComissionPercentage == NULL) {
+						 $vendorComissionResult = $this->GlobalModel->selectQuery("vendorconfiguration.defaultVendorCommission", "vendorconfiguration");
+						 $vendorComission = 0;
+						 if ($vendorComissionResult) {
+						 $vendorComissionPercentage = $vendorComissionResult->result_array()[0]["defaultVendorCommission"];
+						 }
+						 }
+						 $vendorAmount = 0;
+						 $vcomission = round($subtotal * ($vendorComissionPercentage / 100));
+						 $vendorAmount = ($subtotal - $vcomission);
+						 $vcData['comissionAmount'] = $vcomission;
+						 $vcData['deliveryBoyCode'] = $vendorCode;
+						 $vcData['orderCode'] = $orderCode;
+						 $vcData['comissionPercentage'] = $vendorComissionPercentage;
+						 $vcData['subTotal'] = $subtotal;
+						 $vcData['vendorAmount'] = $vendorAmount;
+						 $vcData['grandTotal'] = $grandTotal;
+						 $vcData['isActive'] = 1;
+						 $vcData['isPaid']=0;
+						 $vcData['commissionType'] = 'regular';
+						 $delboyCommission = $this->GlobalModel->addNew($vcData, 'vendorordercommission', 'VNDC');*/
 						}
 						$orderUpdate = $this->GlobalModel->doEdit($ordData, 'vendorordermaster', $postData['orderCode']);
 						if ($orderUpdate == 'true') {
@@ -995,7 +1050,8 @@ class DeliveryApi extends REST_Controller
 											$DeviceIdsArr[] = $vendorfirebaseId;
 											$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
 										}
-									} else if ($orderStatus == "PUP") {
+									}
+									else if ($orderStatus == "PUP") {
 										$title = "Order - " . $orderCode;
 										$message = "Your order has been picked up!";
 										//notifications to client										
@@ -1007,7 +1063,8 @@ class DeliveryApi extends REST_Controller
 												$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
 											}
 										}
-									} else if ($orderStatus == "RCH") {
+									}
+									else if ($orderStatus == "RCH") {
 										$title = "Order - " . $orderCode;
 										$message = "Delivery boy has reached near the restaurant...";
 										//vendor notifications
@@ -1024,7 +1081,8 @@ class DeliveryApi extends REST_Controller
 												$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
 											}
 										}
-									} else if ($orderStatus == "DEL") {
+									}
+									else if ($orderStatus == "DEL") {
 										$title = "Order - " . $orderCode;
 										$message = "The order has been delivered successfully!";
 										//vendor notifications
@@ -1041,25 +1099,30 @@ class DeliveryApi extends REST_Controller
 												$this->sendNotification($DeviceIdsArr, $title, $message, $orderCode);
 											}
 										}
-									} else {
-										// no more notifications
+									}
+									else {
+									// no more notifications
 									}
 								}
 							}
 						}
-					} else {
+					}
+					else {
 						$orderUpdate = 'false';
 					}
 				}
 				if ($orderUpdate == 'true') {
 					return $this->response(array("status" => "200", "message" => "Order Status updated successfully..."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Failed to update order status"), 200);
 				}
-			} else { 
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => "Server seems busy! Please try later"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -1074,7 +1137,8 @@ class DeliveryApi extends REST_Controller
 			if ($grandTotal > $amountUpTo) {
 				$percnVal = round($grandTotal * ($cumissionPercentage / 100));
 				$delCom = $percnVal;
-			} else {
+			}
+			else {
 				$delCom = $baseCumission;
 			}
 			$dataUpCnt['amountUpTo'] = $amountUpTo;
@@ -1092,11 +1156,11 @@ class DeliveryApi extends REST_Controller
 		$postData = $this->post();
 		if (isset($postData['code']) && $postData['code'] != '') {
 			$orderColumns = array("ordermaster.code,ordermaster.clientCode,ordermaster.orderStatus,ordermaster.orderedTime,ordermaster.placedTime,ordermaster.shippedTime,ordermaster.address,ordermaster.phone,ordermaster.totalPrice,ordermaster.areaCode,ordermaster.editId,clientmaster.code,clientmaster.name");
-			$cond=array(); 
+			$cond = array();
 			if (isset($postData['orderStatus']) && $postData['orderStatus'] != '') {
 				$cond = array('ordermaster.orderStatus' => $postData['orderStatus'], 'ordermaster.deliveryBoyCode' => $postData['code'], 'ordermaster.isActive' => 1);
 			}
-			$orderBy = array('ordermaster' . ".id" => 'DESC'); 
+			$orderBy = array('ordermaster' . ".id" => 'DESC');
 			$join = array('clientmaster' => 'clientmaster.code = ordermaster.clientCode');
 			$joinType = array('clientmaster' => 'left');
 			$extraCondition = "ordermaster.orderStatus NOT IN('RJT','DEL','CAN')";
@@ -1105,10 +1169,12 @@ class DeliveryApi extends REST_Controller
 			if ($p_result) {
 				$result['listRecords'] = $p_result->result();
 				$this->response(array("status" => "200", "message" => " Order details", "result" => $result), 200);
-			} else {
+			}
+			else {
 				$this->response(array("status" => "300", "message" => " No more Records"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -1142,7 +1208,8 @@ class DeliveryApi extends REST_Controller
 					$insertResult = $this->GlobalModel->onlyinsert($datainsert, 'orderbagcount');
 					$existsDate = date('Y-m-d');
 					$existsCount = 1;
-				} else {
+				}
+				else {
 					$existsDate = $checkExist->result()[0]->toDate;
 					$existsCount = $checkExist->result()[0]->count;
 				}
@@ -1191,10 +1258,12 @@ class DeliveryApi extends REST_Controller
 							$notification['type'] = 'order';
 							$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
 							return $this->response(array("status" => "200", "message" => "Order Successfully Placed."), 200);
-						} else {
+						}
+						else {
 							return $this->response(array("status" => "300", "message" => "Failed To delivered Order."), 200);
 						}
-					} else {
+					}
+					else {
 						$dataCount = array('count' => 1, 'toDate' => $toDate);
 						$res = $this->GlobalModel->doEditWithField($dataCount, 'orderbagcount', 'cityCode', $cityCode);
 						$data = array(
@@ -1233,11 +1302,13 @@ class DeliveryApi extends REST_Controller
 
 							$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
 							return $this->response(array("status" => "200", "message" => "Order Successfully Placed."), 200);
-						} else {
+						}
+						else {
 							return $this->response(array("status" => "300", "message" => "Failed To delivered Order."), 200);
 						}
 					}
-				} else {
+				}
+				else {
 
 					$dataCount = array('count' => 2, 'toDate' => $toDate);
 					$res = $this->GlobalModel->doEditWithField($dataCount, 'orderbagcount', 'cityCode', $cityCode);
@@ -1277,11 +1348,13 @@ class DeliveryApi extends REST_Controller
 
 						$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
 						return $this->response(array("status" => "200", "message" => "Order Successfully Placed."), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "300", "message" => "Failed To delivered Order."), 200);
 					}
 				}
-			} else if ($postData['orderStatus'] == 'DEL') {
+			}
+			else if ($postData['orderStatus'] == 'DEL') {
 				$data = array(
 					'orderStatus' => $postData['orderStatus'],
 					'paymentStatus' => 'PID',
@@ -1297,7 +1370,7 @@ class DeliveryApi extends REST_Controller
 					foreach ($getLineData->result() as $line) {
 						$productCode = $line->productCode;
 						$stock = ($line->quantity * $line->weight);
-						//$consumeStock = $this->GlobalModel->stockChange($productCode,$stock,'consume');
+					//$consumeStock = $this->GlobalModel->stockChange($productCode,$stock,'consume');
 					}
 
 
@@ -1309,8 +1382,8 @@ class DeliveryApi extends REST_Controller
 					$userRole = '';
 					$points = 0;
 					$pamount = 0;
-					$ip =   $_SERVER['REMOTE_ADDR'];
-					$datapoints =  $this->GlobalModel->selectDataByField('code', $delboyCode, 'usermaster');
+					$ip = $_SERVER['REMOTE_ADDR'];
+					$datapoints = $this->GlobalModel->selectDataByField('code', $delboyCode, 'usermaster');
 					if ($datapoints->num_rows() > 0) {
 						foreach ($datapoints->result_array() as $rp) {
 							$userRole = $rp['role'];
@@ -1348,10 +1421,12 @@ class DeliveryApi extends REST_Controller
 					$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
 
 					return $this->response(array("status" => "200", "message" => "Order Successfully Delivered."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Failed To delivered Order."), 200);
 				}
-			} else {
+			}
+			else {
 				$data = array(
 					'orderStatus' => $postData['orderStatus'],
 					'placedTime' => $timeStamp,
@@ -1371,20 +1446,20 @@ class DeliveryApi extends REST_Controller
 
 					//delivery boy penulty
 					/*$settingData = $this->GlobalModel->selectQuery("settings.settingValue","settings",array("settings.code"=>"SET_9"));
-					if($settingData){
-						$dbPenulty = $settingData->result_array()[0]['settingValue'];
-						if($dbPenulty!=0 && $dbPenulty!='' && $dbPenulty!=NULL){
-							$commAmount = round(($totalPrice * $dbPenulty) / 100,2);
-							$dbcAdd['commissionAmount'] = $commAmount;
-							$dbcAdd['orderAmount'] = $totalPrice;
-							$dbcAdd['orderCode'] = $orderCode;
-							$dbcAdd['deliveryBoyCode'] = $postData['userCode'];
-							$dbcAdd['orderType'] = 'vegetable';
-							$dbcAdd['commissionType'] = 'penalty';
-							$dbcAdd['isActive'] = 1;
-							$delboyCommission = $this->GlobalModel->addNew($dbcAdd, 'deliveryboyearncommission', 'DBEC');
-						}
-					}*/
+					 if($settingData){
+					 $dbPenulty = $settingData->result_array()[0]['settingValue'];
+					 if($dbPenulty!=0 && $dbPenulty!='' && $dbPenulty!=NULL){
+					 $commAmount = round(($totalPrice * $dbPenulty) / 100,2);
+					 $dbcAdd['commissionAmount'] = $commAmount;
+					 $dbcAdd['orderAmount'] = $totalPrice;
+					 $dbcAdd['orderCode'] = $orderCode;
+					 $dbcAdd['deliveryBoyCode'] = $postData['userCode'];
+					 $dbcAdd['orderType'] = 'vegetable';
+					 $dbcAdd['commissionType'] = 'penalty';
+					 $dbcAdd['isActive'] = 1;
+					 $delboyCommission = $this->GlobalModel->addNew($dbcAdd, 'deliveryboyearncommission', 'DBEC');
+					 }
+					 }*/
 					//notification
 					$random = rand(0, 999);
 					$datamsg = array("title" => 'Order Rejected', "message" => 'Your Order is rejected,Your order id is ' . $orderCode, "order_id" => $orderCode, "random_id" => $random);
@@ -1410,11 +1485,13 @@ class DeliveryApi extends REST_Controller
 					$notify = $this->notificationlibv_3->pushNotification($dataArr, $notification);
 
 					return $this->response(array("status" => "200", "message" => "Order Successfully Rejected."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Failed To Reject Order."), 200);
 				}
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => "* are Required field(s)."), 400);
 		}
 	}
@@ -1486,10 +1563,12 @@ class DeliveryApi extends REST_Controller
 				}
 				$finalResult['orders'] = $clientOrderList;
 				$this->response(array("status" => "200", 'totalPrice' => $totalamount, "message" => " Order details", "result" => $finalResult, "totalRecords" => $totalOrders), 200);
-			} else {
+			}
+			else {
 				$this->response(array("status" => "300", "message" => " No more Records"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -1566,10 +1645,12 @@ class DeliveryApi extends REST_Controller
 
 				$finalResult['orders'] = $clientOrderList;
 				$this->response(array("status" => "200", "message" => " Order details", "result" => $finalResult, "totalRecords" => $totalOrders), 200);
-			} else {
-				$this->response(array("status" => "400", "message" => " No more Records",), 200);
 			}
-		} else {
+			else {
+				$this->response(array("status" => "400", "message" => " No more Records", ), 200);
+			}
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -1585,13 +1666,15 @@ class DeliveryApi extends REST_Controller
 			$resultMaster = $this->GlobalModel->doEdit($dataMaster, 'usermaster', $postData["code"]);
 			if ($resultMaster != false) {
 				return $this->response(array("status" => "200", "message" => "Firebase Id Update Successfully"), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => " Failed to update Firebase Id."), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are required field(s)."), 400);
 		}
-	}  // End update firebaseId
+	} // End update firebaseId
 
 	//get client Delivered order list
 	public function getCommissionRecords_post()
@@ -1607,11 +1690,13 @@ class DeliveryApi extends REST_Controller
 				}
 				$finalResult = array('totalPoints' => strval($points));
 				$this->response(array("status" => "200", "message" => "Touch point Total Amount", "result" => $finalResult), 200);
-			} else {
+			}
+			else {
 				$finalResult = array('totalPoints' => 0);
 				$this->response(array("status" => "300", "message" => "Comimission Details", "result" => $finalResult), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -1627,10 +1712,12 @@ class DeliveryApi extends REST_Controller
 			$member = $this->GlobalModel->selectQuery($orderColumns, $tableName, $cond);
 			if ($member) {
 				$this->response(array("status" => "200", "message" => "User Active"), 200);
-			} else {
+			}
+			else {
 				$this->response(array("status" => "300", "message" => "User InActive"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -1671,10 +1758,12 @@ class DeliveryApi extends REST_Controller
 					}
 					$finalResult['orders'] = $clientOrderList;
 					return $this->response(array("status" => "200", "totalOrders" => $totalOrders, "type" => 'vendor', "result" => $finalResult), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 				}
-			} else {
+			}
+			else {
 				$orderVegiz = $this->GlobalModel->selectQuery('ordermaster.*', 'ordermaster', array('ordermaster.editID' => $deliveryBoyCode, 'ordermaster.orderStatus' => 'PND'));
 				if ($orderVegiz) {
 					$orderCode = $orderVegiz->result_array()[0]['code'];
@@ -1718,14 +1807,17 @@ class DeliveryApi extends REST_Controller
 						}
 						$finalResult['orders'] = $clientOrderList;
 						return $this->response(array("status" => "200", "totalOrders" => $totalOrders, "type" => 'vegiz', "result" => $finalResult), 200);
-					} else {
+					}
+					else {
 						return $this->response(array("status" => "400", "message" => "Data not found."), 200);
 					}
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 				}
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "msg" => " * are required field(s)."), 400);
 		}
 	}
@@ -1748,10 +1840,12 @@ class DeliveryApi extends REST_Controller
 			if ($resultData) {
 				$data['statusList'] = $resultData->result_array();
 				return $this->response(array("status" => "200", "msg" => "Data Found", "result" => $data), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "msg" => "No Data Found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "msg" => "* fields are required"), 200);
 		}
 	}
@@ -1764,10 +1858,12 @@ class DeliveryApi extends REST_Controller
 			if ($resultData) {
 				$data['historyList'] = $resultData->result_array();
 				return $this->response(array("status" => "200", "msg" => "Data Found", "result" => $data), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "msg" => "No Data Found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "msg" => "* fields are required"), 200);
 		}
 	}
@@ -1789,14 +1885,15 @@ class DeliveryApi extends REST_Controller
 		$notification['random_id'] = $random;
 		$notification['type'] = 'order';
 		$notify = $this->notificationlibv_3->sendNotification($dataArr, $notification);
-	    log_message(
+		log_message(
 			'error',
 			'Dboy Notification result -> ' . json_encode($notify, JSON_UNESCAPED_UNICODE)
 		);
-	} 
-	
-	public function sendTestNoti_get(){
-		$this->sendNotification(array("edrpdYLoRke1qb1QO0FsY_:APA91bEK6luDfy1_7xhEx4k8t1mI7T6k-1J5EjkXdVW4dDy4eYF4APvOTomHQHSGspcQWnUmLcdYvLD9Hd6EInUPIJRWI73rAukkhSwalOCGw8B18ACc2v0"),"hello","how r you?",rand(000,999));
+	}
+
+	public function sendTestNoti_get()
+	{
+		$this->sendNotification(array("edrpdYLoRke1qb1QO0FsY_:APA91bEK6luDfy1_7xhEx4k8t1mI7T6k-1J5EjkXdVW4dDy4eYF4APvOTomHQHSGspcQWnUmLcdYvLD9Hd6EInUPIJRWI73rAukkhSwalOCGw8B18ACc2v0"), "hello", "how r you?", rand(000, 999));
 	}
 
 	public function getDeliveredOrdersList_post()
@@ -1829,10 +1926,12 @@ class DeliveryApi extends REST_Controller
 				}
 				$res['deliveryChargesEarnedList'] = $data;
 				return $this->response(array("status" => "200", "deliveryAmountEarned" => $totalAmount, "totalReturnAmount" => number_format($totalReturnAmount, 2), "msg" => "Data found", "result" => $res), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "msg" => "No Data Found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "msg" => "* fields are required"), 200);
 		}
 	}
@@ -1848,10 +1947,12 @@ class DeliveryApi extends REST_Controller
 			$resultMaster = $this->GlobalModel->doEdit($dataMaster, 'usermaster', $postData["code"]);
 			if ($resultMaster != false) {
 				return $this->response(array("status" => "200", "message" => "Record updated successfully"), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => " Failed to update record."), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "msg" => "* fields are required"), 200);
 		}
 	}
@@ -1872,10 +1973,12 @@ class DeliveryApi extends REST_Controller
 					$totalAmount = $totalAmount + $Rec['commissionAmount'];
 				}
 				return $this->response(array("status" => "200", "totalAmount" => $totalAmount, "result" => $arr), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "300", "message" => " No data found"), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * fields are required."), 200);
 		}
 	}
@@ -1897,7 +2000,8 @@ class DeliveryApi extends REST_Controller
 				array_unshift($data, $arr);
 				$newJsonString = json_encode($data);
 				file_put_contents($filename, $newJsonString);
-			} else {
+			}
+			else {
 				$content = json_encode(array($arr));
 				file_put_contents($filename, $content, FILE_APPEND | LOCK_EX);
 			}
@@ -1906,7 +2010,8 @@ class DeliveryApi extends REST_Controller
 			$response['addDate'] = $currentTime;
 			$response['success'] = true;
 			return $this->response(array("status" => "200", "message" => "Location updated successfully", "result" => $response), 200);
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * fields are required."), 200);
 		}
 	}
@@ -1915,13 +2020,13 @@ class DeliveryApi extends REST_Controller
 	{
 		$postData = $this->post();
 		if (isset($postData['deliveryBoyCode']) && $postData['deliveryBoyCode'] != '') {
-			$clientOrderLista  = array();
+			$clientOrderLista = array();
 			$deliveryBoyCode = $postData["deliveryBoyCode"];
 			$extraCondition = "vendorordermaster.orderStatus NOT IN ('DEL','CAN','RJT')";
 			$orderVendor = $this->GlobalModel->selectQuery('vendorordermaster.*', 'vendorordermaster', array('vendorordermaster.deliveryBoyCode' => $deliveryBoyCode), array('vendorordermaster' . ".id" => 'DESC'), array(), array(), array(), "1", "", array(), $extraCondition);
 			if ($orderVendor && $orderVendor->num_rows() > 0) {
 				$orderCode = $orderVendor->result_array()[0]['code'];
-				$tableName = "vendorordermaster"; 
+				$tableName = "vendorordermaster";
 				$orderColumns = array("'food' as orderType,vendorordermaster.code as orderCode,vendorordermaster.shippingCharges as deliveryCharges,vendorordermaster.paymentmode,vendorordermaster.clientCode as clientCode,vendorordermaster.phone,clientmaster.name as clientName,clientmaster.emailid,vendorordermaster.address as clientAddress,vendorordermaster.subTotal,vendorordermaster.tax,vendorordermaster.grandTotal as orderTotalPrice,ifnull(vendorordermaster.totalPackgingCharges,0) as totalPackgingCharges,vendorordermaster.preparingMinutes,vendorordermaster.discount,vendorordermaster.addDate as orderDate, vendororderstatusmaster.statusSName as orderStatus, IFNULL(vendorordermaster.reachStatus,'') as reachStatus, paymentstatusmaster.statusSName as paymentStatus,vendor.code as vendorCode,vendor.entityName as vendorName,vendor.address as vendorAddress,vendor.ownerContact as vendorContact,vendor.latitude as vendorLatitude,vendor.longitude as vendorLogitude,vendor.entityImage as image,bookorderstatuslineentries.statusTime,vendor.cityCode,ifnull(vendorordermaster.preparingMinutes,30) as  preparationTime,IFNULL(DATE_FORMAT(vendorordermaster.orderAcceptedTime, '%H:%i:%s'), '') as orderAcceptedTime");
 				$cond = array("vendorordermaster.code" => $orderCode, "vendorordermaster.isActive" => 1);
 				$extra = "vendorordermaster.orderStatus NOT IN ('DEL','CAN','RJT')";
@@ -1949,7 +2054,7 @@ class DeliveryApi extends REST_Controller
 							$orderProductList = $orderProductRes->result_array();
 							for ($j = 0; $j < sizeof($orderProductList); $j++) {
 								$itemAr['vendorItemCode'] = $orderProductList[$j]["vendorItemCode"];
-								$itemAr['itemName'] =  $orderProductList[$j]["itemName"];
+								$itemAr['itemName'] = $orderProductList[$j]["itemName"];
 								$itemAr['addons'] = $orderProductList[$j]["addons"];
 								$itemAr['addonsCode'] = $orderProductList[$j]["addonsCode"];
 								$itemAr['quantity'] = $orderProductList[$j]["quantity"];
@@ -1959,11 +2064,13 @@ class DeliveryApi extends REST_Controller
 									$path = 'partner/uploads/' . $orderProductList[$j]["vendorCode"] . '/vendoritem/' . $orderProductList[$j]["itemPhoto"];
 									if (file_exists($path)) {
 										$itemAr['itemImage'] = base_url($path);
-									} else {
+									}
+									else {
 										$itemAr['itemImage'] = 'noimage';
 									}
-								} else {
-									$itemAr['itemImage'] = 'noimage'; 
+								}
+								else {
+									$itemAr['itemImage'] = 'noimage';
 								}
 								$resultArr = [];
 								if ($orderProductList[$j]['addonsCode'] != '' && $orderProductList[$j]['addonsCode'] != NULL) {
@@ -1986,25 +2093,28 @@ class DeliveryApi extends REST_Controller
 							}
 							$order["vendorImage"] = base_url() . 'uploads/vendor/' . $clientOrderList[$i]['vendorCode'] . '/' . $clientOrderList[$i]['image'];
 							$order['totalItems'] = sizeof($orderProductList);
-							$order['orderedItems'] = $itemsArray;							
+							$order['orderedItems'] = $itemsArray;
 							$dFormat = DateTime::createFromFormat('Y-m-d H:i:s', $clientOrderList[$i]['orderDate']);
 							$oDt = $dFormat->format('d-m-Y H:i:s');
 							$order["orderDate"] = $oDt;
 						}
 						$clientOrderLista[] = $order;
-						//$clientOrderList[$i]['orderedItems'] = $orderProductList;
+					//$clientOrderList[$i]['orderedItems'] = $orderProductList;
 					}
 					$finalResult['orders'] = $clientOrderLista;
 					return $this->response(array("status" => "200", "totalOrders" => $totalOrders, "type" => 'food', "result" => $finalResult), 200);
-				} else {
+				}
+				else {
 					//vege grocery order check
 					$this->getVegeGrocAssignedOrders($deliveryBoyCode);
 				}
-			} else {
+			}
+			else {
 				//vege grocery order check
 				$this->getVegeGrocAssignedOrders($deliveryBoyCode);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "400", "message" => " * are Required field(s)."), 400);
 		}
 	}
@@ -2013,10 +2123,10 @@ class DeliveryApi extends REST_Controller
 	{
 		$vLat = "16.704987";
 		$vLng = "74.243253";
-		$vAddress = $vCode = $vName = $vContact ="";
+		$vAddress = $vCode = $vName = $vContact = "";
 		$vImage = 'MYVEGIZ LOGO 3rd-01-cut.png';
 		$vImageUrl = base_url('assets/images/MYVEGIZ LOGO 3rd-01-cut.png');
-		$vendor  = $this->db->select("deliverycharge.*")->from("deliverycharge")->where('id', 1)->get()->row_array();
+		$vendor = $this->db->select("deliverycharge.*")->from("deliverycharge")->where('id', 1)->get()->row_array();
 		if (!empty($vendor)) {
 			$vCode = $vendor['code'];
 			$vName = $vendor['companyName'];
@@ -2054,7 +2164,7 @@ class DeliveryApi extends REST_Controller
 					$clientOrderList[$i]['vendorName'] = "MyVegiz";
 					$clientOrderList[$i]['vendorAddress'] = "Mukt Sainik Colony, Kolhapur, Maharashtra 416005";
 					$clientOrderList[$i]['vendorContact'] = "9373747055";
-					$clientOrderList[$i]['image']  = $vImage;
+					$clientOrderList[$i]['image'] = $vImage;
 					$clientOrderList[$i]['vendorImage'] = $vImageUrl;
 					$clientOrderList[$i]['reachStatus'] = $clientOrderList[$i]['reachStatus'] ?? "";
 					$clientOrderList[$i]['emailid'] = $clientOrderList[$i]['emailid'] ?? "";
@@ -2085,60 +2195,107 @@ class DeliveryApi extends REST_Controller
 						$dFormat = DateTime::createFromFormat('Y-m-d H:i:s', $clientOrderList[$i]['orderDate']);
 						$oDt = $dFormat->format('d-m-Y H:i:s');
 						$clientOrderList[$i]['orderDate'] = $oDt;
-						
+
 					}
 				}
 				$finalResult['orders'] = $clientOrderList;
 				return $this->response(array("status" => "200", "totalOrders" => $totalOrders, "type" => 'vegetable', "result" => $finalResult), 200);
-			} else {
+			}
+			else {
 				return $this->response(array("status" => "400", "message" => "Data not found."), 200);
 			}
-		} else {
+		}
+		else {
 			return $this->response(array("status" => "300", "message" => "Data not found."), 200);
 		}
 	}
-	
-	public function calculate_deliveryboy_commission($type,$distanceinKms,$cityCode){
-		$deliveryCharge = $dBoyCommission = $perKmCharges = $minimumKmForFixedCharges =$minimumChargesForFixedKm  = 0;					
-		$chargesResult = $this->GlobalModel->selectQuery('deliverycomissionandcharges.*', 'deliverycomissionandcharges', array('deliverycomissionandcharges.cityCode' => $cityCode ,'deliverycomissionandcharges.forWhichService'=>$type));        
-		$fixedDeliveryFlag=0;   
-		if ($chargesResult) {
-			$charge = $chargesResult->result()[0];				
-			if($charge->isFixedChargesFlag==1){				
-				$deliveryBoyCommission=$charge->fixedChargesOrCommission;  										
-				$fixedDeliveryFlag=1;
+
+	public function calculate_deliveryboy_commission($type, $distanceinKms, $cityCode)
+	{
+		$deliveryCharge = $dBoyCommission = $perKmCharges = $minimumKmForFixedCharges = $minimumChargesForFixedKm = 0;
+		$chargesResult = $this->GlobalModel->selectQuery('deliverycomissionandcharges.*', 'deliverycomissionandcharges', array('deliverycomissionandcharges.cityCode' => $cityCode, 'deliverycomissionandcharges.forWhichService' => $type, 'deliverycomissionandcharges.isActive' => 1));
+
+		// Fallback 1: Try without the extra 'r'
+		if (!$chargesResult && strpos($type, 'deliveryboyr_') === 0) {
+			$fallbackType = str_replace('deliveryboyr_', 'deliveryboy_', $type);
+			$chargesResult = $this->GlobalModel->selectQuery('deliverycomissionandcharges.*', 'deliverycomissionandcharges', array('deliverycomissionandcharges.cityCode' => $cityCode, 'deliverycomissionandcharges.forWhichService' => $fallbackType, 'deliverycomissionandcharges.isActive' => 1));
+			if ($chargesResult)
+				$type = $fallbackType;
+		}
+
+		// Fallback 2: Broader search for ANY active delivery boy commission for this city
+		if (!$chargesResult) {
+			$chargesResult = $this->db->select('*')
+				->from('deliverycomissionandcharges')
+				->where('cityCode', $cityCode)
+				->where('isActive', 1)
+				->like('forWhichService', 'deliveryboy', 'after')
+				->get();
+			if ($chargesResult->num_rows() == 0) {
+				// Try even broader
+				$chargesResult = $this->db->select('*')
+					->from('deliverycomissionandcharges')
+					->where('cityCode', $cityCode)
+					->where('isActive', 1)
+					->group_start()
+					->like('forWhichService', 'delivery', 'both')
+					->like('forWhichService', 'commission', 'both')
+					->group_end()
+					->get();
 			}
-			else
-			{
-				$minimumKmForFixedCharges  = $charge->minimumKmForFixedCharges;
-				$minimumChargesForFixedKm =$charge->minimumChargesForFixedKm;
-				$perKmCharges = $charge->perKmCharges;  
-				
+			if ($chargesResult && $chargesResult->num_rows() == 0)
+				$chargesResult = false;
+		}
+
+		$fixedDeliveryFlag = 0;
+		$debug = "DEBUG: type=$type, dist=$distanceinKms, city=$cityCode\n";
+		if ($chargesResult) {
+			$charge = $chargesResult->result()[0];
+			$debug .= "FOUND: code=" . $charge->code . ", isFixed=" . $charge->isFixedChargesFlag . ", val=" . $charge->fixedChargesOrCommission . "\n";
+			if ($charge->isFixedChargesFlag == 1) {
+				$deliveryBoyCommission = $charge->fixedChargesOrCommission;
+				$fixedDeliveryFlag = 1;
+			}
+			else {
+				$minimumKmForFixedCharges = $charge->minimumKmForFixedCharges;
+				$minimumChargesForFixedKm = $charge->minimumChargesForFixedKm;
+				$perKmCharges = $charge->perKmCharges;
+
 			}
 		}
-		if($fixedDeliveryFlag==1){
-			
-			 $shortestdistance=$distanceinKms;
-			 $dBoyCommission=$deliveryBoyCommission;
-		}else{
-			 if($distanceinKms > $minimumKmForFixedCharges){
+		else {
+			$debug .= "NOT FOUND in DB\n";
+			// Try a broader search to see what's there
+			$all = $this->db->get_where('deliverycomissionandcharges', ['cityCode' => $cityCode])->result_array();
+			foreach ($all as $a) {
+				$debug .= "CITY_RECORD: code=" . $a['code'] . ", service=" . $a['forWhichService'] . ", active=" . $a['isActive'] . "\n";
+			}
+		}
+		if ($fixedDeliveryFlag == 1) {
+
+			$shortestdistance = $distanceinKms;
+			$dBoyCommission = $deliveryBoyCommission;
+		}
+		else {
+			if ($distanceinKms > $minimumKmForFixedCharges) {
 				$finalDistance = $distanceinKms - $minimumKmForFixedCharges;
 				$shortestdistance = $distanceinKms;
-				$shippingCharges1 = $minimumChargesForFixedKm; 
+				$shippingCharges1 = $minimumChargesForFixedKm;
 				$shippingCharges1 = $shippingCharges1 + ($finalDistance * $perKmCharges);
 				$dBoyCommission = $shippingCharges1;
 			}
-			else
-			{
+			else {
 				$shortestdistance = $distanceinKms;
-				$dBoyCommission = $minimumChargesForFixedKm;    
+				$dBoyCommission = $minimumChargesForFixedKm;
 			}
 		}
-		//echo $distanceinKms;
+		$debug .= "RESULT: $dBoyCommission\n";
+		file_put_contents('tmp_debug.txt', $debug, FILE_APPEND);
+		log_message('error', "calculate_deliveryboy_commission: type=$type, cityCode=$cityCode, distance=$distanceinKms, result=$dBoyCommission");
 		return $dBoyCommission;
 	}
-	
-    public function resetPassword_post()
+
+	public function resetPassword_post()
 	{
 		$postData = $this->post();
 		if ($postData["userName"] != '') {
@@ -2155,14 +2312,18 @@ class DeliveryApi extends REST_Controller
 				$insertResult = $this->GlobalModel->onlyinsert($insertArr, 'resetpassword');
 				if ($insertResult != 'false') {
 					return $this->response(array("status" => "200", "message" => " Reset password Request sent. default password is 123456 ... try after admin reset. Change your password after login."), 200);
-				} else {
+				}
+				else {
 					return $this->response(array("status" => "400", "message" => " Opps...! Something went wrong please try again."), 200);
 				}
-			} else {
+			}
+			else {
 				$this->response(array("status" => "400", "message" => "Please Enter Registered username!"), 200);
 			}
-		} else {
+		}
+		else {
 			$this->response(array("status" => "400", "message" => "All * fileds are required"), 400);
 		}
-	}	
+	}
+
 }

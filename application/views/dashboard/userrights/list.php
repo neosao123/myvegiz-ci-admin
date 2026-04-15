@@ -90,7 +90,7 @@
 			{
 				$("#myform").empty();
 				$.ajax({
-					type: "get",
+					type: "POST",
 					url: base_path+"Userrights/getRightsForRole", 
 					data: {'role':role}, 
 					success:function(response)

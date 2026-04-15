@@ -16,7 +16,8 @@ class GlobalModel extends CI_Model
         $currentId = $this->db->insert_id();
         if ($currentId > 0) {
             $res = $currentId;
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -31,7 +32,8 @@ class GlobalModel extends CI_Model
 
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -50,15 +52,19 @@ class GlobalModel extends CI_Model
             $len = strlen($currentId);
             if ($len == 1) {
                 $leadingZeros = "000";
-            } else if ($len == 2) {
+            }
+            else if ($len == 2) {
                 $leadingZeros = "00";
-            } else if ($len == 3) {
+            }
+            else if ($len == 3) {
                 $leadingZeros = "0";
-            } else {
+            }
+            else {
                 $leadingZeros = "";
             }
             $hashCode = $initial . "_" . $leadingZeros . $currentId;
-        } else {
+        }
+        else {
             //Update Code with update query
             $hashCode = $initial . "_" . $currentId;
         }
@@ -68,7 +74,8 @@ class GlobalModel extends CI_Model
         if ($this->db->affected_rows() > 0) {
 
             $res = $hashCode;
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -91,7 +98,8 @@ class GlobalModel extends CI_Model
         if ($this->db->affected_rows() > 0) {
 
             $res = $hashCode;
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -116,7 +124,8 @@ class GlobalModel extends CI_Model
             $res['code'] = $hashCode;
             $res['photo'] = $photopath;
             $res['status'] = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -130,7 +139,8 @@ class GlobalModel extends CI_Model
         $this->db->query("UPDATE `" . $tblname . "` SET `addDate` = '" . $nowdate . "' WHERE `id` = '" . $currentId . "'");
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -182,11 +192,12 @@ class GlobalModel extends CI_Model
         $this->db->query("UPDATE `" . $logtable . "` SET `code` = '" . $hashActCode . "', `date` = '" . $nowdate . "'    WHERE `id` = '" . $currentActId . "'");
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
-        //}
+    //}
     }
 
     //select data by creating view
@@ -210,7 +221,8 @@ class GlobalModel extends CI_Model
                 if ($lc == 0) {
                     $this->db->like($k, $val[0], $val[1]);
                     $lc++;
-                } else {
+                }
+                else {
                     $this->db->or_like($k, $val[0], $val[1]);
                 }
             }
@@ -218,7 +230,8 @@ class GlobalModel extends CI_Model
         foreach ($join as $key => $val) {
             if (!empty($joinType) && $joinType[$key] != "") {
                 $this->db->join($key, $val, $joinType[$key]);
-            } else {
+            }
+            else {
                 $this->db->join($key, $val);
             }
         }
@@ -234,10 +247,12 @@ class GlobalModel extends CI_Model
         //echo $this->db->last_query(); die;
         if (is_bool($query)) {
             return false;
-        } else {
+        }
+        else {
             if ($query->num_rows() > 0) {
                 return $query;
-            } else {
+            }
+            else {
                 return false;
             }
         }
@@ -311,17 +326,17 @@ class GlobalModel extends CI_Model
 
     //*************Common Method for Get Data from third table based on other two table join *********************
     /*1. First Table name which contains our value
-    2. First Table column which is use for compare with other table
-    3. First Table column which contains our actual value
-    4. Second Table which contains resultant value's code
-    5. Second Table column which is use for compare with other table
-    6. Alias of Second Table column
-    6. Second Table column which contains our actual value's code
-    7. Third Table which contains resultant value
-    8. Third Table column which is use for compare with other table
-    9. Alias of Third Table column
-    10.Third Table column which contains our actual value
-    11.Our Input, based on we are searching result from other tables.
+     2. First Table column which is use for compare with other table
+     3. First Table column which contains our actual value
+     4. Second Table which contains resultant value's code
+     5. Second Table column which is use for compare with other table
+     6. Alias of Second Table column
+     6. Second Table column which contains our actual value's code
+     7. Third Table which contains resultant value
+     8. Third Table column which is use for compare with other table
+     9. Alias of Third Table column
+     10.Third Table column which contains our actual value
+     11.Our Input, based on we are searching result from other tables.
      */
     public function selectCombineResult($tblname1, $tblname1FieldForCompare, $tblname1FieldForResult, $tblname2, $tblname2Field1, $tblname2FieldAlias1, $tblname2Field2, $tblname3, $tblname3Field1, $tblname3FieldAlias1, $tblname3Field2, $value)
     {
@@ -416,7 +431,8 @@ class GlobalModel extends CI_Model
         $fromCondtions = substr($fromCondtions, 0, -3);
         if ($select == 1) {
             $select = "";
-        } else {
+        }
+        else {
             $select = 'SELECT * FROM';
         }
 
@@ -431,7 +447,8 @@ class GlobalModel extends CI_Model
         $query = $this->db->query("SELECT * FROM `" . $tblname . "` WHERE `code` = '" . $id . "'");
         if ($this->db->affected_rows() > 0) {
             $res = $query;
-        } else {
+        }
+        else {
             $res = null;
         }
         return $res;
@@ -442,7 +459,8 @@ class GlobalModel extends CI_Model
         $query = $this->db->query("SELECT * FROM `" . $tblname . "` WHERE `" . $field . "` = '" . $value . "'");
         if ($this->db->affected_rows() > 0) {
             $res = $query;
-        } else {
+        }
+        else {
             $res = null;
         }
         return $res;
@@ -453,7 +471,8 @@ class GlobalModel extends CI_Model
         $query = $this->db->query("SELECT * FROM `" . $tblname . "` WHERE `" . $field . "` = '" . $value . "' AND orderStatus='PND' AND clientCode='" . $client . "'");
         if ($this->db->affected_rows() > 0) {
             $res = $query;
-        } else {
+        }
+        else {
             $res = false;
         }
         return $res;
@@ -467,7 +486,8 @@ class GlobalModel extends CI_Model
         for ($t = 0; $t < sizeof($requiredColumns); $t++) {
             if ($t == ($limit - 1)) {
                 $columns .= "`" . $requiredColumns[$t] . "`";
-            } else {
+            }
+            else {
                 $columns .= "`" . $requiredColumns[$t] . "`,";
             }
         }
@@ -491,7 +511,7 @@ class GlobalModel extends CI_Model
         // $querym =  $this->db->query("Select SUM(projectNo) FROM projects");
 
         return $query;
-        // return $querym;
+    // return $querym;
     }
     public function doEdit($data, $tblname, $code)
     {
@@ -503,7 +523,8 @@ class GlobalModel extends CI_Model
 
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -518,7 +539,8 @@ class GlobalModel extends CI_Model
         $this->db->update($tblname, $data);
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -530,7 +552,8 @@ class GlobalModel extends CI_Model
         $this->db->query("UPDATE `" . $tblname . "` SET `isDelete` = '1', `isActive` = '0', `deleteDate` = '" . $nowdate . "'  WHERE `code` = '" . $id . "'");
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -542,7 +565,8 @@ class GlobalModel extends CI_Model
         $this->db->query("UPDATE `" . $tblname . "` SET `isDelete` = '1', `isActive` = '0', `deleteDate` = '" . $nowdate . "'  WHERE `" . $field . "` = '" . $id . "'");
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -554,7 +578,8 @@ class GlobalModel extends CI_Model
         $this->db->query("UPDATE `" . $tblname . "` SET `isDelete` = '1', `deleteDate` = '" . $nowdate . "'  WHERE `code` = '" . $id . "'");
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -565,7 +590,8 @@ class GlobalModel extends CI_Model
         $res = $this->db->query("DELETE FROM `" . $tblname . "` WHERE `code` = '" . $id . "'");
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -577,7 +603,8 @@ class GlobalModel extends CI_Model
         $res = $this->db->query("DELETE FROM `" . $tblname . "` WHERE `" . $field . "` = '" . $value . "'");
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -589,7 +616,8 @@ class GlobalModel extends CI_Model
         $res = $this->db->query("DELETE FROM `" . $tblname . "` WHERE " . $fieldCondition);
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -651,13 +679,15 @@ class GlobalModel extends CI_Model
         $query = $this->db->query("SELECT * FROM `" . $tblname . "` WHERE `" . $field . "`='" . $value . "' AND (`isDelete` IS NULL OR `isDelete`='0')");
         if ($query) {
             $count_row = $query->num_rows();
-        } else {
+        }
+        else {
             $count_row = 0;
         }
 
         if ($count_row > 0) {
             $stmt = true;
-        } else {
+        }
+        else {
             $stmt = false;
         }
         return $stmt;
@@ -686,12 +716,12 @@ class GlobalModel extends CI_Model
         $query = $this->db->query("SELECT DISTINCT `itemCode` FROM `itemvendormaster` WHERE vendorCode ='" . $vendor . "' ");
         //$query = $this->db->query("SELECT DISTINCT `itemvendormaster`.`code` ,  `itemmaster`.`name` FROM `itemvendormaster` INNER JOIN `itemmaster` ON `itemvendormaster`.`code` = `itemmaster`.`code` WHERE `itemvendormaster`.vendorCode ='".$vendor."' " );
         return $query;
-        // if ($this->db->affected_rows() > 0) {
-        // $res = $query;
-        // } else {
-        // $res = 'null';
-        // }
-        // return $res;
+    // if ($this->db->affected_rows() > 0) {
+    // $res = $query;
+    // } else {
+    // $res = 'null';
+    // }
+    // return $res;
     }
 
     ////////////////////// get Line Item list from PR  //////////////////////
@@ -703,7 +733,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -715,7 +746,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -728,7 +760,8 @@ class GlobalModel extends CI_Model
 
         if ($this->db->affected_rows() > 0) {
             $res = $query;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -752,17 +785,20 @@ class GlobalModel extends CI_Model
             $updateQueryResult = $this->db->affected_rows();
             if ($updateQueryResult > 0) {
                 $result = 'true';
-            } else {
+            }
+            else {
                 $result = 'false';
             }
             return $result;
-        } else {
+        }
+        else {
             $insertQuery = $this->db->query("insert into `stockinfo` (productCode,stock) values ('" . $productCode . "','" . $stock . "')");
             //print_r($insertQuery);
             //$insertQueryResult = $this->db->affected_rows();
             if ($insertQuery == 1) {
                 $result = $insertQuery;
-            } else {
+            }
+            else {
                 $result = 'false';
             }
             return $result;
@@ -784,21 +820,25 @@ class GlobalModel extends CI_Model
                 $updateQuery = $this->db->query("UPDATE `stockinfo` SET `stock` = '" . $newStock . "' WHERE `productCode` ='" . $productCode . "' ");
                 if ($this->db->affected_rows() > 0) {
                     $result = 'true';
-                } else {
+                }
+                else {
                     $result = 'false';
                 }
-            } else {
+            }
+            else {
 
                 $newStock = $currentStock - $stock;
                 $updateQuery = $this->db->query("UPDATE `stockinfo` SET `stock` = '" . $newStock . "' WHERE `productCode` ='" . $productCode . "' ");
 
                 if ($this->db->affected_rows() > 0) {
                     $result = 'true';
-                } else {
+                }
+                else {
                     $result = 'false';
                 }
             }
-        } else {
+        }
+        else {
         }
     }
 
@@ -830,15 +870,17 @@ class GlobalModel extends CI_Model
                 $currentLineStock = floatval($currentLineStock);
                 $newLineStock = $currentLineStock - $stock;
                 $this->db->query("UPDATE `stocklinesinfo` SET `itemQuantity` = '" . $newLineStock . "' WHERE itemCode ='" . $itemCode . "' AND activityCode = '" . $activityCode . "' AND storageSection='" . $storage . "'");
-                // if($activity == "INW")
-                // {
-                // $this->db->query("insert into `stocklinesinfo` (activityCode,itemCode,itemQuantity,itemUom,itemPrice,storageSection) values ('".$activityCode."','".$itemCode."','".$stock."','".$itemUom."','".$itemPrice."','".$storage."')");
-                // }
-            } else {
+            // if($activity == "INW")
+            // {
+            // $this->db->query("insert into `stocklinesinfo` (activityCode,itemCode,itemQuantity,itemUom,itemPrice,storageSection) values ('".$activityCode."','".$itemCode."','".$stock."','".$itemUom."','".$itemPrice."','".$storage."')");
+            // }
+            }
+            else {
                 $result = 'false';
             }
             return $result;
-        } else {
+        }
+        else {
             $res = null;
         }
         return $res;
@@ -849,7 +891,8 @@ class GlobalModel extends CI_Model
         $query = $this->db->get_where($tableName, $data);
         if ($query->num_rows() > 0) {
             return false;
-        } else {
+        }
+        else {
             //$result=$this->addWithoutCode($data,$tableName);
             return true; //$result;
         }
@@ -891,10 +934,10 @@ class GlobalModel extends CI_Model
 
     //################# Dependant result of another table #####################//
     /*
-    1.Table name, where we have data for search.
-    2.Common field name of both, mentioned in first table
-    3.Value from which we want result.
-    4.Resultant Table name.
+     1.Table name, where we have data for search.
+     2.Common field name of both, mentioned in first table
+     3.Value from which we want result.
+     4.Resultant Table name.
      */
     public function dependantResult($tblname1, $commonField, $value, $tblname2)
     {
@@ -931,7 +974,8 @@ class GlobalModel extends CI_Model
                     $arr = [];
                     if ($count % 2 == 0) {
                         $arr['outTime'] = $minmaxCode->time;
-                    } else {
+                    }
+                    else {
                         $arr['inTime'] = $minmaxCode->time;
                     }
                     $count++;
@@ -951,12 +995,14 @@ class GlobalModel extends CI_Model
                     $condition = "machinecode ='" . $rowCode->machinecode . "' AND date='" . $date . "'";
                     $this->db->where($condition);
                     if ($this->db->update('attendancedtransaction', array('flag' => 'Y'))) {
-                        //return 'update_true';
-                    } else {
-                        //return 'update_false';
+                    //return 'update_true';
                     }
-                } else {
-                    //return 'insert_false';
+                    else {
+                    //return 'update_false';
+                    }
+                }
+                else {
+                //return 'insert_false';
                 }
             }
         }
@@ -979,7 +1025,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query->result()[0]->count;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -992,7 +1039,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -1098,7 +1146,8 @@ class GlobalModel extends CI_Model
         $query = $this->db->get();
         if ($query->num_rows() == 1) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -1115,7 +1164,8 @@ class GlobalModel extends CI_Model
 
         if ($query->num_rows() == 1) {
             return $query->result();
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -1132,7 +1182,8 @@ class GlobalModel extends CI_Model
 
         if ($query == $pass) {
             $stmt = 'true';
-        } else {
+        }
+        else {
             $stmt = 'false';
         }
         return $stmt;
@@ -1146,7 +1197,8 @@ class GlobalModel extends CI_Model
         $this->db->update($tblname, $data);
         if ($this->db->affected_rows() > 0) {
             echo '<Script type="javascript"> alert(Transaction Successfull) </script>';
-        } else {
+        }
+        else {
             echo '<Script type="javascript"> alert("<h4>Transaction Unsuccessfull</h4>") </script>';
         }
     }
@@ -1161,7 +1213,8 @@ class GlobalModel extends CI_Model
         $query = $this->db->get($tablename);
         if ($query->num_rows() > 0) {
             return $query->result();
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -1172,7 +1225,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query->result()[0]->count;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -1185,7 +1239,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query->result()[0]->count;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -1199,7 +1254,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query->result()[0]->count;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -1212,7 +1268,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query->result()[0]->count;
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -1225,7 +1282,8 @@ class GlobalModel extends CI_Model
         //return $query;
         if ($this->db->affected_rows() > 0) {
             $res = $query->result()[0];
-        } else {
+        }
+        else {
             $res = 'null';
         }
         return $res;
@@ -1241,7 +1299,8 @@ class GlobalModel extends CI_Model
 
         if ($count_row > 0) {
             $stmt = true;
-        } else {
+        }
+        else {
             $stmt = false;
         }
         return $stmt;
@@ -1254,7 +1313,8 @@ class GlobalModel extends CI_Model
         $this->db->update($tblname, $data);
         if ($this->db->affected_rows() > 0) {
             $res = 'true';
-        } else {
+        }
+        else {
             $res = 'false';
         }
         return $res;
@@ -1276,7 +1336,8 @@ class GlobalModel extends CI_Model
         // return  $query->result_array();
         if ($count_row > 0) {
             return $query;
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -1302,7 +1363,8 @@ class GlobalModel extends CI_Model
             $otp = $this->randomCode(6);
             // $this->db->query("insert into `registerOTP`(`otp`) values('".$otp."')");
             return $otp;
-        } else {
+        }
+        else {
             // $this->db->query("insert into `registerOTP`(`otp`) values('".$otp."')");
             return $otp;
         }
@@ -1314,7 +1376,8 @@ class GlobalModel extends CI_Model
         $query = $this->db->where('(isDelete = 0 OR isDelete IS NULL)')->get($tablename);
         if ($query->num_rows() > 0) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -1325,7 +1388,8 @@ class GlobalModel extends CI_Model
         $count_row = $query->num_rows();
         if ($count_row > 0) {
             $stmt = true;
-        } else {
+        }
+        else {
             $stmt = false;
         }
         return $stmt;
@@ -1336,12 +1400,13 @@ class GlobalModel extends CI_Model
     public function hasDeliveryboyReleasedOrder($deliveryBoy, $orderCode)
     {
         $records = $this->db->query("select * from deliveryboystatuslines where orderCode='" . $orderCode . "' and deliveryBoyCode='" . $deliveryBoy . "' and orderStatus='REL'");
-        log_message("error",$this->db->last_query());
-		if ($records->num_rows() > 0) {
-			  log_message('error', "Query returned rows: " . $records->num_rows());
+        log_message("error", $this->db->last_query());
+        if ($records->num_rows() > 0) {
+            log_message('error', "Query returned rows: " . $records->num_rows());
             return true;
-        } else {
-			  log_message('error', "Query returned rows: " . $records->num_rows());
+        }
+        else {
+            log_message('error', "Query returned rows: " . $records->num_rows());
             return false;
         }
     }
@@ -1399,7 +1464,8 @@ class GlobalModel extends CI_Model
                     }
 
                     $tarray["subModules"] = $temp2_array;
-                } else {
+                }
+                else {
                     $tarray["subStatus"] = false;
                 }
                 array_push($temp_array, $tarray);
@@ -1417,7 +1483,7 @@ class GlobalModel extends CI_Model
     function directQuery(string $query_string)
     {
         $query_result = $this->db->query($query_string);
-        if ($query_result->num_rows() >  0) {
+        if ($query_result->num_rows() > 0) {
             return $query_result->result_array();
         }
         return array();
@@ -1445,12 +1511,12 @@ class GlobalModel extends CI_Model
 
     public function check_vege_food_order($orderCode)
     {
-        $cnt =  $this->db->where('code', $orderCode)->from('ordermaster')->count_all_results();
+        $cnt = $this->db->where('code', $orderCode)->from('ordermaster')->count_all_results();
         if ($cnt > 0) {
             return "vege";
         }
 
-        $cnt =  $this->db->where('code', $orderCode)->from('vendorordermaster')->count_all_results();
+        $cnt = $this->db->where('code', $orderCode)->from('vendorordermaster')->count_all_results();
         if ($cnt > 0) {
             return "food";
         }

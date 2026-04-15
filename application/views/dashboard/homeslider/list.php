@@ -14,7 +14,7 @@
                         <div class="d-flex align-items-center">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="<?php echo base_url().'index.php/admin/index';?>">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="<?php echo base_url() . 'index.php/admin/index'; ?>">Home</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Home Slider List</li>
                                 </ol>
                             </nav>
@@ -22,7 +22,7 @@
                     </div>
                     <div class="col-7 align-self-center">
                         <div class="d-flex no-block justify-content-end align-items-center">                            
-                            <div class=""><a class="btn btn-myve" href="<?php echo base_url().'index.php/Homeslider/add';?>">Add Home Slider</a></div>
+                            <div class=""><a class="btn btn-myve" href="<?php echo base_url() . 'index.php/Homeslider/add'; ?>">Add Home Slider</a></div>
                         </div>
                     </div>
                 </div>
@@ -105,13 +105,13 @@
 				"ajax":{  
 					url: base_path+"index.php/Homeslider/getSliderList",  
 					data:{},
-					type:"GET",  
+					type:"POST",  
 					"complete": function(response) {
 						$(".blue").click(function(){
 							var code=$(this).data('seq');
 							$.ajax({
 								url: base_path+"index.php/Homeslider/view",  
-								method:"GET",
+								method:"POST",
 								data:{code:code},
 								datatype:"text",
 								success: function(data)

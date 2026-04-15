@@ -2899,7 +2899,7 @@ class Api extends REST_Controller
 	{
 		$postData = $this->post();
 		// if ($postData["clientCode"] != '' && $postData["city"] != '' && $postData["state"] != '' && $postData["area"] != '' && $postData["local"] != '' && $postData["flat"] != '' && $postData["pincode"] !=''  && $postData["areaCode"] !='')
-		if ($postData["clientCode"] != '' && $postData["address"] != '' && $postData["latitude"] != '' && $postData["longitude"] != '' && $postData["addressType"] != '' && $postData["flat"] != '' && $postData["directionToReach"] != '' && $postData["areaCode"] != '' && $postData["cityCode"] != '') {
+		if ($postData["clientCode"] != '' && $postData["address"] != '' && $postData["latitude"] != '' && $postData["longitude"] != '' && $postData["addressType"] != '' && $postData["flat"] != '' && $postData["areaCode"] != '' && $postData["cityCode"] != '') {
 			$clientCode = $postData["clientCode"];
 			$Result = $this->GlobalModel->selectQuery('clientmaster.*', 'clientmaster', array('clientmaster.code' => $clientCode));
 
